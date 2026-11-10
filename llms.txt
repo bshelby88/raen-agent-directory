@@ -1,0 +1,33 @@
+# RAEN — Royal Agentic Enterprises
+
+> Twelve production x402 micropayment services on Base Mainnet, plus a Bearer-gated MCP gateway exposing 5 flagship tools. Every service returns a standards-compliant HTTP 402 payment challenge (EIP-3005 / x402 scheme `exact`, network `eip155:8453`, USDC).
+
+## Company
+- [RAEN Blog](https://raen.royalruby.io): essays on agentic commerce, the x402 protocol, and the 2014 heritage story (historic tx 53e24ff4).
+- [RAEN Law Pages](https://raen-law-pages.vercel.app): 36 plain-English statute pages. Free, machine-readable legal reference.
+
+## Paid Services (x402, pay per call, $0.01–$5.00)
+- [royal-ruby-x402](https://royal-ruby-x402.fly.dev): flagship document/letter engine. POST a task, receive a 402 challenge.
+- [vault-pro-x402](https://vault-pro-x402.fly.dev): secret/vault operations service.
+- [dispute-forge-x402](https://dispute-forge-x402.fly.dev): consumer dispute letter generation.
+- [contract-eye-x402](https://contract-eye-x402.fly.dev): contract risk analysis.
+- [escrow-x402](https://escrow-x402.fly.dev): escrow-shaped workflow service.
+- [dispatch-x402](https://dispatch-x402.fly.dev): task dispatch orchestration.
+- [nanobanana-x402](https://nanobanana-x402.fly.dev): image generation.
+- [nft-alpha-x402](https://nft-alpha-x402.fly.dev): NFT market analytics.
+- [tradingagents-x402](https://tradingagents-x402.fly.dev): ticker/trading agent analysis.
+- [briefsnap-x402](https://briefsnap-x402.fly.dev): brief/summary generation.
+- [sentry-forge-x402](https://sentry-forge-x402.fly.dev): monitoring/sentry tooling.
+- [staci-tradingagents](https://staci-tradingagents.fly.dev): trading agent service (bare host).
+
+## MCP Gateway
+- [raen-mcp-gateway](https://raen-mcp-gateway.fly.dev/mcp): MCP server (Bearer-gated). Tools: raen_law_lookup, raen_ticker_analysis, raen_dispute_letter, raen_image_generate, raen_contract_analysis. Listed on the MCP Registry as io.github.bshelby88/raen-mcp.
+
+## Free Tools
+- [x402 Live Playground](https://x402-playground.fly.dev/): watch a real 402 challenge decoded live in your browser — no wallet needed.
+- [x402 Challenge Decoder](https://x402-decoder.vercel.app): paste a payment-required header, get the decoded accepts[] JSON.
+- [x402 Integration Cookbook](https://github.com/bshelby88/x402-cookbook): copy-paste client recipes for calling any RAEN service.
+
+## Reference
+- [Proof of Commerce](https://settlement-collector.fly.dev/proof): live settlement telemetry.
+- PayTo for all services: 0x9b8a27e03ceba490953cda8ab1291c0e13baf72f (Base, USDC).

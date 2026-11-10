@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAEN Tool Finder — which x402 service do you need?</title>
+<meta name="description" content="Answer one question and get matched to a live RAEN x402 micropayment service on Base. Every result links to a real, running endpoint with a live 402 challenge.">
+<style>
+  :root { color-scheme: dark; }
+  body { background:#0d1117; color:#e6edf3; font-family:ui-sans-serif,system-ui,sans-serif; max-width:760px; margin:0 auto; padding:2.5rem 1.25rem; }
+  h1 { color:#58e6d9; font-size:1.9rem; margin-bottom:.3rem; }
+  .sub { color:#8b949e; margin-bottom:2rem; }
+  .q { font-size:1.15rem; margin:1.4rem 0 .6rem; }
+  button { display:block; width:100%; text-align:left; margin:.5rem 0; padding:.9rem 1.1rem; background:#161b22; color:#e6edf3; border:1px solid #30363d; border-radius:10px; font-size:1rem; cursor:pointer; }
+  button:hover { border-color:#58e6d9; }
+  .result { border:1px solid #58e6d9; border-radius:12px; padding:1.2rem; margin-top:1.5rem; background:#0f1c1a; }
+  .result a { color:#58e6d9; font-size:1.1rem; }
+  .meta { color:#8b949e; font-size:.85rem; margin-top:.6rem; white-space:pre-wrap; }
+  .back { color:#58e6d9; cursor:pointer; margin-top:1.5rem; display:inline-block; }
+  code { background:#161b22; padding:.1rem .35rem; border-radius:4px; }
+</style>
+</head>
+<body>
+<h1>RAEN Tool Finder</h1>
+<p class="sub">Pick a problem. Get matched to a live x402 service on Base Mainnet — pay per call in USDC, no subscriptions, no signups.</p>
+<div id="stage"></div>
+<script>
+const SERVICES = [
+  {key:"documents", name:"royal-ruby", url:"https://royal-ruby-x402.fly.dev", blurb:"Flagship document & letter engine — professional output from a one-line task.", price:"$1.00–$5.00/call"},
+  {key:"legal", name:"dispute-forge", url:"https://dispute-forge-x402.fly.dev", blurb:"Consumer dispute letters for collections, credit and billing fights.", price:"$1.00/call"},
+  {key:"legal", name:"law pages (free)", url:"https://raen-law-pages.vercel.app", blurb:"36 plain-English statute pages — completely free, no payment at all.", price:"$0.00"},
+  {key:"code", name:"contract-eye", url:"https://contract-eye-x402.fly.dev", blurb:"Contract and agreement risk analysis before you sign.", price:"$1.00/call"},
+  {key:"code", name:"sentry-forge", url:"https://sentry-forge-x402.fly.dev", blurb:"Monitoring and alerting tooling for your stack.", price:"$0.50/call"},
+  {key:"data", name:"tradingagents", url:"https://tradingagents-x402.fly.dev", blurb:"Ticker & market agent analysis.", price:"$0.50–$1.00/call"},
+  {key:"data", name:"nft-alpha", url:"https://nft-alpha-x402.fly.dev", blurb:"NFT market analytics and alpha signals.", price:"$0.50/call"},
+  {key:"media", name:"nanobanana", url:"https://nanobanana-x402.fly.dev", blurb:"AI image generation on demand.", price:"$0.25/call"},
+  {key:"media", name:"briefsnap", url:"https://briefsnap-x402.fly.dev", blurb:"Instant briefs and summaries of anything you paste.", price:"$0.25/call"},
+  {key:"workflows", name:"dispatch", url:"https://dispatch-x402.fly.dev", blurb:"Task dispatch and orchestration across agents.", price:"$0.50/call"},
+  {key:"workflows", name:"escrow", url:"https://escrow-x402.fly.dev", blurb:"Escrow-shaped workflows with on-chain settlement.", price:"$1.00/call"},
+  {key:"workflows", name:"vault-pro", url:"https://vault-pro-x402.fly.dev", blurb:"Secret and vault operations service.", price:"$0.50/call"}
+];
+const QUESTIONS = [
+  {q:"What does your agent need right now?", opts:[
+    ["documents","Professional documents or letters"],
+    ["legal","Legal / dispute / statute help"],
+    ["code","Code, contracts or monitoring"],
+    ["data","Market or NFT data"],
+    ["media","Images or summaries"],
+    ["workflows","Multi-step agent workflows"]]},
+  {q:"Free demo first, or straight to the paid call?", opts:[
+    ["free","Show me a free live demo"],
+    ["paid","Take me to the service"]]}
+];
+let step = 0, picked = null;
+const stage = document.getElementById("stage");
+function render() {
+  if (step === 0) {
+    stage.innerHTML = QUESTIONS[0].q ? `<p class="q">${QUESTIONS[0].q}</p>` + QUESTIONS[0].opts.map(o=>`<button onclick="pick('${o[0]}',${1})">${o[1]}</button>`).join("") : "";
+  } else if (step === 1) {
+    const matches = SERVICES.filter(s=>s.key===picked);
+    if (picked === "free") {
+      stage.innerHTML = `<p class="q">Free live demos — a real 402 challenge, decoded in your browser:</p>
+        <div class="result"><a href="https://x402-playground.fly.dev/">x402 Live Playground →</a><div class="meta">Watch an actual x402 challenge issued and decoded live. No wallet needed.</div></div>
+        <div class="result"><a href="https://x402-decoder.vercel.app">x402 Challenge Decoder →</a><div class="meta">Paste any payment-required header, inspect the accepts[] payload.</div></div>
+        <div class="result"><a href="https://raen-law-pages.vercel.app">RAEN Law Pages →</a><div class="meta">36 statutes, plain English, always free.</div></div>`;
+    } else {
+      const s = matches[0] || SERVICES[0];
+      stage.innerHTML = `<p class="q">Your match:</p><div class="result"><a href="${s.url}" target="_blank" rel="noopener">${s.name} →</a>
+        <p>${s.blurb}</p><div class="meta">Price tier: ${s.price}\nEndpoint: <code>${s.url}</code>\nProtocol: x402 / eip155:8453 (Base, USDC)\nPOST your request → get HTTP 402 challenge → pay → retry with X-PAYMENT header.</div></div>
+        <p class="sub">Want to see the challenge format first? <a style="color:#58e6d9" href="https://x402-playground.fly.dev/">Try the free playground</a> or the <a style="color:#58e6d9" href="https://github.com/bshelby88/x402-cookbook">integration cookbook</a>.</p>`;
+    }
+    const back = document.createElement("span"); back.className="back"; back.textContent="← start over"; back.onclick=()=>{step=0;render();}; stage.appendChild(back);
+  }
+}
+function pick(k, nextStep){ picked = (step===0)?k:picked; step = nextStep; render(); }
+render();
+</script>
+</body>
+</html>
