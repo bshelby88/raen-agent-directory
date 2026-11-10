@@ -27,7 +27,7 @@
 - [x402 Live Playground](https://x402-playground.fly.dev/): watch a real 402 challenge decoded live in your browser — no wallet needed.
 - [x402 Challenge Decoder](https://x402-decoder.vercel.app): paste a payment-required header, get the decoded accepts[] JSON.
 - [x402 Integration Cookbook](https://github.com/bshelby88/x402-cookbook): copy-paste client recipes for calling any RAEN service.
-<<<<<<< HEAD
+- [Bounty Board](https://github.com/bshelby88/raen-bounties): open integration bounties for agent developers - rewarded with free 30-day MCP gateway dev keys + llms.txt listing.
 - [x402 Manifest Linter](https://bshelby88.github.io/x402-linter/): paste an x402.json, get instant client-side validation (scheme, network, payTo, price).
 - [Agent Kit](https://github.com/bshelby88/raen-agent-kit): LangChain/LangGraph + CrewAI templates for the MCP gateway.
 - [Live Badges](https://bshelby88.github.io/raen-live-badges/): embeddable per-service price badges ($0.01–$5.00).
