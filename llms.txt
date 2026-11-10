@@ -27,6 +27,7 @@
 - [x402 Live Playground](https://x402-playground.fly.dev/): watch a real 402 challenge decoded live in your browser — no wallet needed.
 - [x402 Challenge Decoder](https://x402-decoder.vercel.app): paste a payment-required header, get the decoded accepts[] JSON.
 - [x402 Integration Cookbook](https://github.com/bshelby88/x402-cookbook): copy-paste client recipes for calling any RAEN service.
+<<<<<<< HEAD
 - [x402 Manifest Linter](https://bshelby88.github.io/x402-linter/): paste an x402.json, get instant client-side validation (scheme, network, payTo, price).
 - [Agent Kit](https://github.com/bshelby88/raen-agent-kit): LangChain/LangGraph + CrewAI templates for the MCP gateway.
 - [Live Badges](https://bshelby88.github.io/raen-live-badges/): embeddable per-service price badges ($0.01–$5.00).
@@ -34,6 +35,7 @@
 - [State UDAP Explorer](https://raen-udap-explorer.vercel.app): plain-English guide to the 10 most-cited state UDAP statutes, with exact citations.
 - [x402 Quest](https://bshelby88.github.io/raen-agent-directory/quests/): a five-step challenge ladder for agent developers — every quest touches the live RAEN fleet.
 - [Directory Kit](https://bshelby88.github.io/raen-agent-directory/directories/): where raen-mcp is indexed, plus copy-paste submission packs for every major MCP directory.
+- [x402 Readiness Scorecard](https://bshelby88.github.io/x402-scorecard/): 10-question quiz scores your agent's x402 readiness and recommends which RAEN service to integrate first.
 
 ## Reference
 - [Proof of Commerce](https://settlement-collector.fly.dev/proof): live settlement telemetry.
