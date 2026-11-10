@@ -1,0 +1,76 @@
+{
+ "snapshot_utc": "2026-11-10T09:15:00Z",
+ "source": "settlement-collector.fly.dev/stats",
+ "fleet_24h": {
+  "challenges": 2869,
+  "settled": 0,
+  "failed": 181,
+  "revenue_usd": 0
+ },
+ "services": {
+  "royal-ruby": [
+   1057,
+   60,
+   1154
+  ],
+  "escrow": [
+   430,
+   29,
+   470
+  ],
+  "dispatch": [
+   378,
+   3,
+   433
+  ],
+  "sentry-forge": [
+   281,
+   10,
+   281
+  ],
+  "nanobanana": [
+   266,
+   19,
+   290
+  ],
+  "dispute-forge": [
+   127,
+   9,
+   202
+  ],
+  "vault-pro": [
+   121,
+   8,
+   135
+  ],
+  "nft-alpha": [
+   105,
+   6,
+   116
+  ],
+  "tradingagents": [
+   49,
+   19,
+   55
+  ],
+  "briefsnap": [
+   29,
+   10,
+   33
+  ],
+  "contract-eye": [
+   26,
+   8,
+   26
+  ]
+ },
+ "health": {
+  "checked_utc": "2026-11-10T09:15:00Z",
+  "healthy": 12,
+  "of": 12,
+  "mcp_gateway": "401-without-bearer-ok",
+  "law_pages": 200,
+  "blog": 200
+ },
+ "note": "Static snapshot refreshed by the steward each sweep. Figures verbatim from collector API."
+}
