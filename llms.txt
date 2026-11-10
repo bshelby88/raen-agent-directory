@@ -27,6 +27,8 @@
 - [x402 Live Playground](https://x402-playground.fly.dev/): watch a real 402 challenge decoded live in your browser — no wallet needed.
 - [x402 Challenge Decoder](https://x402-decoder.vercel.app): paste a payment-required header, get the decoded accepts[] JSON.
 - [x402 Integration Cookbook](https://github.com/bshelby88/x402-cookbook): copy-paste client recipes for calling any RAEN service.
+- [First Call Free](https://bshelby88.github.io/raen-first-call-free/): a real 402 payment and a real on-chain refund — royal-ruby for net $0, one per new wallet per 30 days.
+- [State UDAP Explorer](https://raen-udap-explorer.vercel.app): plain-English guide to the 10 most-cited state UDAP statutes, with exact citations.
 
 ## Reference
 - [Proof of Commerce](https://settlement-collector.fly.dev/proof): live settlement telemetry.

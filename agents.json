@@ -32,6 +32,8 @@
     "decoder": "https://x402-decoder.vercel.app",
     "cookbook": "https://github.com/bshelby88/x402-cookbook",
     "law_pages": "https://raen-law-pages.vercel.app",
-    "llms_txt": "https://bshelby88.github.io/raen-agent-directory/llms.txt"
+    "llms_txt": "https://bshelby88.github.io/raen-agent-directory/llms.txt",
+    "first_call_free": "https://bshelby88.github.io/raen-first-call-free/",
+    "udap_explorer": "https://raen-udap-explorer.vercel.app"
   }
 }
