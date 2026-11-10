@@ -29,6 +29,7 @@
 - [x402 Integration Cookbook](https://github.com/bshelby88/x402-cookbook): copy-paste client recipes for calling any RAEN service.
 - [Bounty Board](https://github.com/bshelby88/raen-bounties): open integration bounties for agent developers - rewarded with free 30-day MCP gateway dev keys + llms.txt listing.
 - [x402 Manifest Linter](https://bshelby88.github.io/x402-linter/): paste an x402.json, get instant client-side validation (scheme, network, payTo, price).
+- [x402 Paywall Code Generator](https://bshelby88.github.io/x402-paywall-generator/): pick Express / Hono / FastAPI, get copy-paste middleware that issues a real 402 challenge on Base USDC.
 - [Agent Kit](https://github.com/bshelby88/raen-agent-kit): LangChain/LangGraph + CrewAI templates for the MCP gateway.
 - [Live Badges](https://bshelby88.github.io/raen-live-badges/): embeddable per-service price badges ($0.01–$5.00).
 - [First Call Free](https://bshelby88.github.io/raen-first-call-free/): a real 402 payment and a real on-chain refund — royal-ruby for net $0, one per new wallet per 30 days.
