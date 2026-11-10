@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAEN Directory Kit — where the raen-mcp gateway is indexed, and copy-paste submission packs</title>
+<meta name="description" content="The MCP discovery ecosystem mapped: where io.github.bshelby88/raen-mcp is listed today, ready-to-paste descriptors for every major MCP directory, and a submission checklist.">
+<style>
+  :root { color-scheme: dark; }
+  body { background:#0d1117; color:#e6edf3; font-family:ui-sans-serif,system-ui,sans-serif; max-width:780px; margin:0 auto; padding:2.5rem 1.25rem; }
+  h1 { color:#58e6d9; font-size:1.9rem; margin-bottom:.3rem; }
+  h2 { color:#58e6d9; font-size:1.25rem; margin-top:2.2rem; }
+  .sub { color:#8b949e; margin-bottom:2rem; }
+  table { border-collapse:collapse; width:100%; margin:1rem 0; }
+  th,td { border:1px solid #30363d; padding:.5rem .7rem; text-align:left; font-size:.9rem; }
+  th { background:#161b22; color:#8b949e; }
+  .ok { color:#3fb950; font-weight:600; }
+  .todo { color:#d29922; font-weight:600; }
+  pre { background:#161b22; border:1px solid #30363d; border-radius:8px; padding:1rem; overflow-x:auto; font-size:.85rem; }
+  code { background:#161b22; padding:.1rem .35rem; border-radius:4px; }
+  a { color:#58e6d9; }
+  .note { color:#8b949e; font-size:.85rem; }
+</style>
+</head>
+<body>
+<h1>RAEN Directory Kit</h1>
+<p class="sub">One page for everything discovery: where <code>io.github.bshelby88/raen-mcp</code> is indexed today, copy-paste submission packs for every major MCP directory, and the exact remaining checklist. Statuses marked <span class="ok">VERIFIED</span> were checked live; everything else is explicitly unverified.</p>
+
+<h2>Current listing status</h2>
+<table>
+  <tr><th>Surface</th><th>Status</th><th>Evidence</th></tr>
+  <tr><td>Official MCP Registry</td><td class="ok">VERIFIED listed</td><td><a href="https://registry.modelcontextprotocol.io/v0.1/servers?search=raen">registry.modelcontextprotocol.io — search "raen"</a> returns <code>io.github.bshelby88/raen-mcp</code></td></tr>
+  <tr><td>raen-mcp-gateway (self-hosted)</td><td class="ok">VERIFIED live</td><td><a href="https://raen-mcp-gateway.fly.dev/mcp">raen-mcp-gateway.fly.dev/mcp</a> — Bearer-gated; 401 without key = healthy gate</td></tr>
+  <tr><td>GitHub (primary source)</td><td class="ok">VERIFIED public</td><td><a href="https://github.com/bshelby88/raen-workspace">github.com/bshelby88</a> repos; most directories crawl GitHub automatically</td></tr>
+  <tr><td>Third-party directories (Glama, mcp.so, Smithery, PulseMCP, mcp.directory, etc.)</td><td class="todo">UNVERIFIED</td><td>No confirmed listing found yet — most auto-crawl the official registry and GitHub over time; manual submissions need account auth (staged for owner)</td></tr>
+</table>
+<p class="note">Why this matters: the official registry is the seed. Most third-party directories harvest from it and from GitHub, so a well-formed GitHub repo + registry listing propagates. The manual submissions below accelerate that.</p>
+
+<h2>Copy-paste submission pack</h2>
+<p>Use these exact values when any directory asks. All fields verified against the live gateway.</p>
+
+<h3>1. Server descriptor (server.json / registry-style)</h3>
+<pre>{
+  "$schema": "https://cdn.jsdelivr.net/npm/@modelcontextprotocol/server-registry-schema@latest/schema.json",
+  "name": "io.github.bshelby88/raen-mcp",
+  "displayName": "RAEN MCP Gateway",
+  "description": "Five flagship x402 tools over one Bearer-gated MCP gateway: law_lookup (36 plain-English statutes), dispute_letter, image_generate, contract_analysis, ticker_analysis. Pay-per-call in USDC on Base Mainnet (eip155:8453).",
+  "websiteUrl": "https://raen.royalruby.io",
+  "repositoryUrl": "https://github.com/bshelby88/raen-workspace",
+  "transport": {
+    "type": "streamable-http",
+    "url": "https://raen-mcp-gateway.fly.dev/mcp",
+    "headers": { "Authorization": "Bearer <RAEN_MCP_KEY>" }
+  },
+  "tags": ["x402", "payments", "legal", "documents", "contracts", "trading", "images"]
+}</pre>
+
+<h3>2. Client config (for directories that show install snippets)</h3>
+<pre>{
+  "mcpServers": {
+    "raen": {
+      "type": "http",
+      "url": "https://raen-mcp-gateway.fly.dev/mcp",
+      "headers": { "Authorization": "Bearer RAEN_MCP_KEY" }
+    }
+  }
+}</pre>
+<p class="note">Free developer keys: email <code>ops@royalruby.io</code> with subject <code>AGENT KIT KEY</code>.</p>
+
+<h3>3. One-paragraph blurb</h3>
+<pre>RAEN is twelve production x402 micropayment services on Base Mainnet
+($0.01–$5.00 per call, USDC, payTo 0x9b8a27e03ceba490953cda8ab1291c0e13baf72f),
+unified behind one Bearer-gated MCP gateway (raen-mcp-gateway.fly.dev/mcp) with
+five flagship tools. Try anything free-first: real 402 challenge decoded live at
+the x402 Playground, or a genuine net-$0 first call via First Call Free.</pre>
+
+<h3>4. Badge markdown (for your README once listed)</h3>
+<pre>[![RAEN on the MCP Registry](https://img.shields.io/badge/MCP_Registry-io.github.bshelby88%2Fraen--mcp-58e6d9)](https://registry.modelcontextprotocol.io/v0.1/servers?search=raen)</pre>
+
+<h2>Manual submission checklist (needs owner auth)</h2>
+<table>
+  <tr><th>Directory</th><th>How</th><th>Status</th></tr>
+  <tr><td>Smithery</td><td>smithery.yaml in repo + smithery.ai dashboard (GitHub auth)</td><td class="todo">todo</td></tr>
+  <tr><td>Glama</td><td>glama.ai/mcp/servers → "Add server" (GitHub auth)</td><td class="todo">todo</td></tr>
+  <tr><td>PulseMCP</td><td>pulsemcp.com → submit form</td><td class="todo">todo</td></tr>
+  <tr><td>mcp.so</td><td>mcp.so → submit server URL</td><td class="todo">todo</td></tr>
+  <tr><td>mcp.directory</td><td>Submit via site form</td><td class="todo">todo</td></tr>
+  <tr><td>mcp.tc</td><td>"submit its URL" — submit github.com/bshelby88/raen-workspace</td><td class="todo">todo</td></tr>
+</table>
+<p class="note">Exact submission steps live in the owner-actions file in the RAEN workspace. Each submission is a two-minute GitHub-sign-in task.</p>
+
+<h2>Why directories matter for buyers</h2>
+<p>Every agent operator who browses a directory is, by definition, shopping for exactly what RAEN sells: real tools their agents can pay for per call. Directory listings are the highest-intent inbound channel available — and the official registry listing is already propagating to crawlers.</p>
+
+<p class="note">Part of the <a href="../">RAEN Agent Directory</a> · <a href="../quests/">x402 Quest</a> · payTo 0x9b8a27e03ceba490953cda8ab1291c0e13baf72f (Base, USDC)</p>
+</body>
+</html>

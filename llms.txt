@@ -32,6 +32,8 @@
 - [Live Badges](https://bshelby88.github.io/raen-live-badges/): embeddable per-service price badges ($0.01–$5.00).
 - [First Call Free](https://bshelby88.github.io/raen-first-call-free/): a real 402 payment and a real on-chain refund — royal-ruby for net $0, one per new wallet per 30 days.
 - [State UDAP Explorer](https://raen-udap-explorer.vercel.app): plain-English guide to the 10 most-cited state UDAP statutes, with exact citations.
+- [x402 Quest](https://bshelby88.github.io/raen-agent-directory/quests/): a five-step challenge ladder for agent developers — every quest touches the live RAEN fleet.
+- [Directory Kit](https://bshelby88.github.io/raen-agent-directory/directories/): where raen-mcp is indexed, plus copy-paste submission packs for every major MCP directory.
 
 ## Reference
 - [Proof of Commerce](https://settlement-collector.fly.dev/proof): live settlement telemetry.
