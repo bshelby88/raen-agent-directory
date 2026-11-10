@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>x402 Quest — RAEN Fleet</title>
+<style>
+  :root{color-scheme:dark}
+  body{margin:0;font-family:ui-monospace,Menlo,Consolas,monospace;background:#0b0e14;color:#d7e0ee;line-height:1.6}
+  a{color:#4dd0e1}
+  .wrap{max-width:860px;margin:0 auto;padding:2.5rem 1.2rem}
+  h1{color:#4dd0e1;font-size:1.7rem;margin:.2rem 0}
+  .sub{color:#8fa3bf;margin-bottom:2rem}
+  .q{border:1px solid #1e2a3a;border-radius:10px;padding:1.1rem 1.3rem;margin:1rem 0;background:#101623}
+  .q h2{font-size:1.05rem;margin:0 0 .4rem;color:#e6edf3}
+  .badge{display:inline-block;font-size:.7rem;border:1px solid #4dd0e1;color:#4dd0e1;border-radius:999px;padding:.1rem .6rem;margin-left:.4rem;vertical-align:middle}
+  .badge.easy{border-color:#66bb6a;color:#66bb6a}
+  .badge.med{border-color:#ffb74d;color:#ffb74d}
+  .badge.hard{border-color:#ef5350;color:#ef5350}
+  pre{background:#080b11;border:1px solid #1e2a3a;border-radius:8px;padding:.8rem;overflow-x:auto;font-size:.8rem}
+  .note{color:#8fa3bf;font-size:.85rem}
+  footer{margin-top:3rem;border-top:1px solid #1e2a3a;padding-top:1rem;color:#5c6f8a;font-size:.8rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>⚛ x402 Quest</h1>
+  <p class="sub">A challenge ladder for agent developers. Learn the x402 payment protocol by actually doing it — every quest below touches the <strong>live</strong> RAEN fleet (12 services on Base mainnet). Finish quests, get on the leaderboard, win free calls.</p>
+
+  <div class="q">
+    <h2>Quest 1 — Decode a live 402 challenge <span class="badge easy">EASY · 10 XP</span></h2>
+    <p>Hit a paid endpoint without paying. The server answers HTTP 402 with a base64-encoded challenge header. Decode it and read the real price and payTo address.</p>
+    <pre>curl -s -D headers.txt -o body.txt -X POST \
+  https://sentry-forge-x402.fly.dev/scan \
+  -H 'Content-Type: application/json' \
+  -d '{"target":"example.com"}'
+
+# headers.txt contains: payment-required: <base64>
+echo "<paste>" | base64 -d | python -m json.tool</pre>
+    <p class="note">Prove it: send us the decoded <code>accepts[0].payTo</code> and <code>maxAmountRequired</code>. (Hint: payTo ends in ...f72f.)</p>
+  </div>
+
+  <div class="q">
+    <h2>Quest 2 — Map the fleet from llms.txt <span class="badge easy">EASY · 10 XP</span></h2>
+    <p>Fetch <a href="../llms.txt">our llms.txt</a> and count the x402 services listed. Agent-native discovery is the point: your agent should read this file, not this page.</p>
+    <pre>curl -s https://bshelby88.github.io/raen-agent-directory/llms.txt</pre>
+    <p class="note">Prove it: reply with the service count and the cheapest paid endpoint you can find.</p>
+  </div>
+
+  <div class="q">
+    <h2>Quest 3 — Make the fleet's first real settlement <span class="badge med">MEDIUM · 50 XP</span></h2>
+    <p>Pick any service, pay a challenge end-to-end with a real x402 client (USDC on Base). The first settled payment in fleet history is currently 0 — check the live counter at <a href="../stats/">Open Telemetry</a>. Settle it and your wallet's payment shows on that stats page within the hour.</p>
+    <p class="note">New wallet? Use <a href="../#first-call-free">First Call Free</a> — your first call is rebated to net $0, so the quest costs you nothing.</p>
+  </div>
+
+  <div class="q">
+    <h2>Quest 4 — Ship an integration in public <span class="badge med">MEDIUM · 50 XP</span></h2>
+    <p>Wrap one RAEN service in a tool for your agent framework (LangChain, CrewAI, ElizaOS, MCP client — anything). Use the <a href="../">Agent Kit</a> template. Open a PR or gist and send us the link.</p>
+  </div>
+
+  <div class="q">
+    <h2>Quest 5 — Beat the Manifest Linter's gauntlet <span class="badge hard">HARD · 100 XP</span></h2>
+    <p>Build your own x402 service and pass <a href="../">Manifest Linter</a> checks 1–8 on the first run: exact scheme, eip155:8453, valid payTo, reachable endpoint, live 402 challenge that matches the manifest byte-for-byte.</p>
+  </div>
+
+  <h2 style="color:#4dd0e1">Leaderboard &amp; redemption</h2>
+  <p>Send proof to <strong>ops@royalruby.io</strong> with subject <code>x402 QUEST &lt;N&gt;</code> (a draft — nothing auto-sends). Verified finishers get listed here with their handle + project link, and their next calls on the fleet are rebated net-$0 via the First Call Free rail.</p>
+  <p class="note">Current leaderboard: <em>empty — the top spot is open. Everything on this page is verifiable right now.</em></p>
+
+  <footer>
+    RAEN — Royal Agentic Enterprises · <a href="../">Agent Directory</a> · <a href="../stats/">Open Telemetry</a> · <a href="https://raen.royalruby.io">Blog</a> · <a href="https://raen-law-pages.vercel.app">Law Pages</a>
+  </footer>
+</div>
+</body>
+</html>
