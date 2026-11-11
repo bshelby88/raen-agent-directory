@@ -43,6 +43,9 @@
 - [Run in Postman](https://bshelby88.github.io/raen-postman/): one-click Postman collection for all 12 services — unpaid requests fetch a live 402 challenge for free; collection JSON at https://raw.githubusercontent.com/bshelby88/raen-postman/main/raen-x402.postman_collection.json
 - [API Docs (OpenAPI)](https://raen-api-docs.vercel.app/): interactive OpenAPI 3.1 reference for all 12 services — spec at https://raen-api-docs.vercel.app/openapi.yaml.
 
+## Managed Services
+- [RAEN Managed Agent Ops](https://raen-managed-ops.vercel.app): RAEN deploys and operates a customer-facing AI agent for local businesses (calls, bookings, lead intake). 30-day pilot $250 with setup included, then $300-500/mo. Weekly value-ledger report from real agent telemetry. Contact: ops@royalruby.io.
+
 ## Outcome Products (one-time packages)
 - [Dispute Package ($49)](https://raen-dispute-package.vercel.app): 3 dispute letters (dispute-forge) + 12 statute citations (royal-ruby) + step-by-step filing guide. One-time purchase, USDC on Base via the x402 rail, or card-less invoice via ops@royalruby.io. Mirror: https://bshelby88.github.io/raen-dispute-package/
 - [Contract Review ($19)](https://raen-contract-review.vercel.app): contract-eye risk analysis + plain-English summary and redline suggestions. One-time purchase, same payment rail. Mirror: https://bshelby88.github.io/raen-contract-review/
