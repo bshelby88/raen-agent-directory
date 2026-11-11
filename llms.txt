@@ -58,9 +58,12 @@
 - [Contract Review ($19)](https://raen-contract-review.vercel.app): contract-eye risk analysis + plain-English summary and redline suggestions. One-time purchase, same payment rail. Mirror: https://bshelby88.github.io/raen-contract-review/
 - [Market Intelligence Pack ($29)](https://raen-market-pack.vercel.app): tradingagents multi-agent consensus + ticker brief, up to 5 tickers (synthetic demo payload per the live manifest — disclosed on the page). One-time purchase, same payment rail. Mirror: https://bshelby88.github.io/raen-market-pack/
 
+- [RAEN MCP Gateway quickstart for MCP client users](https://bshelby88.github.io/raen-agent-directory/mcp-clients.html): connect Claude Desktop, Cursor or any Streamable-HTTP MCP client to the 5-tool RAEN gateway (law lookup $0.05, ticker analysis $0.05, dispute letter $0.75, image gen $0.01, contract analysis $0.05). Free-first-call charge-and-rebate; self-serve 30-day dev key via POST /keys/request. Verify-first checklist (agent card, sales ledger, MCP Registry).
+
 ## Reference
 - [Proof of Commerce](https://settlement-collector.fly.dev/proof): live settlement telemetry.
 - [Client Value Ledger](https://bshelby88.github.io/raen-agent-directory/value-ledger.html): weekly per-client value report (tasks completed, latency, settled USDC) from settlement telemetry. JSON: value-ledger.json.
 - PayTo for all services: 0x9b8a27e03ceba490953cda8ab1291c0e13baf72f (Base, USDC).
 - x402 Quest: challenge ladder for agent developers (decode a live 402, map the fleet, first settlement, integrations, linter gauntlet): https://bshelby88.github.io/raen-agent-directory/quests/
 - [Upwork gig draft — x402 paid-API deployment](https://bshelby88.github.io/raen-agent-directory/upwork-gig.html): publication-ready Upwork profile headline, overview, skills tags and $1,500/$2,500/$3,500 gig tiers (mirrors raen-x402-consulting). Account creation is owner-only; copy is staged here.
+
