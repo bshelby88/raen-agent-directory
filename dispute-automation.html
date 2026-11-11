@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAEN for Dispute-Automation Builders — plug FCRA/FDCPA citations and letter generation into your credit-repair tool</title>
+<meta name="description" content="For developers building credit-repair and dispute-letter automation: pay-per-call FCRA/FDCPA/TILA citation lookup and dispute letter generation via x402 USDC micropayments on Base. No subscription, no API key waitlist.">
+<style>
+:root { color-scheme: dark; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#0a0e14; color:#e6edf3; font-family:ui-sans-serif,system-ui,sans-serif; line-height:1.65; padding:2rem 1rem; }
+main { max-width:780px; margin:0 auto; }
+h1 { font-size:1.8rem; margin:.8rem 0 .4rem; }
+h1 span { color:#22d3ee; }
+h2 { color:#22d3ee; font-size:1.2rem; margin:1.8rem 0 .5rem; }
+.sub { color:#8b949e; margin-bottom:1.5rem; }
+.card { background:#161b22; border:1px solid #30363d; border-radius:10px; padding:1.1rem 1.2rem; margin:.8rem 0; }
+.k { color:#8b949e; font-size:.78rem; text-transform:uppercase; letter-spacing:.05em; }
+pre { background:#0d1117; border:1px solid #30363d; border-radius:8px; padding:1rem; overflow-x:auto; font-size:.85rem; margin:.8rem 0; }
+code { color:#e6edf3; }
+a { color:#22d3ee; }
+table { width:100%; border-collapse:collapse; margin:.8rem 0; font-size:.92rem; }
+th { text-align:left; color:#22d3ee; border-bottom:1px solid #30363d; padding:.45rem .6rem; }
+td { padding:.45rem .6rem; border-bottom:1px solid #21262d; color:#b8c4cf; }
+.note { color:#8b949e; font-size:.88rem; margin-top:1.4rem; }
+</style>
+</head>
+<body><main>
+<h1>RAEN for <span>Dispute-Automation Builders</span></h1>
+<p class="sub">You're building credit-repair, dispute-letter, or consumer-rights tooling. Your users need accurate FCRA/FDCPA/TILA citations and generated letters. Here is the pay-per-call rail — no subscription, no API-key waitlist, settle in USDC on Base.</p>
+
+<h2>What you get</h2>
+<table>
+<tr><th>Capability</th><th>Endpoint</th><th>Price</th></tr>
+<tr><td>Statute citation lookup (FCRA · FDCPA · TILA · state UDAP, reporting timelines, SOL)</td><td><a href="https://royal-ruby-x402.fly.dev">royal-ruby-x402</a> · POST /api/law-lookup</td><td>$0.05/call</td></tr>
+<tr><td>Full FCRA dispute letter generation</td><td><a href="https://dispute-forge-x402.fly.dev">dispute-forge-x402</a></td><td>see 402 challenge</td></tr>
+<tr><td>Dispute letter + certificate (Cloudflare edge)</td><td><a href="https://dispute-forge-worker.raen.workers.dev">dispute-forge-worker</a></td><td>$0.75/call</td></tr>
+<tr><td>Contract risk analysis (for B2B-adjacent flows)</td><td><a href="https://contract-eye-x402.fly.dev">contract-eye-x402</a> · POST /api/analyze-contract</td><td>$1.00/call</td></tr>
+</table>
+
+<h2>Free reference layer for your docs</h2>
+<div class="card"><span class="k">No charge</span><br>
+<a href="https://raen-law-pages.vercel.app">raen-law-pages.vercel.app</a> — 36 plain-English statute pages (FCRA, FDCPA, TILA), machine-readable, freely linkable. Use it for your UI's citation popovers; pay per call when your agent needs the structured API.</div>
+
+<h2>Integration in one call</h2>
+<pre><code>curl -i -X POST https://royal-ruby-x402.fly.dev/api/law-lookup \
+  -H 'Content-Type: application/json' \
+  -d '{"query":"FCRA 1681i reinvestigation"}'
+# → 402 with a payment-required header (x402 v2, scheme "exact",
+#   network "eip155:8453", asset USDC, payTo 0x9b8a...f72f)
+# Pay the EIP-3005 transfer, retry with X-PAYMENT — done.</code></pre>
+<p>Any x402 client library works. Settlement is on-chain USDC on Base mainnet — verify every payment yourself on any public RPC; we publish a <a href="https://settlement-collector.fly.dev/ledger">public sales ledger</a> and a <a href="https://settlement-collector.fly.dev/proof">proof-of-commerce page</a>.</p>
+
+<h2>One-time products for teams that hate per-call billing</h2>
+<table>
+<tr><th>Package</th><th>What's inside</th><th>Price</th></tr>
+<tr><td><a href="https://raen-dispute-package.vercel.app">Dispute Package</a></td><td>3 letters + 12 citations + follow-up guide</td><td>$49–$99 one-time</td></tr>
+<tr><td><a href="https://raen-contract-review.vercel.app">Contract Review Bundle</a></td><td>contract-eye analysis + human-readable summary</td><td>$19 one-time</td></tr>
+</table>
+
+<p class="note">Information only — not legal advice. Prices are exactly what the live 402 challenges advertise; the challenge itself is the source of truth. Fleet status: <a href="https://settlement-collector.fly.dev/">settlement-collector.fly.dev</a>.</p>
+</main></body>
+</html>
