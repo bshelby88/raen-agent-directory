@@ -1,13 +1,13 @@
 {
-  "generated_at_utc": "2026-11-11T11:23:13.279208+00:00",
+  "generated_at_utc": "2026-11-11T16:34:29.800192+00:00",
   "week_ending_utc": "2026-11-11",
   "totals": {
-    "revenue_usdc_all_time": 4.75,
-    "revenue_usdc_external": 4.65,
-    "settled_tx_count": 19,
-    "revenue_usd_24h": 4.75,
+    "revenue_usdc_all_time": 0.1,
+    "revenue_usdc_external": 0,
+    "settled_tx_count": 2,
+    "revenue_usd_24h": 0.1,
     "settled_24h": 19,
-    "challenges_24h": 1932,
+    "challenges_24h": 1905,
     "convert_pct_24h": 1
   },
   "clients": [
@@ -16,8 +16,8 @@
       "service": "briefsnap",
       "tasks_completed_week": 1,
       "tasks_completed_all": 1,
-      "value_settled_usdc": 1,
-      "challenges_week": 121,
+      "value_settled_usdc": 0,
+      "challenges_week": 215,
       "p50_ms": 1020,
       "p95_ms": 1020
     },
@@ -26,8 +26,8 @@
       "service": "contract-eye",
       "tasks_completed_week": 3,
       "tasks_completed_all": 3,
-      "value_settled_usdc": 3,
-      "challenges_week": 143,
+      "value_settled_usdc": 0,
+      "challenges_week": 234,
       "p50_ms": 10100,
       "p95_ms": 14323
     },
@@ -37,7 +37,7 @@
       "tasks_completed_week": 0,
       "tasks_completed_all": 0,
       "value_settled_usdc": 0,
-      "challenges_week": 123,
+      "challenges_week": 127,
       "p50_ms": null,
       "p95_ms": null
     },
@@ -57,7 +57,7 @@
       "tasks_completed_week": 0,
       "tasks_completed_all": 0,
       "value_settled_usdc": 0,
-      "challenges_week": 95,
+      "challenges_week": 45,
       "p50_ms": null,
       "p95_ms": null
     },
@@ -67,7 +67,7 @@
       "tasks_completed_week": 0,
       "tasks_completed_all": 0,
       "value_settled_usdc": 0,
-      "challenges_week": 279,
+      "challenges_week": 231,
       "p50_ms": null,
       "p95_ms": null
     },
@@ -77,7 +77,7 @@
       "tasks_completed_week": 0,
       "tasks_completed_all": 0,
       "value_settled_usdc": 0,
-      "challenges_week": 114,
+      "challenges_week": 115,
       "p50_ms": null,
       "p95_ms": null
     },
@@ -86,8 +86,8 @@
       "service": "royal-ruby",
       "tasks_completed_week": 15,
       "tasks_completed_all": 15,
-      "value_settled_usdc": 0.75,
-      "challenges_week": 852,
+      "value_settled_usdc": 0.1,
+      "challenges_week": 760,
       "p50_ms": 1591,
       "p95_ms": 7341
     },
@@ -97,7 +97,7 @@
       "tasks_completed_week": 0,
       "tasks_completed_all": 0,
       "value_settled_usdc": 0,
-      "challenges_week": 57,
+      "challenges_week": 58,
       "p50_ms": null,
       "p95_ms": null
     },
@@ -107,7 +107,7 @@
       "tasks_completed_week": 0,
       "tasks_completed_all": 0,
       "value_settled_usdc": 0,
-      "challenges_week": 44,
+      "challenges_week": 43,
       "p50_ms": null,
       "p95_ms": null
     },
@@ -117,14 +117,14 @@
       "tasks_completed_week": 0,
       "tasks_completed_all": 0,
       "value_settled_usdc": 0,
-      "challenges_week": 104,
+      "challenges_week": 77,
       "p50_ms": null,
       "p95_ms": null
     }
   ],
   "attribution_gap": {
     "distinct_payers": 0,
-    "unattributed_tx": 17,
+    "unattributed_tx": 0,
     "note": "Collector payer attribution incomplete (INC-03 gap); value totals are from settled events and remain authoritative."
   }
 }

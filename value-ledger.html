@@ -19,14 +19,14 @@ a { color:#22d3ee; }
 </style></head><body><main>
 <h1>RAEN <span>Client Value Ledger</span> — week ending 2026-11-11</h1>
 <p class="sub">What RAEN delivered this week, straight from settlement telemetry — tasks completed, latency, dollar value settled. No estimates.</p>
-<div class="card"><div class="k">Value settled (all time)</div><div class="v">$4.75 USDC</div></div>
-<div class="card"><div class="k">External value</div><div class="v">$4.65</div></div>
-<div class="card"><div class="k">Settled payments</div><div class="v">19</div></div>
-<div class="card"><div class="k">Last 24h</div><div class="v">19 settled · $4.75</div></div>
+<div class="card"><div class="k">Value settled (all time, tx-verified)</div><div class="v">$0.10 USDC</div></div>
+<div class="card"><div class="k">External value</div><div class="v">$0</div></div>
+<div class="card"><div class="k">Settled payments (tx-verified)</div><div class="v">2</div></div>
+<div class="card"><div class="k">Last 24h</div><div class="v">2 verified · 17 unverified</div></div>
 <h2>Per-client value delivered</h2>
 <table><tr><th>Client</th><th>Tasks completed (wk / all)</th><th>Value settled</th><th>p50 / p95 latency</th></tr>
-<tr><td>BriefSnap</td><td>1 / 1</td><td>$1</td><td>1020ms / 1020ms</td></tr>
-<tr><td>Contract Eye</td><td>3 / 3</td><td>$3</td><td>10100ms / 14323ms</td></tr>
+<tr><td>BriefSnap</td><td>1 / 1</td><td>$0</td><td>1020ms / 1020ms</td></tr>
+<tr><td>Contract Eye</td><td>3 / 3</td><td>$0</td><td>10100ms / 14323ms</td></tr>
 <tr><td>dispatch</td><td>0 / 0</td><td>$0</td><td>— / —</td></tr>
 <tr><td>dispute-forge</td><td>0 / 0</td><td>$0</td><td>— / —</td></tr>
 <tr><td>escrow</td><td>0 / 0</td><td>$0</td><td>— / —</td></tr>
@@ -37,5 +37,5 @@ a { color:#22d3ee; }
 <tr><td>tradingagents</td><td>0 / 0</td><td>$0</td><td>— / —</td></tr>
 <tr><td>vault-pro</td><td>0 / 0</td><td>$0</td><td>— / —</td></tr>
 </table>
-<div class="note">Payer attribution gap: 17 settled tx(s) unattributed (collector limitation). Value totals unaffected. Machine-readable JSON: <a href="value-ledger.json">value-ledger.json</a> · Live sources: <a href="https://settlement-collector.fly.dev/stats">/stats</a>, <a href="https://settlement-collector.fly.dev/ledger.json">/ledger.json</a>. Generated 2026-11-11T11:23:13.279208+00:00.</div>
+<div class="note">TRUTH correction (2026-11-11): revenue counts ONLY settlements with an on-chain tx hash. 17 telemetry "settled" events had no on-chain transfer and are now excluded (previously counted as $4.65 "unattributed external" — that money never settled on Base). All-time tx-verified value: $0.10 USDC (RAEN internal test traffic); external payers to date: 0. Machine-readable JSON: <a href="value-ledger.json">value-ledger.json</a> · Live sources: <a href="https://settlement-collector.fly.dev/stats">/stats</a>, <a href="https://settlement-collector.fly.dev/ledger.json">/ledger.json</a>. Generated 2026-11-11T16:34Z.</div>
 </main></body></html>
