@@ -10,6 +10,7 @@
 - [royal-ruby-x402](https://royal-ruby-x402.fly.dev): flagship document/letter engine. POST a task, receive a 402 challenge.
 - [vault-pro-x402](https://vault-pro-x402.fly.dev): secret/vault operations service.
 - [dispute-forge-x402](https://dispute-forge-x402.fly.dev): consumer dispute letter generation.
+- [dispute-forge-worker](https://dispute-forge-worker.raen.workers.dev): dispute-forge on Cloudflare Workers — FCRA dispute letter + certificate, $0.75/call, x402 manifest at /.well-known/x402.json.
 - [contract-eye-x402](https://contract-eye-x402.fly.dev): contract risk analysis.
 - [escrow-x402](https://escrow-x402.fly.dev): escrow-shaped workflow service.
 - [dispatch-x402](https://dispatch-x402.fly.dev): task dispatch orchestration.
