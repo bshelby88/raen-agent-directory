@@ -38,6 +38,8 @@
 - [Directory Kit](https://bshelby88.github.io/raen-agent-directory/directories/): where raen-mcp is indexed, plus copy-paste submission packs for every major MCP directory.
 - [x402 Readiness Scorecard](https://bshelby88.github.io/x402-scorecard/): 10-question quiz scores your agent's x402 readiness and recommends which RAEN service to integrate first.
 - [x402 Payback Calculator](https://bshelby88.github.io/raen-payback-calculator/): pay-per-call vs flat SaaS subscription — monthly cost, verdict, break-even call volume.
+- [RAEN Cost Simulator](https://bshelby88.github.io/raen-cost-calculator/): live per-call/per-day/per-month USDC cost for every fleet service, prices read straight from the manifests.
+- [API Docs (OpenAPI)](https://raen-api-docs.vercel.app/): interactive OpenAPI 3.1 reference for all 12 services — spec at https://raen-api-docs.vercel.app/openapi.yaml.
 
 ## Reference
 - [Proof of Commerce](https://settlement-collector.fly.dev/proof): live settlement telemetry.
