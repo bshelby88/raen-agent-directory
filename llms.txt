@@ -39,6 +39,7 @@
 - [x402 Readiness Scorecard](https://bshelby88.github.io/x402-scorecard/): 10-question quiz scores your agent's x402 readiness and recommends which RAEN service to integrate first.
 - [x402 Payback Calculator](https://bshelby88.github.io/raen-payback-calculator/): pay-per-call vs flat SaaS subscription — monthly cost, verdict, break-even call volume.
 - [RAEN Cost Simulator](https://bshelby88.github.io/raen-cost-calculator/): live per-call/per-day/per-month USDC cost for every fleet service, prices read straight from the manifests.
+- [Run in Postman](https://bshelby88.github.io/raen-postman/): one-click Postman collection for all 12 services — unpaid requests fetch a live 402 challenge for free; collection JSON at https://raw.githubusercontent.com/bshelby88/raen-postman/main/raen-x402.postman_collection.json
 - [API Docs (OpenAPI)](https://raen-api-docs.vercel.app/): interactive OpenAPI 3.1 reference for all 12 services — spec at https://raen-api-docs.vercel.app/openapi.yaml.
 
 ## Reference
