@@ -1,0 +1,130 @@
+{
+  "generated_at_utc": "2026-11-11T11:23:13.279208+00:00",
+  "week_ending_utc": "2026-11-11",
+  "totals": {
+    "revenue_usdc_all_time": 4.75,
+    "revenue_usdc_external": 4.65,
+    "settled_tx_count": 19,
+    "revenue_usd_24h": 4.75,
+    "settled_24h": 19,
+    "challenges_24h": 1932,
+    "convert_pct_24h": 1
+  },
+  "clients": [
+    {
+      "client": "BriefSnap",
+      "service": "briefsnap",
+      "tasks_completed_week": 1,
+      "tasks_completed_all": 1,
+      "value_settled_usdc": 1,
+      "challenges_week": 121,
+      "p50_ms": 1020,
+      "p95_ms": 1020
+    },
+    {
+      "client": "Contract Eye",
+      "service": "contract-eye",
+      "tasks_completed_week": 3,
+      "tasks_completed_all": 3,
+      "value_settled_usdc": 3,
+      "challenges_week": 143,
+      "p50_ms": 10100,
+      "p95_ms": 14323
+    },
+    {
+      "client": "dispatch",
+      "service": "dispatch",
+      "tasks_completed_week": 0,
+      "tasks_completed_all": 0,
+      "value_settled_usdc": 0,
+      "challenges_week": 123,
+      "p50_ms": null,
+      "p95_ms": null
+    },
+    {
+      "client": "dispute-forge",
+      "service": "dispute-forge",
+      "tasks_completed_week": 0,
+      "tasks_completed_all": 0,
+      "value_settled_usdc": 0,
+      "challenges_week": 0,
+      "p50_ms": null,
+      "p95_ms": null
+    },
+    {
+      "client": "escrow",
+      "service": "escrow",
+      "tasks_completed_week": 0,
+      "tasks_completed_all": 0,
+      "value_settled_usdc": 0,
+      "challenges_week": 95,
+      "p50_ms": null,
+      "p95_ms": null
+    },
+    {
+      "client": "nanobanana",
+      "service": "nanobanana",
+      "tasks_completed_week": 0,
+      "tasks_completed_all": 0,
+      "value_settled_usdc": 0,
+      "challenges_week": 279,
+      "p50_ms": null,
+      "p95_ms": null
+    },
+    {
+      "client": "nft-alpha",
+      "service": "nft-alpha",
+      "tasks_completed_week": 0,
+      "tasks_completed_all": 0,
+      "value_settled_usdc": 0,
+      "challenges_week": 114,
+      "p50_ms": null,
+      "p95_ms": null
+    },
+    {
+      "client": "Royal Ruby (law lookup)",
+      "service": "royal-ruby",
+      "tasks_completed_week": 15,
+      "tasks_completed_all": 15,
+      "value_settled_usdc": 0.75,
+      "challenges_week": 852,
+      "p50_ms": 1591,
+      "p95_ms": 7341
+    },
+    {
+      "client": "sentry-forge",
+      "service": "sentry-forge",
+      "tasks_completed_week": 0,
+      "tasks_completed_all": 0,
+      "value_settled_usdc": 0,
+      "challenges_week": 57,
+      "p50_ms": null,
+      "p95_ms": null
+    },
+    {
+      "client": "tradingagents",
+      "service": "tradingagents",
+      "tasks_completed_week": 0,
+      "tasks_completed_all": 0,
+      "value_settled_usdc": 0,
+      "challenges_week": 44,
+      "p50_ms": null,
+      "p95_ms": null
+    },
+    {
+      "client": "vault-pro",
+      "service": "vault-pro",
+      "tasks_completed_week": 0,
+      "tasks_completed_all": 0,
+      "value_settled_usdc": 0,
+      "challenges_week": 104,
+      "p50_ms": null,
+      "p95_ms": null
+    }
+  ],
+  "attribution_gap": {
+    "distinct_payers": 0,
+    "unattributed_tx": 17,
+    "note": "Collector payer attribution incomplete (INC-03 gap); value totals are from settled events and remain authoritative."
+  }
+}

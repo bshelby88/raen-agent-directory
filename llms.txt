@@ -54,5 +54,6 @@
 
 ## Reference
 - [Proof of Commerce](https://settlement-collector.fly.dev/proof): live settlement telemetry.
+- [Client Value Ledger](https://bshelby88.github.io/raen-agent-directory/value-ledger.html): weekly per-client value report (tasks completed, latency, settled USDC) from settlement telemetry. JSON: value-ledger.json.
 - PayTo for all services: 0x9b8a27e03ceba490953cda8ab1291c0e13baf72f (Base, USDC).
 - x402 Quest: challenge ladder for agent developers (decode a live 402, map the fleet, first settlement, integrations, linter gauntlet): https://bshelby88.github.io/raen-agent-directory/quests/
