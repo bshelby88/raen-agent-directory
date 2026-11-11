@@ -42,6 +42,11 @@
 - [Run in Postman](https://bshelby88.github.io/raen-postman/): one-click Postman collection for all 12 services — unpaid requests fetch a live 402 challenge for free; collection JSON at https://raw.githubusercontent.com/bshelby88/raen-postman/main/raen-x402.postman_collection.json
 - [API Docs (OpenAPI)](https://raen-api-docs.vercel.app/): interactive OpenAPI 3.1 reference for all 12 services — spec at https://raen-api-docs.vercel.app/openapi.yaml.
 
+## Outcome Products (one-time packages)
+- [Dispute Package ($49)](https://raen-dispute-package.vercel.app): 3 dispute letters (dispute-forge) + 12 statute citations (royal-ruby) + step-by-step filing guide. One-time purchase, USDC on Base via the x402 rail, or card-less invoice via ops@royalruby.io. Mirror: https://bshelby88.github.io/raen-dispute-package/
+- [Contract Review ($19)](https://raen-contract-review.vercel.app): contract-eye risk analysis + plain-English summary and redline suggestions. One-time purchase, same payment rail. Mirror: https://bshelby88.github.io/raen-contract-review/
+- [Market Intelligence Pack ($29)](https://raen-market-pack.vercel.app): tradingagents multi-agent consensus + ticker brief, up to 5 tickers (synthetic demo payload per the live manifest — disclosed on the page). One-time purchase, same payment rail. Mirror: https://bshelby88.github.io/raen-market-pack/
+
 ## Reference
 - [Proof of Commerce](https://settlement-collector.fly.dev/proof): live settlement telemetry.
 - PayTo for all services: 0x9b8a27e03ceba490953cda8ab1291c0e13baf72f (Base, USDC).
