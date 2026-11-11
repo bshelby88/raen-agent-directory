@@ -37,6 +37,7 @@
 - [x402 Quest](https://bshelby88.github.io/raen-agent-directory/quests/): a five-step challenge ladder for agent developers — every quest touches the live RAEN fleet.
 - [Directory Kit](https://bshelby88.github.io/raen-agent-directory/directories/): where raen-mcp is indexed, plus copy-paste submission packs for every major MCP directory.
 - [x402 Readiness Scorecard](https://bshelby88.github.io/x402-scorecard/): 10-question quiz scores your agent's x402 readiness and recommends which RAEN service to integrate first.
+- [x402 Payback Calculator](https://bshelby88.github.io/raen-payback-calculator/): pay-per-call vs flat SaaS subscription — monthly cost, verdict, break-even call volume.
 
 ## Reference
 - [Proof of Commerce](https://settlement-collector.fly.dev/proof): live settlement telemetry.
