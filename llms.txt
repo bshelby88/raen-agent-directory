@@ -48,6 +48,8 @@
 - [RAEN Dispute Fulfillment - white-label](https://raen-managed-dispute.vercel.app): We run dispute-letter fulfillment behind your brand. $49/package direct; $0.75/letter white-label for credit-repair SaaS platforms ($100/mo min); 30-day pilot $250. Package = 3 letters + 12 statute citations + filing guide. Contact: ops@royalruby.io.
 - [x402 Implementation Consulting](https://bshelby88.github.io/raen-x402-consulting/): fixed-price build of a production paid API on x402 rails ($1,500-$3,500 tiers). We deploy the endpoint, manifest, settlement middleware and telemetry on your domain; the RAEN fleet is the live reference. Contact: ops@royalruby.io.
 
+- [Proof-of-Commerce for sellers](https://bshelby88.github.io/raen-proof-commerce/): trust infrastructure as a service — your own public sales ledger, on-chain-verifiable settlements, live telemetry page, rebate reconciliation. $29/mo (1 service) / $99/mo (5 services). Built on the RAEN fleet's own live ledger as reference. Contact: ops@royalruby.io.
+
 ## Outcome Products (one-time packages)
 - [Dispute Package ($49)](https://raen-dispute-package.vercel.app): 3 dispute letters (dispute-forge) + 12 statute citations (royal-ruby) + step-by-step filing guide. One-time purchase, USDC on Base via the x402 rail, or card-less invoice via ops@royalruby.io. Mirror: https://bshelby88.github.io/raen-dispute-package/
 - [Contract Review ($19)](https://raen-contract-review.vercel.app): contract-eye risk analysis + plain-English summary and redline suggestions. One-time purchase, same payment rail. Mirror: https://bshelby88.github.io/raen-contract-review/
