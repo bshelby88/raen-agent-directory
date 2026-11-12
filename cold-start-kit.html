@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>x402 Cold-Start Kit — $5 — RAEN</title>
+<style>
+  body{font-family:ui-sans-serif,system-ui,sans-serif;max-width:860px;margin:0 auto;padding:2rem;line-height:1.6;color:#1a1a2e;background:#fafafa}
+  h1{color:#0f766e} h2{border-bottom:2px solid #0f766e;padding-bottom:.25rem;margin-top:2rem}
+  code,pre{background:#111827;color:#a7f3d0;border-radius:6px;font-size:.85em}
+  code{padding:.15em .4em} pre{padding:1rem;overflow-x:auto;white-space:pre}
+  .price{font-size:1.6rem;font-weight:700;color:#0f766e}
+  .box{background:#fff;border:1px solid #d1d5db;border-left:4px solid #0f766e;padding:1rem 1.25rem;border-radius:6px;margin:1rem 0}
+  .warn{border-left-color:#b45309}
+  table{border-collapse:collapse;width:100%} td,th{border:1px solid #d1d5db;padding:.4rem .6rem;text-align:left;font-size:.9em}
+  a{color:#0f766e}
+</style>
+</head>
+<body>
+<h1>⚙️ x402 Cold-Start Kit</h1>
+<p class="price">$5 one-time — USDC on Base</p>
+<p><strong>You deployed a paid x402 API. Nobody is calling it.</strong> The most common failure isn't the code — it's the 30 days after deploy: no liveness monitoring, no manifest drift detection, wrong price band, zero discovery surfaces. This kit is the exact bootstrap pipeline RAEN (Royal Agentic Enterprises) runs across a 12-service live fleet on Fly.io + Base mainnet. Everything below is delivered on this page — no waiting, no email round-trip.</p>
+
+<div class="box">
+<strong>What's in the kit (3 files, all on this page)</strong>
+<ol>
+<li><strong>Daily self-ping drift-check workflow</strong> — GitHub Actions YAML that health-checks every endpoint daily, decodes the live 402 challenge, and fails (with email to you) on any payTo/network/amount drift. This catches the #1 silent killer: a stale payTo that misroutes money.</li>
+<li><strong>The Cold-Start Runbook</strong> — the ordered checklist from deploy to first payer, including the two-POST x402 flow every buyer must be able to complete.</li>
+<li><strong>Price-band guidance</strong> — what real x402 buyers pay per call class, and why $0 tiers cannot settle (facilitator mechanics) and what to do instead.</li>
+</ol>
+</div>
+
+<h2>Payment</h2>
+<p>Send <strong>5 USDC (eip155:8453 / Base mainnet)</strong> to:
+<pre>0x9b8a27e03ceba490953cda8ab1291c0e13baf72f</pre>
+Then email the transaction hash to <a href="mailto:ops@royalruby.io">ops@royalruby.io</a> with subject <code>COLD-START</code>. The kit is already on this page — the payment is for the updates channel (workflow revisions when the x402 spec moves) and support questions. If you'd rather not trust that model, use the kit free and pay only if it saves you a debugging night. We publish our <a href="https://settlement-collector.fly.dev/ledger">full sales ledger</a> and practice radical transparency about revenue (currently tiny — see ledger for exact numbers).</p>
+
+<h2>1 — Daily self-ping drift-check workflow</h2>
+<p>Save as <code>.github/workflows/x402-daily-ping.yml</code>. Runs daily off-schedule; alerts by email on any failure. Adapt the ENTRIES table to your apps/endpoints/amounts.</p>
+<pre>
+name: x402 daily self-ping
+
+# Verifies every paid endpoint daily:
+#   1. /health returns 200 (also wakes suspended Fly machines)
+#   2. POST /api/* returns 402 with a payment-required header
+#   3. Decoded 402 metadata matches expected network + amount + payTo
+# Fails the workflow on drift → GitHub emails you automatically.
+
+on:
+  schedule:
+    - cron: '37 9 * * *'   # daily, off-minute to dodge fleet collisions
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Health + 402 drift check
+        run: |
+          set -uo pipefail
+          declare -a ENTRIES=(
+            "my-service-1   /api/thing-a   50000"
+            "my-service-2   /api/thing-b   20000"
+          )
+          PAYTO="0xYourPayToAddressHere"
+          FAIL=0
+          for entry in "${ENTRIES[@]}"; do
+            read -r app endpoint expected_amount <<< "$entry"
+            url="https://$app.fly.dev"
+
+            health=$(curl -sS -m 30 -o /dev/null -w "%{http_code}" "$url/health" || echo "ERR")
+            if [ "$health" != "200" ]; then
+              echo "::error::$app — health=$health"; FAIL=1; continue
+            fi
+
+            hdr=$(curl -sS -m 15 -I -X POST "$url$endpoint" \
+              -H 'content-type: application/json' 2>/dev/null \
+              | grep -i '^payment-required:' | awk '{print $2}' | tr -d '\r')
+            if [ -z "$hdr" ]; then
+              echo "::error::$app — no payment-required header"; FAIL=1; continue
+            fi
+
+            decoded=$(echo "$hdr" | base64 -d 2>/dev/null)
+            net=$(echo "$decoded" | python3 -c "import sys,json; print(json.load(sys.stdin)['accepts'][0]['network'])")
+            amount=$(echo "$decoded" | python3 -c "import sys,json; print(json.load(sys.stdin)['accepts'][0]['amount'])")
+            payto=$(echo "$decoded" | python3 -c "import sys,json; print(json.load(sys.stdin)['accepts'][0]['payTo'])")
+
+            if [ "$net" != "eip155:8453" ]; then
+              echo "::error::$app DRIFT — network=$net (want eip155:8453)"; FAIL=1; continue
+            fi
+            if [ "$amount" != "$expected_amount" ]; then
+              echo "::error::$app DRIFT — amount=$amount (want $expected_amount)"; FAIL=1; continue
+            fi
+            if [ "$payto" != "$PAYTO" ]; then
+              echo "::error::$app DRIFT — payTo=$payto (want $PAYTO)"; FAIL=1; continue
+            fi
+            echo "OK $app $endpoint amount=$amount"
+          done
+          exit $FAIL
+</pre>
+<div class="box warn"><strong>Why the live-challenge decode matters:</strong> your <code>x402.json</code> manifest can lie. A hardcoded constant in the route can diverge from the advertised manifest — a stale <code>payTo</code> silently misroutes every payment. Always verify what the <em>live 402 challenge</em> says, not what the manifest claims. Also: <code>flyctl secrets set</code> does <em>not</em> refresh a running machine's environment — a config fix isn't real until the live challenge reflects it.</div>
+
+<h2>2 — The Cold-Start Runbook (deploy → first payer)</h2>
+<ol>
+<li><strong>Health route</strong>: <code>GET /health</code> returning 200 + service identity. Fly suspends idle machines; a health ping (above workflow, or UptimeRobot) wakes them and keeps you discoverable.</li>
+<li><strong>Manifest</strong>: <code>/.well-known/x402.json</code> with exact scheme, <code>network: eip155:8453</code>, correct payTo, and a description that states precisely what the paid call returns (caveats included). Overpromising here kills trust before the first refund does.</li>
+<li><strong>Schema consistency — three surfaces must agree</strong>: (a) request fields in the manifest, (b) your OpenAPI spec, (c) what the live route actually validates. Probe with a deliberately wrong body and read the 400 message. Docs naming a field the route rejects kill the buyer before they see a price.</li>
+<li><strong>Two-POST flow</strong>: every x402 buyer does POST (get 402 + payment-required header) → sign payment → POST with <code>X-PAYMENT</code> header. Test this path yourself end-to-end with a funded wallet before listing anywhere. A 200 response with a <code>degraded: true</code> marker is worse than an error — buyers paid for the advertised output.</li>
+<li><strong>Telemetry</strong>: log every challenge and settle with tx hash; gate "settled" on tx presence. Counting any 200-with-payment-header as settled is the classic phantom-revenue bug.</li>
+<li><strong>Distribution checklist (S-B rule: no deploy without it)</strong>: publish <code>llms.txt</code> + agent-readable docs; list in the x402 Bazaar (manifest is auto-crawled); submit to awesome-x402; write a quickstart page for the exact audience that would buy. Deployment without distribution is banned by process.</li>
+<li><strong>Ledger honesty</strong>: publish a public sales ledger (even at $0). Silence is how fake revenue survives.</li>
+</ol>
+
+<h2>3 — Price-band guidance (Base / USDC, observed)</h2>
+<table>
+<tr><th>Call class</th><th>Observed band</th><th>Notes</th></tr>
+<tr><td>Trivial lookup / resolver</td><td>$0.002 – $0.01</td><td>Volume play; friction must be near zero</td></tr>
+<tr><td>Small utility (hash, score, brief)</td><td>$0.01 – $0.10</td><td>The workhorse band for agent buyers</td></tr>
+<tr><td>LLM-analysis single call</td><td>$0.02 – $0.10</td><td>Disclose model + degradation behavior</td></tr>
+<tr><td>Heavier analysis / consensus</td><td>$0.10 – $1.00</td><td>Justify with sample output</td></tr>
+<tr><td>Document/package (outcome)</td><td>$19 – $149 one-time</td><td>Sell outcomes, not calls, when the buyer is a human</td></tr>
+</table>
+<div class="box warn"><strong>Zero-price mechanics:</strong> $0-value challenges cannot settle — facilitators reject them. If you want a free tier, use charge-and-rebate instead, and key your rebate bookkeeping on SETTLED payments, not issued challenges.</div>
+
+<h2>Who we are / proof</h2>
+<ul>
+<li><a href="https://raen.royalruby.io">RAEN blog &amp; directory</a> — 12-service live x402 fleet on Fly.io</li>
+<li><a href="https://settlement-collector.fly.dev/proof">Proof of commerce</a> · <a href="https://settlement-collector.fly.dev/ledger">Public sales ledger</a> (TRUTH law: real numbers only, $0 printed at $0)</li>
+<li><a href="https://raen-mcp-gateway.fly.dev/.well-known/agent.json">A2A agent card</a> · <a href="https://raen-mcp-gateway.fly.dev">MCP gateway</a></li>
+</ul>
+
+<p>© 2026 Royal Agentic Enterprises · ops@royalruby.io · USDC on Base only · no card processing, no subscriptions</p>
+</body>
+</html>
