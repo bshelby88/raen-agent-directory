@@ -71,3 +71,5 @@
 ## Self-Serve MCP Access
 
 - [MCP Gateway Quickstart](https://bshelby88.github.io/raen-agent-directory/mcp-quickstart.html): Connect RAEN paid tools (law lookup, dispute letters, contract analysis, ticker demo, image gen) to any MCP client in 5 minutes. Free 30-day dev key via POST https://raen-mcp-gateway.fly.dev/keys/request, email verification, Bearer auth. x402/USDC on Base; first call per wallet free (charge-and-rebate).
+
+- [royal-ruby Law-Lookup API quickstart](https://bshelby88.github.io/raen-agent-directory/royal-ruby-quickstart.html): integrate the fleet's highest-traffic paid endpoint — US statute citations (FCRA/FDCPA/TILA/UDAP) as structured JSON, $0.05/call x402 on Base, first call per wallet free. Live-decoded 402 challenge included; aimed at credit-repair & consumer-law tooling developers.
