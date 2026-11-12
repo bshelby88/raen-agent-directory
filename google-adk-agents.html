@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paid tool calls in Google ADK — x402 micro-priced endpoints (Base USDC)</title>
+<style>
+body{font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;max-width:820px;margin:2rem auto;padding:0 1.2rem;line-height:1.6;color:#1a1a2e}
+h1{font-size:1.7rem;line-height:1.25}
+h2{font-size:1.25rem;margin-top:2rem}
+code,pre{font-family:ui-monospace,Consolas,monospace;font-size:.88rem}
+pre{background:#0f172a;color:#e2e8f0;padding:1rem;border-radius:8px;overflow-x:auto}
+table{border-collapse:collapse;width:100%;margin:1rem 0}
+th,td{border:1px solid #d5d8e0;padding:.5rem .65rem;text-align:left;vertical-align:top}
+th{background:#f1f3f7}
+.small{font-size:.85rem;color:#555}
+a{color:#0b5fff}
+</style>
+</head>
+<body>
+<p class="small">RAEN · x402 paid APIs on Base</p>
+<h1>Give your Google ADK agent a wallet: per-call tools, priced in cents</h1>
+
+<p>Google's Agent Development Kit (ADK) makes it easy to compose multi-agent pipelines — but the tools those agents call usually come with API keys, monthly minimums, and dashboards for functions your agent invokes twice a week. The endpoints below are plain HTTPS POSTs that cost <strong>$0.01–$1.50 per call</strong>, settled in USDC on Base via the <a href="https://www.x402.org">x402</a> protocol. The payment IS the auth — a <code>FunctionTool</code> wrapper is ~30 lines and needs no account with anyone.</p>
+
+<h2>The tool menu</h2>
+
+<table>
+<tr><th>What the agent can do</th><th>Endpoint</th><th>Price</th></tr>
+<tr><td>AI image generation / edit — base64 PNG</td><td><code>POST nanobanana-x402.fly.dev/api/generate-image</code></td><td>$0.01</td></tr>
+<tr><td>Contract risk analysis — flagged clauses, severity, suggested edits</td><td><code>POST contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td></tr>
+<tr><td>US consumer-law citations (FCRA / FDCPA / TILA / UDAP)</td><td><code>POST royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05</td></tr>
+<tr><td>Synthetic market-consensus demo for a ticker (disclosed demo payload)</td><td><code>POST tradingagents-x402.fly.dev/api/analyze-ticker</code></td><td>$0.05</td></tr>
+<tr><td>Obsidian project or agent scaffolding from a one-line brief</td><td><code>POST vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td></tr>
+<tr><td>Route a natural-language intent to the right paid service</td><td><code>POST dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td></tr>
+<tr><td>Document summary — bullets, paragraph, or executive format</td><td><code>POST briefsnap-x402.fly.dev/api/summarize</code></td><td>$1.00</td></tr>
+<tr><td>Extract action items, decisions, deadlines from meeting notes</td><td><code>POST briefsnap-x402.fly.dev/api/extract-actions</code></td><td>$1.50</td></tr>
+</table>
+
+<p>Every endpoint publishes a machine-readable manifest at <code>https://&lt;host&gt;/.well-known/x402.json</code> — read it at call time for the live price and request schema rather than hardcoding either.</p>
+
+<h2>Wrapping one as an ADK FunctionTool</h2>
+
+<p>x402 is a two-POST flow: the first POST returns <code>402</code> with a <code>payment-required</code> header (a challenge naming price, payee, and network); your wallet signs a USDC <code>transferWithAuthorization</code> on Base and you re-send with a <code>PAYMENT-SIGNATURE</code> header. The <a href="https://github.com/coinbase/x402">x402 python SDK</a> handles the signing. ADK just sees a normal async function tool:</p>
+
+<pre>
+import json, base64, httpx
+from google.adk.agents import Agent
+from google.adk.tools import FunctionTool
+
+async def law_lookup(topic: str) -> dict:
+    """Look up US consumer-law citations (FCRA/FDCPA/TILA/UDAP) on a topic.
+    Costs $0.05 USDC per call."""
+    url = "https://royal-ruby-x402.fly.dev/api/law-lookup"
+    body = {"topic": topic}
+
+    async with httpx.AsyncClient(timeout=60) as c:
+        # 1) First POST — read the 402 challenge
+        r = await c.post(url, json=body)
+        if r.status_code != 402:
+            return {"error": "unexpected status", "status": r.status_code}
+        challenge = json.loads(base64.b64decode(r.headers["payment-required"]))
+        accepts = challenge["accepts"][0]  # scheme exact, eip155:8453, USDC
+
+        # 2) Sign the USDC transferWithAuthorization (x402 SDK or your signer)
+        sig = await sign_x402_payment(accepts, from_key=AGENT_KEY)
+
+        # 3) Re-send with PAYMENT-SIGNATURE
+        r2 = await c.post(url, json=body, headers={"PAYMENT-SIGNATURE": sig})
+        return r2.json() if r2.status_code == 200 else {"error": r2.status_code}
+
+law_agent = Agent(
+    name="law_researcher",
+    model="gemini-2.0-flash",
+    instruction="Research US consumer-protection law citations for the user.",
+    tools=[FunctionTool(law_lookup)],
+)
+</pre>
+
+<p>Hand the tool to the <code>Agent</code> (or drop it into a <code>SequentialAgent</code> pipeline) and the model only spends when the task actually warrants $0.05 — every payment is an on-chain USDC transfer you can reconcile, and ADK's tool-call tracing shows exactly which step paid what.</p>
+
+<p>The same endpoints also work from the <a href="https://raen-mcp-gateway.fly.dev/keys/request">MCP bearer-key gateway</a> if you prefer key-auth to wallet-auth (ADK speaks MCP via <code>MCPToolset</code> with <code>connection_params=StreamableHttpConnectionParams</code>), and from <a href="langchain-agents.html">LangChain/LangGraph</a>, <a href="pydanticai-agents.html">PydanticAI</a>, <a href="autogen-agents.html">AutoGen</a>, or <a href="n8n-automation.html">n8n</a> with the identical URLs.</p>
+
+<h2>Why pay-per-call beats a key/subscription for agent tools</h2>
+
+<ul>
+<li><strong>Spend follows use:</strong> a 100-call run costs ~$5 on the micro-priced endpoints; an idle month costs $0.</li>
+<li><strong>No credential sprawl:</strong> no per-vendor API keys to store, rotate, or leak in your agents' env.</li>
+<li><strong>On-chain audit trail:</strong> every tool call that cost money left a USDC transfer on Base.</li>
+<li><strong>Works for humans and agents alike:</strong> the identical URL serves an ADK tool, an n8n HTTP node, or an autonomous agent with an x402 wallet.</li>
+</ul>
+
+<h2>Honest caveats</h2>
+
+<ul>
+<li>All-time fleet revenue to date: $0.10 internal test settlements; 0 external payers so far (live ledger: <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>). You would be early.</li>
+<li>The tradingagents market-analysis endpoint returns a disclosed synthetic demo payload — do not wire it into money decisions.</li>
+<li>contract-eye discloses its delivery mode per response: if LLM analysis is unavailable it returns a deterministic rule-based clause scan (fields <code>method</code> / <code>delivery_mode</code> tell you which). briefsnap discloses fallback mode the same way (<code>mode</code> / <code>delivery_mode</code>).</li>
+<li>The consumer-law endpoint is not legal advice; these are information-only services.</li>
+<li>Network: Base (eip155:8453), USDC, scheme <code>exact</code>, payTo <code>0x9b8a…f72f</code> — always verify against the live manifest at call time.</li>
+</ul>
+
+<p>
+<a href="https://raen.royalruby.io/">Fleet overview &amp; docs</a> ·
+<a href="langchain-agents.html">LangChain/LangGraph version →</a> ·
+<a href="pydanticai-agents.html">PydanticAI version →</a> ·
+<a href="autogen-agents.html">AutoGen version →</a> ·
+<a href="n8n-automation.html">n8n version →</a>
+</p>
+
+<p class="small">Questions: ops@royalruby.io · Royal Agentic Enterprises · <a href="https://bshelby88.github.io/raen-agent-directory/">RAEN agent directory</a></p>
+</body>
+</html>
