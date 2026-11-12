@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paid API steps for n8n, Make &amp; Zapier — RAEN x402 micro-priced endpoints</title>
+<meta name="description" content="Drop pay-per-call APIs straight into your n8n / Make / Zapier workflows: image generation from $0.01, contract analysis $0.05, law citations $0.05, document summaries $1.00. Pay in USDC on Base per call — no subscriptions, no API-key sales calls.">
+<style>
+:root{--bg:#0d1117;--card:#161b22;--line:#30363d;--fg:#e6edf3;--dim:#8b949e;--accent:#e97627;--ok:#3fb950}
+*{box-sizing:border-box}body{margin:0;font:16px/1.6 -apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--fg)}
+main{max-width:860px;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-size:2rem;line-height:1.2}h2{margin-top:2.5rem;border-bottom:1px solid var(--line);padding-bottom:.4rem}
+a{color:#58a6ff}.kicker{color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-size:.85rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:1rem 1.25rem;margin:1rem 0}
+.price{float:right;font-weight:700;color:var(--ok)}
+code,pre{background:#0a0d12;border:1px solid var(--line);border-radius:6px;font:13px/1.5 ui-monospace,Consolas,monospace}
+pre{padding:1rem;overflow-x:auto}code{padding:.1em .4em}
+table{border-collapse:collapse;width:100%}td,th{border:1px solid var(--line);padding:.5rem .7rem;text-align:left}
+.truth{color:var(--dim);font-size:.85rem}
+.btn{display:inline-block;background:var(--accent);color:#fff;padding:.6rem 1.2rem;border-radius:6px;text-decoration:none;font-weight:600}
+</style>
+</head>
+<body>
+<main>
+<p class="kicker">RAEN · x402 paid APIs on Base</p>
+<h1>Pay-per-call API steps for your automation workflows</h1>
+<p>You build flows in n8n, Make, or Zapier. Sometimes you need one step the platforms don't ship: an AI image, a contract risk pass, a legal citation, a summary. Subscriptions are the wrong shape for one call per run. Every endpoint below is a plain HTTPS POST that costs <strong>$0.01–$1.50 per call</strong>, paid in USDC on Base via the x402 protocol — no account, no key, no sales call.</p>
+
+<h2>The endpoint table</h2>
+<table>
+<tr><th>What your flow gets</th><th>Endpoint</th><th>Price</th></tr>
+<tr><td>AI image generation (or image edit) — base64 PNG</td><td><code>POST nanobanana-x402.fly.dev/api/generate-image</code></td><td>$0.01</td></tr>
+<tr><td>Contract risk analysis — flagged clauses, severity, suggested edits</td><td><code>POST contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td></tr>
+<tr><td>US consumer-law citations (FCRA / FDCPA / TILA / UDAP)</td><td><code>POST royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05</td></tr>
+<tr><td>Obsidian project or agent scaffolding from a one-line brief</td><td><code>POST vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td></tr>
+<tr><td>Route a natural-language intent to the right paid service</td><td><code>POST dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td></tr>
+<tr><td>Document summary — bullets, paragraph, or executive format</td><td><code>POST briefsnap-x402.fly.dev/api/summarize</code></td><td>$1.00</td></tr>
+<tr><td>Extract action items, decisions, deadlines from meeting notes</td><td><code>POST briefsnap-x402.fly.dev/api/extract-actions</code></td><td>$1.50</td></tr>
+</table>
+<p>Full machine-readable manifests: <code>https://&lt;host&gt;/.well-known/x402.json</code> on every endpoint above.</p>
+
+<h2>How a call works from an HTTP Request node</h2>
+<p>x402 is a two-POST dance. Your first POST gets an <code>HTTP 402</code> with a <code>payment-required</code> header — a challenge naming the price and payee. You (or your agent/wallet helper) sign a USDC <code>transferWithAuthorization</code> on Base and re-send the POST with a <code>PAYMENT-SIGNATURE</code> header. The response is your JSON payload.</p>
+<pre>POST https://contract-eye-x402.fly.dev/api/analyze-contract
+Content-Type: application/json
+
+{ "text": "&lt;your contract text, 50-50000 chars&gt;",
+  "focus": ["renewal","liability"] }
+→ 402 + payment-required header (challenge)
+→ sign &amp; resend with PAYMENT-SIGNATURE header
+→ 200 { risk_score, flagged_clauses[], suggested_edits }</pre>
+<p>In n8n: an <em>HTTP Request</em> node for the first call, your wallet/signer step in between, a second HTTP Request node with the signature header. In Make/Zapier: same pattern with a custom webhook or Code step for signing. If you already run an AI agent with an x402-compatible wallet, it just works.</p>
+
+<h2>Why this shape beats an API-key subscription</h2>
+<ul>
+<li><strong>Zero commitment:</strong> pay 1¢ when the flow runs; pay nothing when it doesn't.</li>
+<li><strong>No onboarding wall:</strong> no dashboard, no email, no key rotation. The payment IS the auth.</li>
+<li><strong>Auditable spend:</strong> every payment is an on-chain USDC transfer on Base you can reconcile.</li>
+<li><strong>Agent-friendly:</strong> the same endpoints serve autonomous agents — your workflows and your agents call the identical surface.</li>
+</ul>
+
+<h2>Honest caveats</h2>
+<ul class="truth">
+<li>All-time fleet revenue to date: $0.10 internal test settlements; 0 external payers so far (live ledger: <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>). You would be early.</li>
+<li>Market-analysis endpoints currently return a disclosed synthetic demo payload — do not wire them into money decisions.</li>
+<li>contract-eye discloses its delivery mode per response: if LLM analysis is unavailable it returns a deterministic rule-based clause scan (fields <code>method</code> / <code>delivery_mode</code> tell you which).</li>
+<li>Payments are information-only services; the consumer-law endpoint is not legal advice.</li>
+<li>Network: Base (eip155:8453), USDC, scheme <code>exact</code>, payTo <code>0x9b8a…f72f</code> — always verify against the live manifest at call time.</li>
+</ul>
+
+<p>
+<a class="btn" href="https://raen.royalruby.io">Fleet overview &amp; docs</a>
+&nbsp; <a href="https://raen-mcp-gateway.fly.dev/keys/request">Need a bearer-key MCP variant instead? Self-serve dev key →</a>
+</p>
+<p class="truth">Questions: ops@royalruby.io · Royal Agentic Enterprises · <a href="https://bshelby88.github.io/raen-agent-directory/">RAEN agent directory</a></p>
+</main>
+</body>
+</html>
