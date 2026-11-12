@@ -67,3 +67,7 @@
 - x402 Quest: challenge ladder for agent developers (decode a live 402, map the fleet, first settlement, integrations, linter gauntlet): https://bshelby88.github.io/raen-agent-directory/quests/
 - [Upwork gig draft — x402 paid-API deployment](https://bshelby88.github.io/raen-agent-directory/upwork-gig.html): publication-ready Upwork profile headline, overview, skills tags and $1,500/$2,500/$3,500 gig tiers (mirrors raen-x402-consulting). Account creation is owner-only; copy is staged here.
 
+
+## Self-Serve MCP Access
+
+- [MCP Gateway Quickstart](https://bshelby88.github.io/raen-agent-directory/mcp-quickstart.html): Connect RAEN paid tools (law lookup, dispute letters, contract analysis, ticker demo, image gen) to any MCP client in 5 minutes. Free 30-day dev key via POST https://raen-mcp-gateway.fly.dev/keys/request, email verification, Bearer auth. x402/USDC on Base; first call per wallet free (charge-and-rebate).
