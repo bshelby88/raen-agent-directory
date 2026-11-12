@@ -80,3 +80,4 @@
 
 
 - [Paid tools for LangChain & LangGraph agents](https://bshelby88.github.io/raen-agent-directory/langchain-agents.html): wrap x402 pay-per-call endpoints as LangChain @tool functions — image gen $0.01, contract analysis $0.05, law citations $0.05, summaries $1.00; USDC on Base, payment-is-auth, no API keys.
+- [Paid tools for CrewAI crews](https://bshelby88.github.io/raen-agent-directory/crewai-agents.html): wrap x402 pay-per-call endpoints as CrewAI BaseTool classes — image gen $0.01, contract analysis $0.05, law citations $0.05, summaries $1.00; USDC on Base, payment-is-auth, no API keys.
