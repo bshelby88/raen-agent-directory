@@ -1,0 +1,27 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>x402 for MCP Server Developers — Charge for Your Tools — RAEN</title>
+<meta name="description" content="You built an MCP server. Nobody pays you for it. Here's how to make any tool a paid tool with x402 on Base — a pattern deployed in production across 12 services by RAEN.">
+<style>body{font-family:ui-sans-serif,system-ui,sans-serif;max-width:760px;margin:0 auto;padding:2rem 1.25rem;line-height:1.6;color:#1a1a2e}h1{font-size:1.9rem}code,pre{background:#f4f4f8;border-radius:6px;padding:.15em .4em;font-size:.92em}pre{padding:1rem;overflow:auto}a{color:#0b66c3}.card{border:1px solid #ddd;border-radius:10px;padding:1rem 1.25rem;margin:1.25rem 0}.note{color:#555;font-size:.9rem}</style></head><body>
+<h1>You built an MCP server. Here's how to get paid for it.</h1>
+<p><strong>Audience:</strong> developers publishing MCP servers (Anthropic registry, Smithery, mcp.so) whose tools generate real API costs they eat for free.</p>
+<p><strong>The pattern:</strong> x402 turns any HTTP endpoint into a paid endpoint using native HTTP 402. The client's agent pays in USDC on Base, on-demand, no subscription, no accounts. We run this in production on <a href="https://settlement-collector.fly.dev/proof">12 live services</a> (challenge → settle → telemetry, real on-chain settlement).</p>
+<div class="card"><h3>The 10-minute version</h3>
+<ol><li>Expose a plain JSON API route on your server's host (Fly, Vercel, anywhere).</li>
+<li>Return a <code>402</code> with an <code>accepts</code> block: <code>scheme: "exact"</code>, <code>network: "eip155:8453"</code> (Base), <code>payTo: &lt;your wallet&gt;</code>, <code>amount</code> in USDC base units.</li>
+<li>Verify the payer's X-PAYMENT header against a facilitator, then serve the tool output.</li></ol>
+<p class="note">Your MCP tool handler becomes a thin wrapper: forward the call to your paid route. Agents already speak x402 — the payment is invisible to the human.</p></div>
+<div class="card"><h3>Manifest your server</h3>
+<p>Publish <code>/.well-known/x402.json</code> so aggregators and agents discover your pricing:</p>
+<pre>{"version":"2.0.0","endpoints":{"/api/tool":{"method":"POST","accepts":{"scheme":"exact","price":"$0.05","network":"eip155:8453","payTo":"0xYOUR_WALLET"}}}}</pre></div>
+<div class="card"><h3>What we learned deploying it 12 times</h3>
+<ul><li><strong>Pricing:</strong> $0.05–$0.10 per call is the working band. Zero-value challenges can't settle — use charge-and-rebate if you want a free tier.</li>
+<li><strong>Trust:</strong> publish a public settlement ledger. Bots generate 99% of challenge traffic; your first real payer is the milestone that matters.</li>
+<li><strong>Ops:</strong> Fly secrets don't refresh a running machine's env — a manifest fix isn't real until a live 402 decode shows your wallet.</li></ul></div>
+<h3>Copy our work</h3>
+<ul>
+<li><a href="https://bshelby88.github.io/raen-skills/">RAEN Skills storefront</a> — the Steward self-healing-fleet pattern, charge-and-rebate funnel design, and x402-on-Fly production deployment, packaged as buyable skill packages.</li>
+<li><a href="https://bshelby88.github.io/raen-x402-consulting/">Done-for-you deployment</a> — we'll make your MCP server's tools paid tools, $1,500–$3,500 fixed, delivered with the settlement ledger live.</li>
+<li><a href="https://bshelby88.github.io/raen-agent-directory/agent-devs.html">x402 reference fleet</a> — all 12 services with manifests and prices.</li>
+</ul>
+<p class="note">Contact: ops@royalruby.io · Payments settle in USDC on Base to the operator wallet shown on each service's manifest.</p>
+</body></html>
