@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paid tool calls in LangChain &amp; LangGraph — x402 micro-priced endpoints (Base USDC)</title>
+<meta name="description" content="Wrap pay-per-call APIs as LangChain @tool functions your agents call on demand: image generation $0.01, contract analysis $0.05, law citations $0.05, document summaries $1.00. USDC on Base via x402 — no API keys, no subscriptions.">
+<style>
+:root{--bg:#0d1117;--card:#161b22;--line:#30363d;--fg:#e6edf3;--dim:#8b949e;--accent:#1c9c72;--ok:#3fb950}
+*{box-sizing:border-box}body{margin:0;font:16px/1.6 -apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--fg)}
+main{max-width:860px;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-size:2rem;line-height:1.2}h2{margin-top:2.5rem;border-bottom:1px solid var(--line);padding-bottom:.4rem}
+a{color:#58a6ff}.kicker{color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-size:.85rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:1rem 1.25rem;margin:1rem 0}
+code,pre{background:#0a0d12;border:1px solid var(--line);border-radius:6px;font:13px/1.5 ui-monospace,Consolas,monospace}
+pre{padding:1rem;overflow-x:auto}code{padding:.1em .4em}
+table{border-collapse:collapse;width:100%}td,th{border:1px solid var(--line);padding:.5rem .7rem;text-align:left}
+.truth{color:var(--dim);font-size:.85rem}
+.btn{display:inline-block;background:var(--accent);color:#fff;padding:.6rem 1.2rem;border-radius:6px;text-decoration:none;font-weight:600}
+</style>
+</head>
+<body>
+<main>
+<p class="kicker">RAEN · x402 paid APIs on Base</p>
+<h1>Give your LangChain agent a wallet: per-call tools, priced in cents</h1>
+<p>Agents written with LangChain or LangGraph are good at deciding <em>when</em> to call a tool. The awkward part is the tool itself: API keys, rate limits, and $20/month minimums for a call your agent makes twice. The endpoints below are plain HTTPS POSTs that cost <strong>$0.01–$1.50 per call</strong>, settled in USDC on Base via the x402 protocol. The payment IS the auth — a tool wrapper is ~30 lines and needs no account.</p>
+
+<h2>The tool menu</h2>
+<table>
+<tr><th>What the agent can do</th><th>Endpoint</th><th>Price</th></tr>
+<tr><td>AI image generation / edit — base64 PNG</td><td><code>POST nanobanana-x402.fly.dev/api/generate-image</code></td><td>$0.01</td></tr>
+<tr><td>Contract risk analysis — flagged clauses, severity, suggested edits</td><td><code>POST contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td></tr>
+<tr><td>US consumer-law citations (FCRA / FDCPA / TILA / UDAP)</td><td><code>POST royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05</td></tr>
+<tr><td>Obsidian project or agent scaffolding from a one-line brief</td><td><code>POST vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td></tr>
+<tr><td>Route a natural-language intent to the right paid service</td><td><code>POST dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td></tr>
+<tr><td>Document summary — bullets, paragraph, or executive format</td><td><code>POST briefsnap-x402.fly.dev/api/summarize</code></td><td>$1.00</td></tr>
+<tr><td>Extract action items, decisions, deadlines from meeting notes</td><td><code>POST briefsnap-x402.fly.dev/api/extract-actions</code></td><td>$1.50</td></tr>
+</table>
+<p>Every endpoint publishes a machine-readable manifest at <code>https://&lt;host&gt;/.well-known/x402.json</code> — read it at call time for the live price and request schema rather than hardcoding either.</p>
+
+<h2>Wrapping one as a LangChain tool</h2>
+<p>x402 is a two-POST flow: the first POST returns <code>402</code> with a <code>payment-required</code> header (a challenge naming price, payee, and network); your wallet signs a USDC <code>transferWithAuthorization</code> on Base and you re-send with a <code>PAYMENT-SIGNATURE</code> header. The <a href="https://github.com/coinbase/x402">x402 python SDK</a> handles the signing; you just wrap it in <code>@tool</code>:</p>
+<pre>@tool
+def analyze_contract(text: str, focus: list[str] = []) -> dict:
+    """Analyze contract text for risky or one-sided clauses.
+    Returns risk score, flagged clauses with severity and suggested edits.
+    Costs $0.05 USDC per call."""
+
+    PAY_TO = "0x9b8a27e03CEbA490953cDa8AB1291c0E13bAf72f"
+
+    # 1) First POST — read the 402 challenge
+    r = httpx.post(URL, json={"text": text, "focus": focus})
+    if r.status_code != 402:
+        return {"error": "unexpected status", "status": r.status_code}
+    challenge = json.loads(base64.b64decode(r.headers["payment-required"]))
+    accepts = challenge["accepts"][0]   # scheme exact, eip155:8453, USDC
+
+    # 2) Sign the USDC transferWithAuthorization (x402 SDK or your signer)
+    sig = sign_x402_payment(accepts, from_key=AGENT_KEY)
+
+    # 3) Re-send with PAYMENT-SIGNATURE
+    r2 = httpx.post(URL, json={"text": text, "focus": focus},
+                    headers={"PAYMENT-SIGNATURE": sig})
+    return r2.json()   # { risk_score, flagged_clauses[], suggested_edits }</pre>
+<p>In LangGraph this is an ordinary node/tool — the agent only spends when it decides the tool is worth $0.05, and every payment is an on-chain USDC transfer you can reconcile. The same endpoints also work from an <a href="https://raen-mcp-gateway.fly.dev/keys/request">MCP bearer-key gateway</a> if you prefer key-auth to wallet-auth.</p>
+
+<h2>Why pay-per-call beats a key/subscription for agent tools</h2>
+<ul>
+<li><strong>Spend follows use:</strong> a 100-call month costs ~$5 on the micro-priced endpoints; an idle month costs $0.</li>
+<li><strong>No credential sprawl:</strong> no per-vendor API keys to store, rotate, or leak in your agent's env.</li>
+<li><strong>On-chain audit trail:</strong> every tool call that cost money left a USDC transfer on Base.</li>
+<li><strong>Works for humans and agents alike:</strong> the identical URL serves your Python tool, an n8n HTTP node, or an autonomous agent with an x402 wallet.</li>
+</ul>
+
+<h2>Honest caveats</h2>
+<ul class="truth">
+<li>All-time fleet revenue to date: $0.10 internal test settlements; 0 external payers so far (live ledger: <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>). You would be early.</li>
+<li>Market-analysis endpoints currently return a disclosed synthetic demo payload — do not wire them into money decisions.</li>
+<li>contract-eye discloses its delivery mode per response: if LLM analysis is unavailable it returns a deterministic rule-based clause scan (fields <code>method</code> / <code>delivery_mode</code> tell you which). briefsnap discloses fallback mode the same way (<code>mode</code> / <code>delivery_mode</code>).</li>
+<li>The consumer-law endpoint is not legal advice; these are information-only services.</li>
+<li>Network: Base (eip155:8453), USDC, scheme <code>exact</code>, payTo <code>0x9b8a…f72f</code> — always verify against the live manifest at call time.</li>
+</ul>
+
+<p>
+<a class="btn" href="https://raen.royalruby.io">Fleet overview &amp; docs</a>
+&nbsp; <a href="https://bshelby88.github.io/raen-agent-directory/n8n-automation.html">Automation-platform version (n8n/Make/Zapier) →</a>
+</p>
+<p class="truth">Questions: ops@royalruby.io · Royal Agentic Enterprises · <a href="https://bshelby88.github.io/raen-agent-directory/">RAEN agent directory</a></p>
+</main>
+</body>
+</html>
