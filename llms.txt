@@ -44,6 +44,8 @@
 - [API Docs (OpenAPI)](https://raen-api-docs.vercel.app/): interactive OpenAPI 3.1 reference for all 12 services — spec at https://raen-api-docs.vercel.app/openapi.yaml.
 
 ## Managed Services
+- [RAEN as Go CLIs](https://bshelby88.github.io/raen-agent-directory/go-clients.html): every paid fleet endpoint callable from Go via gutenberg-cli-generated typed clients; two-POST x402 flow, live OpenAPI specs, dry-run smoke check.
+
 - [NFT Alpha quickstart](https://bshelby88.github.io/raen-agent-directory/nft-alpha-quickstart.html): 3-step agent quickstart for the live $0.02/call NFT market-signal API (POST https://nft-alpha-x402.fly.dev/api/nft-signal, x402 on Base). OpenSea 5-minute rolling signals, 8 watched collections, honest caveats included.
 
 - [RAEN Housing Partnerships (HFA / lender / counseling)](https://bshelby88.github.io/raen-housing-partnerships/): Two standing MOU structures for housing finance agencies, lenders and HUD-approved counseling agencies: $50 per complete DPA application processed, $150 per funded-loan referral. Pilot scope 30 days. Contact: ops@royalruby.io.
