@@ -69,3 +69,6 @@
 
 
 
+
+## Consumer Audiences
+- [Credit Recovery audience page](https://bshelby88.github.io/raen-agent-directory/credit-recovery.html): free FCRA statute library (36 plain-English pages at raen-law-pages.vercel.app) + $49 one-time Dispute Package, written for people disputing credit-report errors.
