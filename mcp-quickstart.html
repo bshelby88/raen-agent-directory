@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connect RAEN's paid tools to any MCP client in 5 minutes</title>
+<style>body{font-family:system-ui,sans-serif;max-width:760px;margin:2rem auto;padding:0 1rem;line-height:1.6;color:#222}code,pre{background:#f4f4f4;padding:.15em .35em;border-radius:4px;font-size:.92em}pre{padding:1rem;overflow-x:auto}h1{font-size:1.6rem}h2{font-size:1.2rem;margin-top:2rem}.note{background:#eef6ff;border-left:3px solid #246;padding:.75rem 1rem;border-radius:4px}</style>
+</head>
+<body>
+<h1>Connect RAEN's paid tools to any MCP client in 5 minutes</h1>
+<p>RAEN runs five paid API services — US consumer-law citation lookup, credit dispute letters, contract clause analysis, ticker consensus demo, and AI image generation — behind one MCP gateway. Every call settles in USDC on Base Mainnet via the x402 protocol. Your first call per wallet is free (charged then rebated, net $0).</p>
+<p>This guide gets you a working Bearer key and your first paid tool call, self-serve, no human in the loop.</p>
+
+<h2>Step 1 — Request a free 30-day dev key</h2>
+<pre><code>curl -X POST https://raen-mcp-gateway.fly.dev/keys/request \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"you@example.com"}'</code></pre>
+<p>A verification link arrives by email within a minute (sent via Resend from royalruby.io). Open it to activate the key. Rate limit: 3 requests per IP per day.</p>
+
+<h2>Step 2 — Point your MCP client at the gateway</h2>
+<p>Endpoint: <code>https://raen-mcp-gateway.fly.dev/mcp</code> (JSON-RPC transport, Bearer auth). Agent card: <code>https://raen-mcp-gateway.fly.dev/.well-known/agent.json</code> — protocolVersion 0.3.0, five skills listed.</p>
+<p>Tools available once authenticated:</p>
+<table border="1" cellpadding="6">
+<tr><th>Tool</th><th>What it returns</th><th>Price (USDC)</th></tr>
+<tr><td>raen_law_lookup</td><td>FCRA/FDCPA/TILA/state UDAP citations + plain-English summaries</td><td>$0.05</td></tr>
+<tr><td>raen_contract_analysis</td><td>Risk score, flagged clauses, severity, suggested edits</td><td>$0.05</td></tr>
+<tr><td>raen_dispute_letter</td><td>FCRA-compliant dispute letter + SVG certificate</td><td>$0.75</td></tr>
+<tr><td>raen_ticker_analysis</td><td>Synthetic ticker consensus demo (no live market data)</td><td>$0.05</td></tr>
+<tr><td>raen_image_generate</td><td>AI image from text prompt (base64 PNG)</td><td>$0.01</td></tr>
+</table>
+
+<h2>Step 3 — Payment mechanics (x402, Base Mainnet)</h2>
+<p>Calls settle via x402: the server returns an HTTP 402 challenge naming an amount and payTo address; your client (or the MCP client's x402 middleware) pays on-chain in USDC and retries with proof. Scheme: <code>exact</code>, network <code>eip155:8453</code> (Base). Free-first-call uses charge-and-rebate — the charge is real, the rebate is real, net cost $0.</p>
+<p><a href="https://settlement-collector.fly.dev/proof">See proof of commerce — real settled payments on-chain</a>.</p>
+
+<div class="note"><strong>Caveats (honest ones):</strong> Ticker analysis runs a synthetic demo payload, not live market data. Law lookup is information, not legal advice. Image generation requires a valid upstream key; if the upstream is degraded the service says so rather than shipping a silent stub.</div>
+
+<h2>Alternative entry</h2>
+<p>If you prefer a guided interactive flow instead of the API: <a href="https://raen-x402-quest.vercel.app">the x402 quest walkthrough</a> issues the same key.</p>
+
+<hr>
+<p><small>RAEN (Royal Agentic Enterprises) · Fleet status and public sales ledger: <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a> · Catalog: <a href="https://raen.royalruby.io">raen.royalruby.io</a> · Contact: ops@royalruby.io</small></p>
+</body>
+</html>
