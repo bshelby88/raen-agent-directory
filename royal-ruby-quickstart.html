@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>royal-ruby Law-Lookup API quickstart — statute citations for credit-repair & consumer-law tooling</title>
+<style>body{font-family:system-ui,sans-serif;max-width:760px;margin:2rem auto;padding:0 1rem;line-height:1.6;color:#222}code,pre{background:#f4f4f4;padding:.15em .35em;border-radius:4px;font-size:.92em}pre{padding:1rem;overflow-x:auto}h1{font-size:1.5rem}h2{font-size:1.2rem;margin-top:2rem}.note{background:#eef6ff;border-left:3px solid #246;padding:.75rem 1rem;border-radius:4px}</style>
+</head>
+<body>
+<h1>royal-ruby Law-Lookup API quickstart</h1>
+<p><strong>Who this is for:</strong> developers building credit-repair tools, dispute-letter generators, debt-collection compliance checks, or consumer-law chatbots who need accurate US statute citations — FCRA, FDCPA, TILA, and state UDAP statutes — returned as structured JSON with plain-English summaries, reporting timelines, and statutes of limitations.</p>
+<p><strong>Price:</strong> $0.05 USDC per call, settled on-chain via <a href="https://www.x402.org">x402</a> on Base Mainnet. Your wallet's first call is free (charged then fully rebated — net $0).</p>
+
+<h2>1. Try the endpoint (free — decode the challenge)</h2>
+<pre><code>curl -i -X POST https://royal-ruby-x402.fly.dev/api/law-lookup \
+  -H 'Content-Type: application/json' \
+  -d '{"topic":"credit dispute"}'</code></pre>
+<p>Without a payment header you get <code>HTTP 402</code> and a base64 <code>payment-required</code> challenge. Decoded (verified live 2026-11-11): <code>scheme: exact</code>, <code>network: eip155:8453</code>, <code>amount: 50000</code> ($0.05 USDC), <code>payTo: 0x9b8a27e03ceba490953cda8ab1291c0e13baf72f</code>, asset USDC <code>0x8335…2913</code>. Challenge before payment means you can verify every price and destination yourself — nothing is hidden.</p>
+
+<h2>2. Pay with any x402 client</h2>
+<p>Use any x402-compatible HTTP client (the <a href="https://github.com/coinbase/x402">x402 fetch middleware</a>, an agent framework integration, or <a href="https://bshelby88.github.io/raen-agent-kit/">raen-agent-kit templates for LangChain/LangGraph and CrewAI</a>). The client signs a USDC <code>transferWithAuthorization</code> on Base, retries with the <code>X-PAYMENT</code> header, and receives the full result JSON. There is no account, no API key, no signup — the payment itself is the auth.</p>
+
+<h2>3. Response shape</h2>
+<p>A successful call returns statute records for the requested topic: statute name, citation, jurisdiction, a plain-English summary, credit-reporting timelines where applicable, and the statute of limitations. Free reference companion (36 plain-English statute pages, no payment at all): <a href="https://raen-law-pages.vercel.app">raen-law-pages.vercel.app</a> — use the free pages to browse, the API to integrate.</p>
+
+<div class="note"><strong>Honest caveats:</strong> Information only — not legal advice. Summaries are plain-English restatements, not counsel. If you need a no-code option, the <a href="https://raen-dispute-package.vercel.app">$49 Dispute Package</a> bundles 3 letters + 12 citations + filing guide, and the MCP gateway exposes the same lookup as <code>raen_law_lookup</code> (<a href="https://bshelby88.github.io/raen-agent-directory/mcp-clients.html">quickstart</a>).</div>
+
+<h2>Verify before you trust</h2>
+<ul>
+<li><a href="https://royal-ruby-x402.fly.dev/.well-known/x402.json">Live x402 manifest</a></li>
+<li><a href="https://settlement-collector.fly.dev/ledger">Public sales ledger — every settled payment, tx-verified</a></li>
+<li><a href="https://settlement-collector.fly.dev/proof">Proof of commerce</a></li>
+</ul>
+
+<hr>
+<p><small>RAEN (Royal Agentic Enterprises) · Catalog: <a href="https://raen.royalruby.io">raen.royalruby.io</a> · Contact: ops@royalruby.io</small></p>
+</body>
+</html>
