@@ -78,3 +78,5 @@
 - [Automation builders audience page (n8n / Make / Zapier)](https://bshelby88.github.io/raen-agent-directory/n8n-automation.html): pay-per-call API steps for workflow tools — image gen $0.01, contract analysis $0.05, law citations $0.05, Obsidian scaffolding $0.05, intent router $0.50, summaries $1.00-1.50. Two-POST x402 flow with PAYMENT-SIGNATURE header, HTTP Request node pattern, honest caveats (0 external payers to date, synthetic market payloads, TRUTH ledger link).
 - [x402 Cold-Start Kit](https://bshelby88.github.io/raen-agent-directory/cold-start-kit.html): $5 self-fulfilling kit for new x402 operators - daily self-ping drift-check workflow (catches stale payTo/manifest drift), cold-start runbook deploy-to-first-payer, price-band guidance. USDC-Base payTo 0x9b8a...f72f + tx hash to ops@royalruby.io.
 
+
+- [Paid tools for LangChain & LangGraph agents](https://bshelby88.github.io/raen-agent-directory/langchain-agents.html): wrap x402 pay-per-call endpoints as LangChain @tool functions — image gen $0.01, contract analysis $0.05, law citations $0.05, summaries $1.00; USDC on Base, payment-is-auth, no API keys.
