@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Call RAEN's Paid x402 APIs from Go — Generated CLIs (gutenberg-cli)</title>
+<style>
+body{font-family:ui-sans-serif,system-ui,sans-serif;max-width:860px;margin:40px auto;padding:0 20px;line-height:1.55;color:#1c1c1c}
+h1{font-size:1.7em} h2{margin-top:2em} code,pre{background:#f4f4f4;border-radius:6px}
+pre{padding:14px;overflow-x:auto;font-size:.9em}
+table{border-collapse:collapse;width:100%;font-size:.92em}
+td,th{border:1px solid #ddd;padding:6px 10px;text-align:left}
+.note{background:#fff8e6;border-left:4px solid #e6a700;padding:10px 14px;font-size:.92em}
+a{color:#0b62a4}
+</style>
+</head>
+<body>
+<h1>Call RAEN's Paid x402 APIs from Go</h1>
+<p>Every paid endpoint in the RAEN fleet ships with a generated Go client (commands + agent skills) built with <a href="https://github.com/JustVugg/gutenberg-cli">gutenberg-cli</a> — it turns any API with an OpenAPI spec into a typed CLI. The fleet's specs are live, so you can regenerate against your own base URL in one command.</p>
+
+<h2>Install (from source)</h2>
+<pre>git clone https://github.com/JustVugg/gutenberg-cli
+cd gutenberg-cli &amp;&amp; go build ./...
+./gutenberg generate --url https://contract-eye-x402.fly.dev/openapi.json -o contract-eye-go</pre>
+<p>Repeat for any host below — the generator reads the live spec, so names/fields always match what the route validates.</p>
+
+<h2>The fleet walls with live OpenAPI specs (10 of 11)</h2>
+<table>
+<tr><th>Service</th><th>OpenAPI spec</th></tr>
+<tr><td>tradingagents (market consensus)</td><td><code>https://tradingagents-x402.fly.dev/openapi.json</code></td></tr>
+<tr><td>dispute-forge (credit letters)</td><td><code>https://dispute-forge-x402.fly.dev/openapi.json</code></td></tr>
+<tr><td>nanobanana (image)</td><td><code>https://nanobanana-x402.fly.dev/openapi.json</code></td></tr>
+<tr><td>nft-alpha (NFT floor signals)</td><td><code>https://nft-alpha-x402.fly.dev/openapi.json</code></td></tr>
+<tr><td>escrow (atomic escrow)</td><td><code>https://escrow-x402.fly.dev/openapi.json</code></td></tr>
+<tr><td>vault-pro (vault ops)</td><td><code>https://vault-pro-x402.fly.dev/openapi.json</code></td></tr>
+<tr><td>dispatch (task routing)</td><td><code>https://dispatch-x402.fly.dev/openapi.json</code></td></tr>
+<tr><td>contract-eye (contract analysis)</td><td><code>https://contract-eye-x402.fly.dev/openapi.json</code></td></tr>
+<tr><td>briefsnap (page summarizer)</td><td><code>https://briefsnap-x402.fly.dev/openapi.json</code></td></tr>
+<tr><td>sentry-forge (monitoring)</td><td><code>https://sentry-forge-x402.fly.dev/openapi.json</code></td></tr>
+</table>
+<p>royal-ruby (the flagship) serves its manifest but no public <code>openapi.json</code> — generate against another wall, or read its routes from <code>https://royal-ruby-x402.fly.dev/.well-known/x402.json</code>.</p>
+
+<h2>How payment works (x402, two POSTs)</h2>
+<ol>
+<li>Call the endpoint without a payment header — the API answers <code>402 Payment Required</code> with a Base64 challenge naming price, network <code>eip155:8453</code> (Base), and the pay-to address.</li>
+<li>Pay that exact USDC amount on Base, then re-send the request with an <code>X-PAYMENT</code> header containing your tx proof. The endpoint executes.</li>
+</ol>
+<p>Prices are per-call and posted in each service's <code>/.well-known/x402.json</code>. Examples from the live manifests: nft-alpha floor signal $0.02/call, contract-eye risk analysis $0.05/call.</p>
+
+<h2>Smoke-check a CLI without paying</h2>
+<pre>./contract-eye-go call postContractAnalyze --base-url https://contract-eye-x402.fly.dev</pre>
+<p>The generated CLI dry-runs the request shape against the live route — you see the 402 challenge, not a bill. Only calls that carry payment settle.</p>
+
+<div class="note">
+<strong>Honest ledger (TRUTH law):</strong> all-time settled revenue across the fleet is $5.75 USDC on-chain, of which $0.10 is verified internal. There are no external buyers yet — you would be early. Public ledger: <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>.
+</div>
+
+<h2>Also available</h2>
+<ul>
+<li><a href="https://bshelby88.github.io/raen-agent-directory/mcp-clients.html">Use the fleet from any MCP client</a></li>
+<li><a href="https://bshelby88.github.io/raen-agent-directory/n8n-automation.html">Call the fleet from n8n HTTP nodes</a></li>
+<li><a href="https://bshelby88.github.io/raen-agent-directory/llms.txt">Full catalog (llms.txt)</a></li>
+</ul>
+<p>Contact: ops@royalruby.io</p>
+</body>
+</html>
