@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Try-RAEN A/B copy lab — experiment design &amp; live results</title>
+<meta name="description" content="Public experiment log for the A/B copy test running on RAEN's buyer funnel entry page (try-raen.html): hypothesis, variants, measurement funnel, decision rule, and live numbers.">
+<style>
+:root { color-scheme: dark; }
+body { background:#0d1117; color:#e6edf3; font-family:ui-sans-serif,system-ui,sans-serif; max-width:780px; margin:0 auto; padding:2.5rem 1.25rem 4rem; line-height:1.6; }
+h1 { color:#58e6d9; font-size:1.8rem; margin-bottom:.3rem; }
+h2 { color:#58e6d9; font-size:1.2rem; margin-top:2rem; }
+.sub { color:#8b949e; margin-bottom:1.5rem; }
+pre { background:#0a0f1e; border:1px solid #2b3760; border-radius:8px; padding:.8rem; overflow:auto; font-size:.82rem; }
+code { background:#161b22; padding:.1rem .35rem; border-radius:4px; font-size:.9em; }
+a { color:#58e6d9; }
+.dim { color:#8b949e; font-size:.88rem; }
+table { border-collapse:collapse; width:100%; font-size:.9rem; }
+td, th { border:1px solid #30363d; padding:.4rem .6rem; text-align:left; }
+th { color:#8b949e; font-weight:600; }
+</style>
+</head>
+<body>
+<h1>Try-RAEN A/B copy lab</h1>
+<p class="sub">RAEN's buyer funnel entry (<a href="try-raen.html">try-raen.html</a>) is running a public A/B copy experiment. This page is the experiment record: hypothesis, variants, measurement, decision rule. Last updated 2026-11-13 (experiment start).</p>
+
+<h2>Why this surface</h2>
+<p>try-raen.html is the funnel entry every buyer journey is pointed at — from the directory index, llms.txt, the cookbook, and the connector pages. Fleet telemetry (2026-11-13): ~2,300 challenges/24h with zero settles, so the leak to fix is attention&nbsp;→&nbsp;demo-run&nbsp;→&nbsp;paid call, not pricing. The first measurable step is the demo-run rate on this page.</p>
+
+<h2>Hypothesis</h2>
+<p>Control (A) sells the mechanism ("try RAEN in 60 seconds — decode a live 402 challenge"). Variant (B) sells the buyer's outcome ("give your agent its first paid API call"). For a developer audience deciding whether the pattern is worth wiring in, outcome framing should lift the demo-click rate. If it doesn't, mechanism framing is the honest winner — the demo is the product here.</p>
+
+<h2>Variants</h2>
+<table>
+<tr><th></th><th>A (control)</th><th>B (outcome)</th></tr>
+<tr><td>H1</td><td>Try RAEN in 60 seconds</td><td>Give your agent its first paid API call</td></tr>
+<tr><td>Sub</td><td>"One click. A real HTTP 402 'Payment Required' challenge, fetched live from a paid AI-agent API on Base mainnet and decoded in your browser…"</td><td>"In 60 seconds: fetch a real HTTP 402 payment challenge from a live paid API on Base, decode exactly what your agent would pay — then copy the one-line pattern that makes your agent call it…"</td></tr>
+<tr><td>CTA</td><td>▶ Run the live 402 demo</td><td>▶ Prove it live</td></tr>
+</table>
+<p>Everything below the fold (steps 1–3, curl one-liner, ledger links) is identical for both variants. Only H1, subhead, and CTA label differ. Variant assignment is a 50/50 coin flip, persisted per browser session, and exposed as <code>data-ab-variant</code> on <code>&lt;body&gt;</code>.</p>
+
+<h2>Measurement funnel</h2>
+<p>Per-variant beacons hit the collector's public hit counter:</p>
+<ul>
+<li>Page load → <code>src=try-raen-a</code> or <code>try-raen-b</code></li>
+<li>Demo click → <code>src=try-raen-a-demo</code> or <code>try-raen-b-demo</code></li>
+</ul>
+<pre>curl -s https://settlement-collector.fly.dev/hits.json | python -m json.tool</pre>
+<p class="dim">Metrics per variant: page loads, demo clicks, demo-click rate. Down-funnel (challenge→settle) is read from <a href="https://settlement-collector.fly.dev/stats">/stats</a>; at current traffic volumes it is directional only. Known limits, stated honestly: session persistence means reloads re-count a load (symmetric across variants, doesn't bias the split); JS-disabled visitors aren't counted at all; and bot traffic inflates loads, not clicks.</p>
+
+<h2>Decision rule</h2>
+<ul>
+<li><b>Sample gate:</b> no verdict before ≥100 page loads per variant.</li>
+<li><b>Adopt B</b> if its demo-click rate is ≥ 1.5× A's at the sample gate (small numbers demand a wide margin, not a p-value).</li>
+<li><b>Kill B</b> if its rate is ≤ A's at the gate — revert to single-copy control.</li>
+<li><b>Iterate</b> if between 1× and 1.5× — new variant C tests a sharper outcome claim.</li>
+</ul>
+
+<h2>Live status</h2>
+<p id="status">Loading live beacon counts…</p>
+<script>
+fetch('https://settlement-collector.fly.dev/hits.json',{cache:'no-store'})
+  .then(function(r){return r.json();})
+  .then(function(d){
+    var by = d.by_src || {};
+    function g(k){ return by[k]||0; }
+    var la=g('try-raen-a'), lb=g('try-raen-b'), ca=g('try-raen-a-demo'), cb=g('try-raen-b-demo');
+    function rate(c,l){ return l>0 ? (100*c/l).toFixed(0)+'%' : '—'; }
+    document.getElementById('status').innerHTML =
+      'Loads — A: <b>'+la+'</b> · B: <b>'+lb+'</b><br>'+
+      'Demo clicks — A: <b>'+ca+'</b> ('+rate(ca,la)+' of loads) · B: <b>'+cb+'</b> ('+rate(cb,lb)+' of loads)<br>'+
+      'Verdict: ' + ((la<100||lb<100) ? 'pending (sample gate: 100 loads/side)' : 'sample gate reached — see decision rule');
+  })
+  .catch(function(){ document.getElementById('status').textContent = 'Live counts unavailable right now — raw data at settlement-collector.fly.dev/hits.json'; });
+</script>
+
+<p class="dim" style="margin-top:2rem">TRUTH framing: external revenue all-time is $0.00 (2026-11-13). This experiment measures the top of the funnel only. <a href="index.html">RAEN Tool Finder</a> · <a href="ledger-issue-001.html">Daily Ledger #001</a></p>
+</body>
+</html>
