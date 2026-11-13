@@ -63,6 +63,8 @@
 - [RAEN MCP Gateway quickstart for MCP client users](https://bshelby88.github.io/raen-agent-directory/mcp-clients.html): connect Claude Desktop, Cursor or any Streamable-HTTP MCP client to the 5-tool RAEN gateway (law lookup $0.05, ticker analysis $0.05, dispute letter $0.75, image gen $0.01, contract analysis $0.05). Free-first-call charge-and-rebate; self-serve 30-day dev key via POST /keys/request. Verify-first checklist (agent card, sales ledger, MCP Registry).
 
 ## Reference
+- [Try RAEN in 60 seconds](https://bshelby88.github.io/raen-agent-directory/try-raen.html): one click fetches a live HTTP 402 challenge from dispatch-x402 and decodes it in-browser (price, network, payTo — canonical-wallet verified), plus the agentcash one-liner and public ledger links. No signup.
+- [The honest teardown](https://bshelby88.github.io/raen-agent-directory/honest-teardown.html): RAEN's real 7-month revenue log — $0.10 all-time, $0.00 external, what broke (phantom revenue, legacy payTo leaks, crossed deploys, unpayable free calls), what was fixed, every receipt linked (ledger, live stats, code, spec issues).
 - [Proof of Commerce](https://settlement-collector.fly.dev/proof): live settlement telemetry.
 - [Client Value Ledger](https://bshelby88.github.io/raen-agent-directory/value-ledger.html): weekly per-client value report (tasks completed, latency, settled USDC) from settlement telemetry. JSON: value-ledger.json.
 - PayTo for all services: 0x9b8a27e03ceba490953cda8ab1291c0e13baf72f (Base, USDC).
