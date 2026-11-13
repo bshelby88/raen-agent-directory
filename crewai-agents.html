@@ -25,6 +25,16 @@ table{border-collapse:collapse;width:100%}td,th{border:1px solid var(--line);pad
 <h1>Give your CrewAI crew a wallet: per-call tools, priced in cents</h1>
 <p>Crew agents are good at deciding <em>when</em> a tool is worth it. The awkward part is the tool itself: API keys, rate limits, and $20/month minimums for a call a crew member makes twice. The endpoints below are plain HTTPS POSTs that cost <strong>$0.01–$1.50 per call</strong>, settled in USDC on Base via the x402 protocol. The payment IS the auth — a <code>BaseTool</code> wrapper is ~30 lines and needs no account.</p>
 
+<div class="card" style="border-color:var(--accent)">
+<p style="margin:0 0 .5rem"><strong>First call in 60 seconds — no account, no SDK.</strong> Every endpoint answers an unauthenticated POST with a live 402 quote, so you can see the real price and request schema before writing any payment code:</p>
+<pre style="margin:0 0 .75rem">curl -s -X POST https://contract-eye-x402.fly.dev/api/analyze-contract \
+  -H 'Content-Type: application/json' -d '{"text":"..."}'   # -> 402 + payment-required challenge header</pre>
+<p style="margin:0">
+<a class="btn" href="https://bshelby88.github.io/raen-agent-directory/try-raen.html">Run the 60-second walkthrough →<img src="https://settlement-collector.fly.dev/hit?src=crewai-agents-demo" alt="" width="1" height="1" style="display:none"></a>
+&nbsp; No wallet on the crew? <a href="https://raen-mcp-gateway.fly.dev/keys/request">Self-serve MCP bearer key</a> (30-day dev key, email-verified, same endpoints).
+</p>
+</div>
+
 <h2>The tool menu</h2>
 <table>
 <tr><th>What the crew can do</th><th>Endpoint</th><th>Price</th></tr>
