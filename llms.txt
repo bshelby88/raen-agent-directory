@@ -1,103 +1,206 @@
 # RAEN — Royal Agentic Enterprises
 
+
+
 > Twelve production x402 micropayment services on Base Mainnet, plus a Bearer-gated MCP gateway exposing 5 flagship tools. Every service returns a standards-compliant HTTP 402 payment challenge (EIP-3005 / x402 scheme `exact`, network `eip155:8453`, USDC).
 
+
+
 ## Benchmark & Proof
+
 - [Autonomous Operations Benchmark v1](https://bshelby88.github.io/raen-agent-directory/benchmark.html): the fleet's 7-month autonomous-ops dataset with measurement methodology — 19/19 endpoint quality gate, 14/14 fleet health, 29 machines across 64 apps, $0.10 tx-verified revenue, $0 external, every incident and open failure published. Compete: measure your fleet the same way and publish better numbers with receipts.
+
 - Machine-readable: [benchmark.json](https://bshelby88.github.io/raen-agent-directory/benchmark.json).
 
+
+
 ## Company
+
 - [RAEN Blog](https://raen.royalruby.io): essays on agentic commerce, the x402 protocol, and the 2014 heritage story (historic tx 53e24ff4).
+
 - [RAEN Law Pages](https://raen-law-pages.vercel.app): 36 plain-English statute pages. Free, machine-readable legal reference.
 
+
+
 ## Paid Services (x402, pay per call, $0.01–$5.00)
+
 - [royal-ruby-x402](https://royal-ruby-x402.fly.dev): flagship document/letter engine. POST a task, receive a 402 challenge.
+
 - [vault-pro-x402](https://vault-pro-x402.fly.dev): secret/vault operations service.
+
 - [dispute-forge-x402](https://dispute-forge-x402.fly.dev): consumer dispute letter generation.
+
 - [dispute-forge-worker](https://dispute-forge-worker.raen.workers.dev): dispute-forge on Cloudflare Workers — FCRA dispute letter + certificate, $0.75/call, x402 manifest at /.well-known/x402.json.
+
 - [contract-eye-x402](https://contract-eye-x402.fly.dev): contract risk analysis.
+
 - [escrow-x402](https://escrow-x402.fly.dev): escrow-shaped workflow service.
+
 - [dispatch-x402](https://dispatch-x402.fly.dev): task dispatch orchestration.
+
 - [nanobanana-x402](https://nanobanana-x402.fly.dev): image generation.
+
 - [nft-alpha-x402](https://nft-alpha-x402.fly.dev): NFT market analytics.
+
 - [tradingagents-x402](https://tradingagents-x402.fly.dev): ticker/trading agent analysis.
+
 - [briefsnap-x402](https://briefsnap-x402.fly.dev): brief/summary generation.
+
 - [sentry-forge-x402](https://sentry-forge-x402.fly.dev): monitoring/sentry tooling.
+
 - [staci-tradingagents](https://staci-tradingagents.fly.dev): trading agent service (bare host).
 
+
+
 ## MCP Gateway
+
 - [raen-mcp-gateway](https://raen-mcp-gateway.fly.dev/mcp): MCP server (Bearer-gated). Tools: raen_law_lookup, raen_ticker_analysis, raen_dispute_letter, raen_image_generate, raen_contract_analysis. Listed on the MCP Registry as io.github.bshelby88/raen-mcp.
 
+
+
 ## Free Tools
+
 - [x402 Live Playground](https://x402-playground.fly.dev/): watch a real 402 challenge decoded live in your browser — no wallet needed.
+
 - [x402 Challenge Decoder](https://x402-decoder.vercel.app): paste a payment-required header, get the decoded accepts[] JSON.
+
 - [x402 Integration Cookbook](https://github.com/bshelby88/x402-cookbook): copy-paste client recipes for calling any RAEN service.
+
 - [Bounty Board](https://github.com/bshelby88/raen-bounties): open integration bounties for agent developers - rewarded with free 30-day MCP gateway dev keys + llms.txt listing.
+
 - [x402 Manifest Linter](https://bshelby88.github.io/x402-linter/): paste an x402.json, get instant client-side validation (scheme, network, payTo, price).
+
 - [x402 Paywall Code Generator](https://bshelby88.github.io/x402-paywall-generator/): pick Express / Hono / FastAPI, get copy-paste middleware that issues a real 402 challenge on Base USDC.
+
 - [Agent Kit](https://github.com/bshelby88/raen-agent-kit): LangChain/LangGraph + CrewAI templates for the MCP gateway.
+
 - [Live Badges](https://bshelby88.github.io/raen-live-badges/): embeddable per-service price badges ($0.01–$5.00).
+
 - [First Call Free](https://bshelby88.github.io/raen-first-call-free/): a real 402 payment and a real on-chain refund — royal-ruby for net $0, one per new wallet per 30 days.
+
 - [State UDAP Explorer](https://raen-udap-explorer.vercel.app): plain-English guide to the 10 most-cited state UDAP statutes, with exact citations.
+
 - [x402 Quest](https://bshelby88.github.io/raen-agent-directory/quests/): a five-step challenge ladder for agent developers — every quest touches the live RAEN fleet.
+
 - [Directory Kit](https://bshelby88.github.io/raen-agent-directory/directories/): where raen-mcp is indexed, plus copy-paste submission packs for every major MCP directory.
+
 - [x402 Readiness Scorecard](https://bshelby88.github.io/x402-scorecard/): 10-question quiz scores your agent's x402 readiness and recommends which RAEN service to integrate first.
+
 - [x402 Payback Calculator](https://bshelby88.github.io/raen-payback-calculator/): pay-per-call vs flat SaaS subscription — monthly cost, verdict, break-even call volume.
+
 - [RAEN Cost Simulator](https://bshelby88.github.io/raen-cost-calculator/): live per-call/per-day/per-month USDC cost for every fleet service, prices read straight from the manifests.
+
 - [Run in Postman](https://bshelby88.github.io/raen-postman/): one-click Postman collection for all 12 services — unpaid requests fetch a live 402 challenge for free; collection JSON at https://raw.githubusercontent.com/bshelby88/raen-postman/main/raen-x402.postman_collection.json
+
 - [API Docs (OpenAPI)](https://raen-api-docs.vercel.app/): interactive OpenAPI 3.1 reference for all 12 services — spec at https://raen-api-docs.vercel.app/openapi.yaml.
 
+
+
 ## Managed Services
+
 - [RAEN as Go CLIs](https://bshelby88.github.io/raen-agent-directory/go-clients.html): every paid fleet endpoint callable from Go via gutenberg-cli-generated typed clients; two-POST x402 flow, live OpenAPI specs, dry-run smoke check.
+
+
 
 - [NFT Alpha quickstart](https://bshelby88.github.io/raen-agent-directory/nft-alpha-quickstart.html): 3-step agent quickstart for the live $0.02/call NFT market-signal API (POST https://nft-alpha-x402.fly.dev/api/nft-signal, x402 on Base). OpenSea 5-minute rolling signals, 8 watched collections, honest caveats included.
 
+
+
 - [RAEN Housing Partnerships (HFA / lender / counseling)](https://bshelby88.github.io/raen-housing-partnerships/): Two standing MOU structures for housing finance agencies, lenders and HUD-approved counseling agencies: $50 per complete DPA application processed, $150 per funded-loan referral. Pilot scope 30 days. Contact: ops@royalruby.io.
+
 - [RAEN Managed Agent Ops](https://raen-managed-ops.vercel.app): RAEN deploys and operates a customer-facing AI agent for local businesses (calls, bookings, lead intake). 30-day pilot $250 with setup included, then $300-500/mo. Weekly value-ledger report from real agent telemetry. Contact: ops@royalruby.io.
+
 - [RAEN Dispute Fulfillment - white-label](https://raen-managed-dispute.vercel.app): We run dispute-letter fulfillment behind your brand. $49/package direct; $0.75/letter white-label for credit-repair SaaS platforms ($100/mo min); 30-day pilot $250. Package = 3 letters + 12 statute citations + filing guide. Contact: ops@royalruby.io.
+
 - [x402 Implementation Consulting](https://bshelby88.github.io/raen-x402-consulting/): fixed-price build of a production paid API on x402 rails ($1,500-$3,500 tiers). We deploy the endpoint, manifest, settlement middleware and telemetry on your domain; the RAEN fleet is the live reference. Contact: ops@royalruby.io.
+
+
 
 - [Proof-of-Commerce for sellers](https://bshelby88.github.io/raen-proof-commerce/): trust infrastructure as a service — your own public sales ledger, on-chain-verifiable settlements, live telemetry page, rebate reconciliation. $29/mo (1 service) / $99/mo (5 services). Built on the RAEN fleet's own live ledger as reference. Contact: ops@royalruby.io.
 
+
+
 ## Outcome Products (one-time packages)
+
 - [Dispute Package ($49)](https://raen-dispute-package.vercel.app): 3 dispute letters (dispute-forge) + 12 statute citations (royal-ruby) + step-by-step filing guide. One-time purchase, USDC on Base via the x402 rail, or card-less invoice via ops@royalruby.io. Mirror: https://bshelby88.github.io/raen-dispute-package/
+
 - [Contract Review ($19)](https://raen-contract-review.vercel.app): contract-eye risk analysis + plain-English summary and redline suggestions. One-time purchase, same payment rail. Mirror: https://bshelby88.github.io/raen-contract-review/
+
 - [Market Intelligence Pack ($29)](https://raen-market-pack.vercel.app): tradingagents multi-agent consensus + ticker brief, up to 5 tickers (synthetic demo payload per the live manifest — disclosed on the page). One-time purchase, same payment rail. Mirror: https://bshelby88.github.io/raen-market-pack/
+
+
 
 - [RAEN MCP Gateway quickstart for MCP client users](https://bshelby88.github.io/raen-agent-directory/mcp-clients.html): connect Claude Desktop, Cursor or any Streamable-HTTP MCP client to the 5-tool RAEN gateway (law lookup $0.05, ticker analysis $0.05, dispute letter $0.75, image gen $0.01, contract analysis $0.05). Free-first-call charge-and-rebate; self-serve 30-day dev key via POST /keys/request. Verify-first checklist (agent card, sales ledger, MCP Registry).
 
+
+
 ## Reference
+
 - [Try RAEN in 60 seconds](https://bshelby88.github.io/raen-agent-directory/try-raen.html): one click fetches a live HTTP 402 challenge from dispatch-x402 and decodes it in-browser (price, network, payTo — canonical-wallet verified), plus the agentcash one-liner and public ledger links. No signup.
+
 - [The honest teardown](https://bshelby88.github.io/raen-agent-directory/honest-teardown.html): RAEN's real 7-month revenue log — $0.10 all-time, $0.00 external, what broke (phantom revenue, legacy payTo leaks, crossed deploys, unpayable free calls), what was fixed, every receipt linked (ledger, live stats, code, spec issues).
+
 - [Proof of Commerce](https://settlement-collector.fly.dev/proof): live settlement telemetry.
+
 - [Client Value Ledger](https://bshelby88.github.io/raen-agent-directory/value-ledger.html): weekly per-client value report (tasks completed, latency, settled USDC) from settlement telemetry. JSON: value-ledger.json.
+
 - PayTo for all services: 0x9b8a27e03ceba490953cda8ab1291c0e13baf72f (Base, USDC).
+
 - x402 Quest: challenge ladder for agent developers (decode a live 402, map the fleet, first settlement, integrations, linter gauntlet): https://bshelby88.github.io/raen-agent-directory/quests/
+
 - [Upwork gig draft — x402 paid-API deployment](https://bshelby88.github.io/raen-agent-directory/upwork-gig.html): publication-ready Upwork profile headline, overview, skills tags and $1,500/$2,500/$3,500 gig tiers (mirrors raen-x402-consulting). Account creation is owner-only; copy is staged here.
 
 
 
 
+
+
+
+
+
 ## Consumer Audiences
+
 - [Credit Recovery audience page](https://bshelby88.github.io/raen-agent-directory/credit-recovery.html): free FCRA statute library (36 plain-English pages at raen-law-pages.vercel.app) + $49 one-time Dispute Package, written for people disputing credit-report errors.
+
 - [RAEN x402 reference fleet for agent builders](https://bshelby88.github.io/raen-agent-directory/agent-devs.html): 12 live x402-priced services on Base to inspect end-to-end (manifests, live 402 challenge decode, settlement telemetry, public sales ledger), agent-kit templates, x402 cookbook, manifest linter + challenge decoder, and production gotchas (zero-price tiers do not settle; manifests can lie; decode a live 402 when auditing). PayTo 0x9b8a27e03ceba490953cda8ab1291c0e13baf72f.
+
 - [Automation builders audience page (n8n / Make / Zapier)](https://bshelby88.github.io/raen-agent-directory/n8n-automation.html): pay-per-call API steps for workflow tools — image gen $0.01, contract analysis $0.05, law citations $0.05, Obsidian scaffolding $0.05, intent router $0.50, summaries $1.00-1.50. Two-POST x402 flow with PAYMENT-SIGNATURE header, HTTP Request node pattern, honest caveats (0 external payers to date, synthetic market payloads, TRUTH ledger link).
+
 - [x402 Cold-Start Kit](https://bshelby88.github.io/raen-agent-directory/cold-start-kit.html): $5 self-fulfilling kit for new x402 operators - daily self-ping drift-check workflow (catches stale payTo/manifest drift), cold-start runbook deploy-to-first-payer, price-band guidance. USDC-Base payTo 0x9b8a...f72f + tx hash to ops@royalruby.io.
 
 
+
+
+
 - [Paid tools for LangChain & LangGraph agents](https://bshelby88.github.io/raen-agent-directory/langchain-agents.html): wrap x402 pay-per-call endpoints as LangChain @tool functions — image gen $0.01, contract analysis $0.05, law citations $0.05, summaries $1.00; USDC on Base, payment-is-auth, no API keys.
+
 - [Paid tools for CrewAI crews](https://bshelby88.github.io/raen-agent-directory/crewai-agents.html): wrap x402 pay-per-call endpoints as CrewAI BaseTool classes — image gen $0.01, contract analysis $0.05, law citations $0.05, summaries $1.00; USDC on Base, payment-is-auth, no API keys.- [Paid tools for PydanticAI agents](https://bshelby88.github.io/raen-agent-directory/pydanticai-agents.html): wrap x402 pay-per-call endpoints as typed @agent.tool functions — image gen $0.01, contract analysis $0.05, law citations $0.05, summaries $1.00-1.50; USDC on Base, payment-is-auth, no API keys. Two-POST 402-challenge flow, schema-validated outputs.
+
 - [Paid tools for OpenAI Agents SDK agents](https://bshelby88.github.io/raen-agent-directory/openai-agents-sdk.html): wrap x402 pay-per-call endpoints as @function_tool async functions — image gen $0.01, contract analysis $0.05, law citations $0.05, summaries $1.00; USDC on Base, payment-is-auth, no API keys. Same URLs also work via MCP bearer-key gateway.
+
 - [Paid tools for LlamaIndex agents](https://bshelby88.github.io/raen-agent-directory/llamaindex-agents.html): wrap x402 pay-per-call endpoints as async FunctionTool wrappers — image gen $0.01, contract analysis $0.05, law citations $0.05, summaries $1.00-1.50; USDC on Base, payment-is-auth, no API keys. Two-POST 402-challenge flow.
+
 - [Paid tools for Haystack pipelines](https://bshelby88.github.io/raen-agent-directory/haystack-agents.html): wrap x402 pay-per-call endpoints as Haystack 2.x @component pipeline steps (ComponentTool for agents) — image gen $0.01, contract analysis $0.05, law citations $0.05, summaries $1.00-1.50; USDC on Base, payment-is-auth, no API keys. Two-POST 402-challenge flow + MCP bearer-key gateway alternative.
+
 - [Paid tools for Microsoft Semantic Kernel agents](https://bshelby88.github.io/raen-agent-directory/semantic-kernel-agents.html): wrap x402 pay-per-call endpoints as @kernel_function plugin methods — image gen $0.01, contract analysis $0.05, law citations $0.05, summaries $1.00-1.50; USDC on Base, payment-is-auth, no API keys. Two-POST 402-challenge flow + MCP bearer-key gateway alternative.
+
 - [Paid tools for AWS Strands Agents](https://bshelby88.github.io/raen-agent-directory/strands-agents.html): wrap x402 pay-per-call endpoints as strands-agents @tool wrappers — image gen $0.01, contract analysis $0.05, law citations $0.05, summaries $1.00-3.00; USDC on Base, payment-is-auth, no API keys. Two-POST 402-challenge flow + MCP bearer-key gateway alternative.
+
 - [Paid tools for the Claude Agent SDK](https://bshelby88.github.io/raen-agent-directory/claude-agent-sdk.html): expose x402 pay-per-call endpoints as SDK MCP tools (createSdkMcpServer in TS, @tool in Python) — image gen $0.01, contract analysis $0.05, law citations $0.05, dispute letters $0.75, summaries $1.00-3.00; USDC on Base, payment-is-auth, no API keys. Two-POST 402-challenge flow + MCP bearer-key gateway alternative.
+
 - [Paid tools for Agno agents](https://bshelby88.github.io/raen-agent-directory/agno-agents.html): wrap x402 pay-per-call endpoints as agno.tools @tool functions for Agent/Team — image gen $0.01, contract analysis $0.05, law citations $0.05, dispute letters $0.75, summaries $1.00-3.00; USDC on Base, payment-is-auth, no API keys. Two-POST 402-challenge flow + MCP bearer-key gateway alternative (MCPTools attaches directly).
+
 - [Paid tools for Mastra agents](https://bshelby88.github.io/raen-agent-directory/mastra-agents.html): wrap x402 pay-per-call endpoints as Mastra createTool() wrappers with zod schemas for Agent/Workflow — image gen $0.01, contract analysis $0.05, law citations $0.05, dispute letters $0.75, summaries $1.00-3.00; USDC on Base, payment-is-auth, no API keys. Two-POST 402-challenge flow + MCP bearer-key gateway alternative (@mastra/mcp).
+
 - [Paid tools for Microsoft AutoGen agents](https://bshelby88.github.io/raen-agent-directory/autogen-agents.html): wrap x402 pay-per-call endpoints as autogen-core FunctionTool wrappers — image gen $0.01, contract analysis $0.05, law citations $0.05, summaries $1.00-3.00; USDC on Base, payment-is-auth, no API keys. Two-POST 402-challenge flow + MCP bearer-key gateway alternative.
+
 - [Paid tools for HuggingFace SmolAgents agents](https://bshelby88.github.io/raen-agent-directory/smolagents-agents.html): wrap x402 pay-per-call endpoints as smolagents @tool decorators for CodeAgent/ToolCallingAgent — image gen $0.01, contract analysis $0.05, law citations $0.05, summaries $1.00-3.00; USDC on Base, payment-is-auth, no API keys. Two-POST 402-challenge flow + MCP bearer-key gateway alternative.
+
 - [Paid tools for Vercel AI SDK agents](https://bshelby88.github.io/raen-agent-directory/vercel-ai-sdk.html): wrap x402 pay-per-call endpoints as ai-SDK tool() wrappers with zod schemas — image gen $0.01, contract analysis $0.05, law citations $0.05, summaries $1.00-3.00; USDC on Base, payment-is-auth, no API keys. Two-POST 402-challenge flow + MCP bearer-key gateway alternative.
+
 - [Paid tools for Google ADK agents](https://bshelby88.github.io/raen-agent-directory/google-adk-agents.html): wrap x402 pay-per-call endpoints as google-adk FunctionTools — image gen $0.01, contract analysis $0.05, law citations $0.05, summaries $1.00-3.00; USDC on Base, payment-is-auth, no API keys. Two-POST 402-challenge flow + MCPToolset bearer-key gateway alternative.
+- [Paid tools for Spring AI agents](https://bshelby88.github.io/raen-agent-directory/spring-ai-agents.html): wrap x402 pay-per-call endpoints as Spring AI FunctionCallback @Bean tools (Java) — law citations $0.05, contract analysis $0.05, NFT signal $0.02, intent dispatch $0.50, dispute letters $0.75, summaries $1.00-1.50, full dispute package $5.00; USDC on Base, payment-is-auth, no API keys. Two-POST 402-challenge flow + MCP bearer-key gateway alternative.
+
+
 
 - open-letter.html — An open letter to every credit-repair coach: white-label letters $0.75, 20% lifetime, first 10 free
