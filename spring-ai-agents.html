@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paid tools for Spring AI agents — RAEN x402 endpoints</title>
+<meta name="description" content="Wrap RAEN's x402 pay-per-call endpoints as Spring AI FunctionCallback / @Bean Function tools. USDC on Base, payment-is-auth, no API keys.">
+<style>
+body{font-family:Georgia,serif;max-width:820px;margin:2rem auto;padding:0 1rem;line-height:1.6;color:#1a1a1a}
+code,pre{font-family:Consolas,monospace;font-size:.88em;background:#f4f4f4;border-radius:4px}
+pre{padding:1rem;overflow-x:auto;border:1px solid #ddd}
+table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccc;padding:.4rem .6rem;text-align:left;font-size:.9rem}
+a{color:#0b5fa5}.caveat{background:#fff8e1;border-left:4px solid #e6a700;padding:.75rem 1rem;font-size:.92rem}
+h1{font-size:1.6rem}h2{font-size:1.25rem;margin-top:2rem}
+</style>
+</head>
+<body>
+<h1>Paid tools for Spring AI agents</h1>
+<p>RAEN's fleet of x402 endpoints (Base Mainnet, USDC, <em>payment is the auth</em> — no API keys, no signup) exposed as Spring AI <code>FunctionCallback</code> tools. Prices below were read from the live manifests this page was built from; every challenge names payTo <code>0x9b8a27e03ceba490953cda8ab1291c0e13baf72f</code>.</p>
+
+<h2>Tool catalog (live-manifest prices)</h2>
+<table>
+<tr><th>Tool</th><th>Endpoint</th><th>Price</th><th>What you get</th></tr>
+<tr><td>Law citation lookup</td><td>POST <code>royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05</td><td>Cited statute lookups (FCRA and related)</td></tr>
+<tr><td>Contract risk analysis</td><td>POST <code>contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td><td>Risk score, flagged clauses with severity + suggested edits</td></tr>
+<tr><td>NFT market signal</td><td>POST <code>nft-alpha-x402.fly.dev/api/nft-signal</code></td><td>$0.02</td><td>Collection signal JSON</td></tr>
+<tr><td>Intent dispatch</td><td>POST <code>dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td><td>Router across the fleet's capabilities</td></tr>
+<tr><td>Dispute letter pack</td><td>POST <code>dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.75</td><td>FCRA dispute letters + citations</td></tr>
+<tr><td>Summarize / extract actions / ELI5</td><td>POST <code>briefsnap-x402.fly.dev/api/…</code></td><td>$1.00–1.50</td><td>Long-doc summary, action items, plain-English rewrite</td></tr>
+<tr><td>Full dispute package</td><td>POST <code>sentry-forge-x402.fly.dev/api/dispute-pack</code></td><td>$5.00</td><td>Complete multi-letter dispute package</td></tr>
+</table>
+
+<h2>The x402 two-POST flow (from Java)</h2>
+<p>Every endpoint works the same way: POST without payment → receive <code>402</code> with a <code>payment-required</code> header (base64 JSON challenge) → pay the named amount to payTo via an EIP-3009 <code>transferWithAuthorization</code> on USDC (Base, chain 8453) → re-send with a <code>PAYMENT-SIGNATURE</code> header. The facilitator (<code>raen-facilitator.fly.dev</code>) verifies the signature on-chain.</p>
+<pre>record LawLookup(String topic, String state) {}
+record LawResult(boolean ok, Object data) {}
+
+@Bean
+public FunctionCallback lawLookup() {
+    return FunctionCallback.builder()
+        .function("lawLookup", LawLookup.class)
+        .description("Look up a US statute citation. Costs $0.05 USDC on Base via x402.")
+        .func((req) -&gt; {
+            HttpRequest first = HttpRequest.newBuilder(
+                URI.create("https://royal-ruby-x402.fly.dev/api/law-lookup"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(new ObjectMapper().writeValueAsString(req)))
+                .build();
+            HttpResponse&lt;String&gt; r = client.send(first, HttpResponse.BodyHandlers.ofString());
+            if (r.statusCode() != 402) throw new IllegalStateException("expected 402 challenge");
+            String challenge = new String(Base64.getDecoder().decode(
+                r.headers().firstValue("payment-required").orElseThrow()), StandardCharsets.UTF_8);
+            // 1. parse challenge JSON (accepts[].payTo, maxAmountRequired, asset)
+            // 2. sign an EIP-3009 transferWithAuthorization with your Base wallet
+            //    (web3j / Web3Signer — use your existing signing infra)
+            // 3. re-send the identical POST with the PAYMENT-SIGNATURE header
+            return x402Client.payAndSend(first, challenge, req);
+        })
+        .build();
+}</pre>
+<p>Prefer not to touch a wallet from Java? The <a href="https://raen-mcp-gateway.fly.dev">RAEN MCP gateway</a> exposes the same tools over Streamable-HTTP with a plain Bearer key (self-serve 30-day key: <code>POST /keys/request</code>) — Spring AI's MCP client support connects directly.</p>
+
+<div class="caveat"><strong>TRUTH caveats:</strong> 0 external payers all-time as of 2026-11-13 (public <a href="https://settlement-collector.fly.dev/ledger">sales ledger</a>; the $0.10 settled is an internal RAEN test). This page's prices were read from live manifests on 2026-11-13; the nanobanana (image gen, $0.01) and tradingagents (ticker analysis) manifests did not respond from our build host this run — the <a href="https://raen.royalruby.io">catalog</a> lists them. Contract analysis can fall back to a deterministic rule-based scan when the LLM layer is degraded; the response fields <code>method</code>/<code>delivery_mode</code> always disclose which ran.</div>
+
+<h2>Verify before you buy</h2>
+<ul>
+<li><code>curl https://royal-ruby-x402.fly.dev/.well-known/x402.json</code> — live manifest, price + payTo</li>
+<li><a href="https://settlement-collector.fly.dev/ledger">Public sales ledger</a> · <a href="https://raen.royalruby.io">Catalog</a> · <a href="https://bshelby88.github.io/raen-agent-directory/try-raen.html">Decode a live 402 in your browser</a></li>
+</ul>
+<p style="color:#666;font-size:.85rem">RAEN · Royal Agentic Enterprises · payTo 0x9b8a27e03ceba490953cda8ab1291c0e13baf72f (Base, USDC) · Built 2026-11-13</p>
+</body>
+</html>
