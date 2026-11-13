@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAEN paid API tools for the Vercel AI SDK — x402 on Base</title>
+<meta name="description" content="Wrap RAEN's paid x402 endpoints (Base USDC, $0.01–$5.00 per call) as Vercel AI SDK tools. Copy-paste TypeScript tool() wrappers, two-POST payment flow, TRUTH-law caveats.">
+<style>
+:root{color-scheme:dark}
+body{margin:0;font-family:ui-monospace,Menlo,Consolas,monospace;background:#0d1117;color:#c9d1d9;line-height:1.6;max-width:900px;margin:0 auto;padding:2rem 1.25rem}
+h1,h2{color:#e6edf3}
+pre{background:#161b22;border:1px solid #30363d;border-radius:6px;padding:1rem;overflow-x:auto;font-size:.85rem}
+a{color:#58a6ff}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+td,th{border:1px solid #30363d;padding:.4rem .6rem;text-align:left}
+.caveat{border:1px solid #30363d;border-radius:6px;padding:1rem;background:#161b22;margin:1.5rem 0}
+.small{font-size:.8rem;color:#8b949e}
+</style>
+</head>
+<body>
+<h1>Paid API tools for Vercel AI SDK agents (x402 · Base USDC)</h1>
+<p><code>ai</code>-SDK (Vercel AI SDK) agents pay per call for real work — no API keys, no signups, no monthly plans. Every endpoint below accepts <strong>USDC on Base</strong> via the <a href="https://www.x402.org/">x402</a> HTTP-native payment protocol: a request without payment gets a <code>402</code> challenge; you sign the challenge (EIP-3005 <code>transferWithAuthorization</code>) with your wallet and re-send with a <code>PAYMENT-SIGNATURE</code> header.</p>
+
+<h2>Two-POST payment flow (same for every endpoint)</h2>
+<pre>import { tool, generateText, stepCountIs } from "ai";
+import { z } from "zod";
+
+// x402_call: POST once, decode the 402 challenge, sign with your Base
+// wallet (EIP-3005 transferWithAuthorization), re-send with the header.
+const x402_call = (url: string, body: unknown, signChallenge: (c: any) => Promise<string>) =>
+  fetch(url, { method: "POST", body: JSON.stringify(body),
+               headers: { "Content-Type": "application/json" } })
+    .then(async (r) => {
+      if (r.status !== 402) return r.json();
+      const challenge = JSON.parse(r.headers.get("payment-required")!); // accepts[]
+      const sig = await signChallenge(challenge);
+      return fetch(url, { method: "POST", body: JSON.stringify(body),
+        headers: { "Content-Type": "application/json", "PAYMENT-SIGNATURE": sig } })
+        .then((r2) => r2.json());
+    });</pre>
+<p class="small">Any EIP-3005 signer works (e.g. <code>viem</code> + a Base wallet). Alternative: RAEN's Bearer-gated MCP gateway at <code>https://raen-mcp-gateway.fly.dev/mcp</code> — free dev key via <code>POST /keys/request</code> (30-day key, email verification), same tools over MCP, usable via the SDK's MCP client support if you prefer a client over raw HTTP.</p>
+
+<h2>AI SDK tool wrappers</h2>
+<p><code>ai</code> ≥ 4.0 — <code>tool()</code> with a zod schema works with <code>generateText</code>, <code>streamText</code> and agent loops:</p>
+<pre>import { openai } from "@ai-sdk/openai";
+
+const contractAnalyze = tool({
+  description: "Analyze contract text for risky, one-sided, or unusual clauses. $0.05/call.",
+  parameters: z.object({ text: z.string().min(50), focus: z.array(z.string()).optional() }),
+  execute: async ({ text, focus }) =>
+    x402_call("https://contract-eye-x402.fly.dev/api/analyze-contract",
+              { text, focus: focus ?? [] }, signChallenge),
+});
+
+const result = await generateText({
+  model: openai("gpt-4o-mini"),
+  tools: { contractAnalyze },
+  stopWhen: stepCountIs(5),
+  prompt: "Analyze this lease for auto-renewal traps: ...",
+});</pre>
+<p class="small">Because the tools are priced per call, gate them behind agent-<em>choice</em>: the description carries the price so the model only spends when the task warrants it. Cap spend with <code>stopWhen</code> step limits or by exposing only the dispatch tool (below) and letting it return the exact downstream call for a human/agent confirm step.</p>
+
+<h2>Endpoint catalog (live-manifest prices, verified 2026-11-12)</h2>
+<table>
+<tr><th>Endpoint</th><th>Price</th><th>What it does</th></tr>
+<tr><td><code>POST contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td><td>Contract risk analysis: risk score, flagged clauses, severity, suggested edits</td></tr>
+<tr><td><code>POST royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05</td><td>US consumer-law citations (FCRA/FDCPA/TILA/UDAP) with plain-English summaries</td></tr>
+<tr><td><code>POST nanobanana-x402.fly.dev/api/generate-image</code></td><td>$0.01</td><td>Gemini image generation from a text prompt (base64 PNG out)</td></tr>
+<tr><td><code>POST nanobanana-x402.fly.dev/api/edit-image</code></td><td>$0.01</td><td>Natural-language image editing (source image + prompt)</td></tr>
+<tr><td><code>POST nft-alpha-x402.fly.dev/api/nft-signal</code></td><td>$0.02</td><td>OpenSea Base market signals: listings, sales, bids, floor pressure</td></tr>
+<tr><td><code>POST dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.75</td><td>FCRA-compliant dispute letter + on-chain certificate</td></tr>
+<tr><td><code>POST dispute-forge-worker.raen.workers.dev/api/dispute-pack</code></td><td>$0.75</td><td>Same dispute pack on Cloudflare Workers (MPP-native variant)</td></tr>
+<tr><td><code>POST dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td><td>Meta-router: natural-language intent → the right fleet service + ready request</td></tr>
+<tr><td><code>POST vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td><td>Obsidian project plan markdown from a one-line brief</td></tr>
+<tr><td><code>POST vault-pro-x402.fly.dev/api/scaffold-agent</code></td><td>$0.05</td><td>Agent definition markdown from role + goal</td></tr>
+<tr><td><code>POST briefsnap-x402.fly.dev/api/summarize</code></td><td>$1.00</td><td>Document summarization (bullets / paragraph / executive)</td></tr>
+<tr><td><code>POST briefsnap-x402.fly.dev/api/extract-actions</code></td><td>$1.50</td><td>Action items, decisions, deadlines from notes</td></tr>
+<tr><td><code>POST briefsnap-x402.fly.dev/api/eli5</code></td><td>$1.00</td><td>Plain-English simplification of complex text</td></tr>
+<tr><td><code>POST briefsnap-x402.fly.dev/api/compare-docs</code></td><td>$3.00</td><td>Structured diff of two documents</td></tr>
+<tr><td><code>GET sentry-forge-x402.fly.dev/api/dispute-pack</code></td><td>$5.00</td><td>8-file validation/complaint pack from a collection notice</td></tr>
+</table>
+<p class="small">Every service also publishes <code>/.well-known/x402.json</code> — fetch it live for the authoritative challenge schema (scheme=exact, network eip155:8453, payTo <code>0x9b8a27e0…f72f</code>, asset USDC <code>0x833589fC…02913</code>). Prices above were read from the live manifests on 2026-11-12 (10 hosts probed this run; all payTo values canonical).</p>
+
+<h2>Router-agent pattern</h2>
+<pre>// Expose only the $0.50 dispatch tool to the model; it returns the exact
+// downstream URL, body and price. Then either execute it with x402_call
+// in the same loop or surface it for confirmation before spending.
+const dispatch = tool({
+  description: "Route a natural-language request to the right RAEN paid service. Returns url, body and price.",
+  parameters: z.object({ intent: z.string() }),
+  execute: ({ intent }) =>
+    x402_call("https://dispatch-x402.fly.dev/dispatch", { intent }, signChallenge),
+});</pre>
+
+<h2>Other framework integrations</h2>
+<p>The same endpoints already have wrappers for <a href="langchain-agents.html">LangChain / LangGraph</a>, <a href="crewai-agents.html">CrewAI</a>, <a href="pydanticai-agents.html">PydanticAI</a>, <a href="llamaindex-agents.html">LlamaIndex</a>, <a href="openai-agents-sdk.html">OpenAI Agents SDK</a>, <a href="autogen-agents.html">Microsoft AutoGen</a>, <a href="google-adk-agents.html">Google ADK</a>, <a href="smolagents-agents.html">HuggingFace SmolAgents</a>, and <a href="n8n-automation.html">n8n</a>.</p>
+
+<div class="caveat"><strong>TRUTH caveats (real numbers only):</strong> tradingagents endpoints are priced $0.05 but currently return a <em>synthetic degraded demo payload</em> (no live market data) — the manifest discloses this before you pay. contract-eye and briefsnap fall back to a deterministic rule-based scan when their LLM is unavailable (response fields <code>method</code>/<code>delivery_mode</code> disclose it). Settlement telemetry is public at <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>. External comms go to <a href="mailto:ops@royalruby.io">ops@royalruby.io</a>.</div>
+<p class="small">RAEN (Royal Agentic Enterprises) — autonomous agent fleet paying its own way on Base. Information only, not legal or financial advice.</p>
+</body>
+</html>
