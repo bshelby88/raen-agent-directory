@@ -1,0 +1,82 @@
+name: Marketplace Watch
+
+# Daily mechanical check of RAEN's marketplace/discoverability surfaces:
+# 1. x402scan.com and AgentCash are reachable (listings live)
+# 2. Every fleet x402 manifest still pays the canonical wallet
+#    0x9b8a...f72f (a stale payTo silently misroutes money)
+# Primary integrity logic also runs on raen-brain /cron/manifest-check
+# every 12h; this is the laptop-independent second opinion.
+
+on:
+  schedule:
+    - cron: '25 7 * * *' # daily 07:25 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check marketplaces + manifest payTo integrity
+        id: check
+        env:
+          CANONICAL: "0x9b8a27e03ceba490953cda8ab1291c0e13baf72f"
+          MANIFESTS: "royal-ruby-x402 tradingagents-x402 dispute-forge-x402 nanobanana-x402 nft-alpha-x402 escrow-x402 vault-pro-x402 dispatch-x402 contract-eye-x402 briefsnap-x402 sentry-forge-x402"
+        run: |
+          set -u
+          PROBLEMS=""
+          {
+            echo "### Marketplace watch $(date -u +%Y-%m-%dT%H:%MZ)"
+            echo
+            echo "| surface | check | verdict |"
+            echo "|---|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          for pair in "x402scan|https://www.x402scan.com/" "AgentCash|https://agentcash.xyz/"; do
+            name="${pair%%|*}"; url="${pair#*|}"
+            code=$(curl -s -o /dev/null -w "%{http_code}" -m 20 -L "$url" || echo 000)
+            if [ "$code" = "200" ]; then verdict="up"; else verdict="UNREACHABLE"; PROBLEMS="$PROBLEMS $name($code)"; fi
+            echo "| $name | http $code | $verdict |" >> "$GITHUB_STEP_SUMMARY"
+          done
+
+          OUT=$(python3 scripts/check-manifests.py \
+            royal-ruby-x402 tradingagents-x402 dispute-forge-x402 \
+            nanobanana-x402 nft-alpha-x402 escrow-x402 vault-pro-x402 \
+            dispatch-x402 contract-eye-x402 briefsnap-x402 sentry-forge-x402) || true
+          echo "$OUT" | awk '{print "| "$1" | "$2" |"}' >> "$GITHUB_STEP_SUMMARY"
+          if echo "$OUT" | grep -qv canonical; then
+            BAD=$(echo "$OUT" | grep -v canonical | awk '{print $1"("$2")"}' | tr '\n' ' ')
+            PROBLEMS="$PROBLEMS $BAD"
+          fi
+
+          echo "problems=$PROBLEMS" >> "$GITHUB_OUTPUT"
+
+      - name: File issue on problems
+        if: steps.check.outputs.problems != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PROBLEMS: ${{ steps.check.outputs.problems }}
+        run: |
+          DATE=$(date -u +%Y-%m-%d)
+          EXISTS=$(gh issue list -R "$GITHUB_REPOSITORY" --state open --search "marketplace-watch in:title" --json number --jq 'length')
+          if [ "$EXISTS" = "0" ]; then
+            BODY="Automated marketplace watch found problems: $PROBLEMS
+          - PAYTO-DRIFT on an x402 service silently misroutes money - fix from source and redeploy (secrets set alone does NOT refresh a running machine).
+          - NO-ROUTES means the manifest is missing/unparseable.
+          - UNREACHABLE marketplace needs a manual listing check."
+            gh issue create -R "$GITHUB_REPOSITORY" \
+              --title "[marketplace-watch] drift/unreachable:$PROBLEMS $DATE" \
+              --label "marketplace-watch" \
+              --body "$BODY"
+          else
+            echo "Open marketplace-watch issue already exists; not duplicating."
+          fi
+
+      - name: Fail run on problems
+        if: steps.check.outputs.problems != ''
+        run: exit 1

@@ -1,0 +1,79 @@
+name: Ledger Truth Snapshot
+
+# Redundancy layer 2 for the settlement ledger check. Primary:
+# raen-brain.fly.dev /cron/ledger-check every 2h. This daily job commits a
+# durable snapshot of settlement-collector's /ledger.json to the repo, so
+# revenue truth survives even if the collector or every runner goes down.
+
+on:
+  schedule:
+    - cron: '10 6 * * *' # daily 06:10 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch ledger
+        id: fetch
+        run: |
+          code=$(curl -s -m 30 -w "%{http_code}" -o /tmp/ledger.json \
+            https://settlement-collector.fly.dev/ledger.json || echo 000)
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          if [ "$code" != "200" ]; then
+            echo "### ledger fetch FAILED (http $code)" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          mkdir -p stats/ledger
+          DATE=$(date -u +%Y-%m-%d)
+          cp /tmp/ledger.json "stats/ledger/snapshot-$DATE.json"
+          {
+            echo "### Ledger snapshot $DATE"
+            echo "- total_settled_usdc: $(jq -r '.total_settled_usdc' /tmp/ledger.json)"
+            echo "- total_external_usdc: $(jq -r '.total_external_usdc' /tmp/ledger.json) (external+verified only = revenue, TRUTH law)"
+            echo "- total_unverified_usdc: $(jq -r '.total_unverified_usdc' /tmp/ledger.json)"
+            echo "- distinct_external_payers: $(jq -r '.distinct_external_payers' /tmp/ledger.json)"
+            echo "- settled_tx_count: $(jq -r '.settled_tx_count' /tmp/ledger.json)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Commit snapshot
+        if: steps.fetch.outputs.code == '200'
+        run: |
+          git config user.name "raen-ledger-bot"
+          git config user.email "jadedfocus@gmail.com"
+          git add stats/ledger/
+          if git diff --cached --quiet; then
+            echo "No snapshot changes (first run may commit identical file)."
+            git diff --cached --exit-code || true
+          fi
+          if ! git diff --cached --quiet || [ -n "$(git status --porcelain stats/ledger)" ]; then
+            git commit -m "chore: ledger snapshot $(date -u +%Y-%m-%d)"
+            git push
+          else
+            echo "Nothing new to commit."
+          fi
+
+      - name: File issue if collector unreachable
+        if: steps.fetch.outputs.code != '200'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CODE: ${{ steps.fetch.outputs.code }}
+        run: |
+          DATE=$(date -u +%Y-%m-%d)
+          EXISTS=$(gh issue list -R "$GITHUB_REPOSITORY" --state open --search "ledger-truth in:title" --json number --jq 'length')
+          if [ "$EXISTS" = "0" ]; then
+            BODY="settlement-collector.fly.dev/ledger.json returned HTTP $CODE. Check https://settlement-collector.fly.dev/health and https://raen-brain.fly.dev/cron/status"
+            gh issue create -R "$GITHUB_REPOSITORY" \
+              --title "[ledger-truth] collector unreachable ($CODE) $DATE" \
+              --label "ledger-truth" \
+              --body "$BODY"
+          else
+            echo "Open ledger-truth issue already exists; not duplicating."
+          fi
+          exit 1

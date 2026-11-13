@@ -1,0 +1,83 @@
+name: Fleet Health Sweep
+
+# Redundancy layer 2 for the Steward's fleet-liveness sweep.
+# Primary: raen-brain.fly.dev (supercronic every 4h). This workflow is the
+# laptop-independent second opinion; it files an issue on failures.
+
+on:
+  schedule:
+    - cron: '15 */4 * * *' # offset from raen-brain's :00 fires
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Curl all 14 fleet endpoints
+        id: sweep
+        env:
+          ENDPOINTS: |-
+            royal-ruby-x402|https://royal-ruby-x402.fly.dev/health
+            tradingagents-x402|https://tradingagents-x402.fly.dev/health
+            dispute-forge-x402|https://dispute-forge-x402.fly.dev/health
+            nanobanana-x402|https://nanobanana-x402.fly.dev/health
+            nft-alpha-x402|https://nft-alpha-x402.fly.dev/health
+            escrow-x402|https://escrow-x402.fly.dev/health
+            vault-pro-x402|https://vault-pro-x402.fly.dev/health
+            dispatch-x402|https://dispatch-x402.fly.dev/health
+            contract-eye-x402|https://contract-eye-x402.fly.dev/health
+            briefsnap-x402|https://briefsnap-x402.fly.dev/health
+            sentry-forge-x402|https://sentry-forge-x402.fly.dev/health
+            staci-tradingagents|https://staci-tradingagents.fly.dev/health
+            raen-blog-x402|https://raen-blog-x402.fly.dev/
+            settlement-collector|https://settlement-collector.fly.dev/health
+        run: |
+          set -u
+          FAILURES=""
+          {
+            echo "### RAEN fleet health $(date -u +%Y-%m-%dT%H:%MZ)"
+            echo
+            echo "| service | http code | verdict |"
+            echo "|---|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+          while IFS= read -r line; do
+            [ -z "$line" ] && continue
+            name="${line%%|*}"
+            url="${line#*|}"
+            code=$(curl -s -o /dev/null -w "%{http_code}" -m 15 "$url" || echo 000)
+            # 404 on /health still means the app is serving (per flyio-fleet-ops);
+            # 000 = no connection = down.
+            if [ "$code" = "000" ]; then
+              verdict="DOWN"
+              FAILURES="$FAILURES $name($code)"
+            else
+              verdict="up"
+            fi
+            echo "| $name | $code | $verdict |" >> "$GITHUB_STEP_SUMMARY"
+          done <<< "$ENDPOINTS"
+          echo "failures=$FAILURES" >> "$GITHUB_OUTPUT"
+
+      - name: File issue on failures
+        if: steps.sweep.outputs.failures != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FAILURES: ${{ steps.sweep.outputs.failures }}
+        run: |
+          DATE=$(date -u +%Y-%m-%d)
+          TITLE="[fleet-health] DOWN:$FAILURES $DATE"
+          EXISTS=$(gh issue list -R "$GITHUB_REPOSITORY" --state open --search "fleet-health in:title" --json number --jq 'length')
+          if [ "$EXISTS" = "0" ]; then
+            BODY="Automated sweep found dead endpoints (000 = no connection): $FAILURES
+          Primary runner: https://raen-brain.fly.dev/cron/status (may have more detail)."
+            gh issue create -R "$GITHUB_REPOSITORY" \
+              --title "$TITLE" \
+              --label "fleet-health" \
+              --body "$BODY"
+          else
+            echo "Open fleet-health issue already exists; not duplicating."
+          fi
+          exit 1
