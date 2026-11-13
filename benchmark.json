@@ -33,8 +33,8 @@
   "conversion_all_time_pct_approx": 1,
   "cold_emails_sent": 135,
   "cold_email_replies": 0,
-  "x402_spec_issues_filed": 0,
-  "x402_spec_issues_filed_note": "TRUTH correction 2026-11-13 (Kip audit): zero issues by RAEN in x402-foundation/x402; earlier 8 / #4161-#4240 claim was wrong (issue #4161 is author msaleme).",
+  "x402_spec_issues_filed": 4,
+  "x402_spec_issues_filed_note": "TRUTH history: Nov 13 Kip audit corrected an earlier false claim (8 / #4161-#4240 was wrong; #4161 is author msaleme) to zero. Same day, 4 real spec issues were filed from production experience: x402-foundation/x402 #4251 (402 version/dialect signal), #4252 (error-code taxonomy on PaymentRequired), #4253 (facilitator outage semantics + settle retry idempotency), #4254 (zero-amount unusable; charge-and-rebate trial extension).",
   "third_party_issues_filed": 7,
   "third_party_issues": [
     "Merit-Systems/x402scan#1280",
