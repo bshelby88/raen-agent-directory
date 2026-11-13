@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paid tools for Dify, Flowise & Langflow — x402 pay-per-call APIs for visual agent builders</title>
+<meta name="description" content="Give your Dify, Flowise or Langflow agent real paid tools — law citations, contract analysis, dispute letters, image generation, summaries — via the RAEN MCP gateway (bearer dev key, no wallet on the platform) or the raw x402 two-POST flow from a Python code node. Prices live-verified from each service's own 402 challenge.">
+<style>
+  body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:880px;margin:0 auto;padding:24px;line-height:1.6;color:#1a1a2e}
+  h1{font-size:1.6em} h2{margin-top:2em;border-bottom:2px solid #e8e8f0;padding-bottom:6px}
+  code,pre{background:#f4f4f8;border-radius:6px;font-size:0.92em}
+  code{padding:2px 5px} pre{padding:14px;overflow-x:auto;border:1px solid #e4e4ec}
+  table{border-collapse:collapse;width:100%;margin:1em 0}
+  th,td{border:1px solid #ddd;text-align:left;padding:7px 10px;vertical-align:top}
+  th{background:#f4f4f8}
+  .caveat{background:#fff8e6;border-left:4px solid #e0a800;padding:10px 14px;margin:1.2em 0}
+  .note{background:#eef6ff;border-left:4px solid #2b6cb0;padding:10px 14px;margin:1.2em 0}
+  a{color:#0a58ca}
+  footer{margin-top:3em;font-size:0.85em;color:#666;border-top:1px solid #eee;padding-top:12px}
+</style>
+</head>
+<body>
+
+<p><a href="https://bshelby88.github.io/raen-agent-directory/llms.txt">← Full RAEN directory (llms.txt)</a></p>
+
+<h1>Paid tools for Dify, Flowise &amp; Langflow (visual agent builders)</h1>
+
+<p>You built an agent or workflow in a visual builder. It needs tools that <em>do real work</em> — statute citations, contract risk scans, dispute letters, images, document summaries. RAEN is a fleet of 12 production x402 micropayment services on Base Mainnet: every endpoint is <strong>pay-per-call USDC, $0.01–$5.00, no subscription, no API-key wall</strong>. This page shows the two honest ways to wire them into Dify, Flowise, or Langflow.</p>
+
+<div class="note"><strong>Protocol reality first.</strong> x402 payments are EIP-3009 signed transfers — a wallet signature. Visual builders have no wallet, so a bare HTTP Request node <em>cannot</em> settle a 402 challenge on its own. You have two workable paths, both below: <strong>(A)</strong> the RAEN MCP gateway with a self-serve Bearer dev key (no wallet needed on the platform — recommended), or <strong>(B)</strong> the raw two-POST x402 flow from a Python code node running the official <code>x402</code> client with your own wallet key.</div>
+
+<h2>The catalog (prices live-verified from each service's own challenge, 2026-11-13)</h2>
+
+<p>Every price below was read from the live <code>/.well-known/x402.json</code> manifest of each service on the day above; the flagship royal-ruby quote was additionally verified by decoding a real HTTP 402 response ($0.05, scheme <code>exact</code>, network <code>eip155:8453</code>, USDC, payTo <code>0x9b8a…f72f</code>).</p>
+
+<table>
+<tr><th>Capability</th><th>Endpoint</th><th>Price / call</th></tr>
+<tr><td>Law citations (FCRA/FDCPA/TILA/state UDAP, 36 statutes)</td><td><code>POST https://royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05 (A/B bucket may quote $0.03 — disclosed in the manifest)</td></tr>
+<tr><td>Contract risk analysis</td><td><code>POST https://contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td></tr>
+<tr><td>Image generation / editing (Gemini)</td><td><code>POST https://nanobanana-x402.fly.dev/api/generate-image</code></td><td>$0.01</td></tr>
+<tr><td>NFT market signals (OpenSea 5-min rolling)</td><td><code>POST https://nft-alpha-x402.fly.dev/api/nft-signal</code></td><td>$0.02</td></tr>
+<tr><td>Obsidian project / agent scaffolding</td><td><code>POST https://vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td></tr>
+<tr><td>Intent router → picks the right fleet service</td><td><code>POST https://dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td></tr>
+<tr><td>FCRA dispute letter + on-chain certificate</td><td><code>POST https://dispute-forge-worker.raen.workers.dev/api/dispute-pack</code></td><td>$0.75</td></tr>
+<tr><td>Document summarize / ELI5</td><td><code>POST https://briefsnap-x402.fly.dev/api/summarize</code> · <code>/api/eli5</code></td><td>$1.00</td></tr>
+<tr><td>Action-item extraction</td><td><code>POST https://briefsnap-x402.fly.dev/api/extract-actions</code></td><td>$1.50</td></tr>
+<tr><td>Compare two documents</td><td><code>POST https://briefsnap-x402.fly.dev/api/compare-docs</code></td><td>$3.00</td></tr>
+<tr><td>8-document dispute pack from one collection notice</td><td><code>GET https://sentry-forge-x402.fly.dev/api/dispute-pack</code></td><td>$5.00</td></tr>
+<tr><td>Ticker analysis (tradingagents)</td><td><code>POST https://staci-tradingagents.fly.dev/api/analyze-ticker</code></td><td>$5.00</td></tr>
+</table>
+
+<div class="caveat"><strong>TRUTH disclosures.</strong> The tradingagents ticker endpoints currently return a <em>synthetic demonstration payload</em>, not live market data — the manifest says so, and the response is not market research. Several services disclose a deterministic fallback mode (e.g. <code>mode=statutory-baseline</code>, rule-based clause scans) when their LLM is unavailable — the response fields tell you which mode you got. External payers to date: 0 — the public ledger is linked below; every settled payment is on-chain.</div>
+
+<h2>Path A (recommended): RAEN MCP gateway + Bearer dev key</h2>
+
+<p>The gateway exposes 5 flagship tools over Streamable-HTTP MCP — law lookup, ticker analysis, dispute letter, image generation, contract analysis — with <strong>free first call on each tool</strong> (charge-and-rebate on-chain: you pay the challenge, we rebate the full amount right after settlement, net $0, once per wallet per 30 days). All three platforms can consume an MCP server:</p>
+
+<ul>
+<li><strong>Dify</strong> — add the gateway as an MCP server (Streamable HTTP) in your workspace's Tools section, with header <code>Authorization: Bearer YOUR_KEY</code>. The tools appear as callable tools for any agent app.</li>
+<li><strong>Flowise</strong> — use the MCP tool node pointing at <code>https://raen-mcp-gateway.fly.dev/mcp</code> with the same authorization header.</li>
+<li><strong>Langflow</strong> — drop in the MCP Tools component, add the gateway URL and the <code>Authorization</code> header, then wire the tools into your agent.</li>
+</ul>
+
+<p><strong>Get the key (self-serve, ~3 minutes, no account):</strong></p>
+
+<pre>curl -X POST https://raen-mcp-gateway.fly.dev/keys/request \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"you@example.com"}'</pre>
+
+<p>You get a verification email; your 30-day Bearer key is issued after you click it. Rate limit 3 requests/day/IP. Per-call pricing after the free first call: law lookup $0.05 · ticker $0.05 · dispute letter $0.75 · image gen $0.01 · contract analysis $0.05, settled on-chain in USDC on Base.</p>
+
+<h2>Path B: raw x402 two-POST flow from a Python code node</h2>
+
+<p>If you want direct x402 (any endpoint, not just the gateway's 5), run a Python code node / custom tool in your builder with the official <code>x402</code> Python client and your own wallet key. The flow for any endpoint in the table:</p>
+
+<ol>
+<li><code>POST</code> the endpoint with your JSON body → <code>HTTP 402</code> with a <code>payment-required</code> header (the challenge: amount, asset, payTo, timeout).</li>
+<li>Have the client sign the EIP-3009 transfer for the quoted amount and <code>POST</code> again with the <code>x-payment</code> header → <code>200</code> with your result.</li>
+</ol>
+
+<p>Copy-paste recipes live in the <a href="https://github.com/bshelby88/x402-cookbook">x402 Integration Cookbook</a> — <code>recipes/02-python-client.md</code> is exactly this two-POST flow with the signing client. Watch it happen with zero code in the <a href="https://x402-playground.fly.dev/">live 402 playground</a>.</p>
+
+<h2>Verify before you trust</h2>
+
+<table>
+<tr><th>Check</th><th>Where</th></tr>
+<tr><td>Live 402 challenge, decoded in-browser</td><td><a href="https://x402-playground.fly.dev/">x402 playground</a></td></tr>
+<tr><td>Public sales ledger (every settled tx, tx-verified)</td><td><a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a></td></tr>
+<tr><td>A2A agent card for the gateway</td><td><a href="https://raen-mcp-gateway.fly.dev/.well-known/agent.json">/.well-known/agent.json</a></td></tr>
+<tr><td>Gateway health (5 tools)</td><td><a href="https://raen-mcp-gateway.fly.dev/health">/health</a></td></tr>
+<tr><td>PayTo for all services</td><td><code>0x9b8a27e03ceba490953cda8ab1291c0e13baf72f</code> (Base, USDC)</td></tr>
+</table>
+
+<p>Integration help: <a href="mailto:ops@royalruby.io">ops@royalruby.io</a> · Full catalog: <a href="https://raen.royalruby.io/">raen.royalruby.io</a> · Framework index: <a href="https://bshelby88.github.io/raen-agent-directory/llms.txt">llms.txt</a> (LangChain, CrewAI, Vercel AI SDK, OpenAI Agents SDK, and ~20 more wrapper guides).</p>
+
+<footer>Built by RAEN (Royal Agentic Enterprises). Prices verified against live manifests 2026-11-13; manifests can drift — decode a live 402 when auditing. Information only, not legal or financial advice.</footer>
+
+<img src="https://settlement-collector.fly.dev/hit?src=visual-builders" width="1" height="1" alt="" aria-hidden="true">
+</body>
+</html>
