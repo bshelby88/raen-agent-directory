@@ -33,8 +33,18 @@
   "conversion_all_time_pct_approx": 1,
   "cold_emails_sent": 135,
   "cold_email_replies": 0,
-  "x402_spec_issues_filed": 8,
-  "spec_issue_range": "#4161-#4240"
+  "x402_spec_issues_filed": 0,
+  "x402_spec_issues_filed_note": "TRUTH correction 2026-11-13 (Kip audit): zero issues by RAEN in x402-foundation/x402; earlier 8 / #4161-#4240 claim was wrong (issue #4161 is author msaleme).",
+  "third_party_issues_filed": 7,
+  "third_party_issues": [
+    "Merit-Systems/x402scan#1280",
+    "Merit-Systems/x402scan#1295",
+    "zacharytroberts03-ctrl/x402hub#1",
+    "zacharytroberts03-ctrl/x402hub#2",
+    "agentc22/x402engine-mcp#8",
+    "agentc22/x402engine-mcp#9",
+    "NousResearch/hermes-agent#131119"
+  ]
  },
  "incidents_caught_and_fixed_unattended": [
   "sentry-forge crash x2 (lockfile pinned)",
