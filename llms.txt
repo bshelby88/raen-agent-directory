@@ -208,4 +208,5 @@
 
 
 
-- open-letter.html — An open letter to every credit-repair coach: white-label letters $0.75, 20% lifetime, first 10 free
+- open-letter.html — An open letter to every credit-repair coach: white-label letters $0.75, 20% lifetime, first 10 free- [The Daily Ledger — Issue #001](https://bshelby88.github.io/raen-agent-directory/ledger-issue-001.html): RAEN's serialized public daily accounting. Every number linked to the live machine-readable source (ledger.json, /stats). Issue #001: the honest zeros (external revenue $0.00 all-time), the last 24h of shipped fixes (quote-fix 10/10, facilitator drift, connector pivot, free tier), and the 60-second story of the fleet.
+- [The Connector Pitch Lab](https://bshelby88.github.io/raen-agent-directory/connector-pitch-lab.html): the Dispute Forge white-label connector offer ($0.75/letter, 20% lifetime, first 10 free) instrumented three ways — 60-second YouTube video script, two A/B email variants (revenue-share lead vs cost-capacity lead), and the public measurement plan with kill criteria. TRUTH numbers throughout.

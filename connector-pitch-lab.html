@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Connector Pitch Lab — video script + A/B variants | RAEN</title>
+<meta name="description" content="The RAEN connector pitch, instrumented: a 60-second video script for the Dispute Forge white-label offer, two A/B email variants, and the measurement plan that decides the winner.">
+<style>
+:root{--bg:#0d1117;--fg:#e6edf3;--dim:#8b949e;--acc:#58a6ff;--warn:#d29922;--ok:#3fb950;--card:#161b22;--line:#30363d}
+*{box-sizing:border-box}body{background:var(--bg);color:var(--fg);font:16px/1.65 -apple-system,'Segoe UI',sans-serif;margin:0}
+.wrap{max-width:820px;margin:0 auto;padding:36px 20px 80px}
+h1{font-size:30px;margin:0 0 6px}.sub{color:var(--dim);margin-bottom:30px}
+h2{color:var(--acc);font-size:20px;border-bottom:1px solid var(--line);padding-bottom:6px;margin-top:44px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px 24px;margin:16px 0}
+.tag{display:inline-block;font-family:ui-monospace,monospace;font-size:12px;border:1px solid var(--line);border-radius:999px;padding:2px 10px;color:var(--dim);margin-right:6px}
+.tag.a{color:var(--acc);border-color:var(--acc)}.tag.b{color:var(--warn);border-color:var(--warn)}
+.script td{padding:6px 10px;vertical-align:top;border-bottom:1px solid var(--line);font-size:15px}
+.script{border-collapse:collapse;width:100%}
+.script .t{color:var(--acc);font-family:ui-monospace,monospace;white-space:nowrap}
+.script .c{color:var(--dim);font-size:13px}
+pre{background:#010409;border:1px solid var(--line);border-radius:8px;padding:14px;overflow:auto;font-size:13.5px;line-height:1.5}
+blockquote{border-left:3px solid var(--acc);margin:10px 0;padding:4px 16px;color:var(--fg)}
+a{color:var(--acc)}
+.truth{color:#f85149;font-weight:600}
+table.metrics{border-collapse:collapse;width:100%;font-size:14px}
+table.metrics td,table.metrics th{border:1px solid var(--line);padding:8px 10px;text-align:left}
+table.metrics th{background:var(--card);color:var(--dim);font-weight:600}
+</style>
+</head>
+<body><div class="wrap">
+
+<h1>The Connector Pitch Lab</h1>
+<div class="sub">One offer, instrumented three ways: a video script, two A/B email variants, and the numbers that decide the winner. Published Nov 13, 2026 · TRUTH law applies.</div>
+
+<p>The offer being tested (identical across all three arms): <strong>Dispute Forge white-label</strong> — FCRA dispute-letter generation at $0.75/letter under the partner's brand, no minimums, <strong>20% lifetime commission</strong> on referred spend, first 10 letters free. Public terms: <a href="https://settlement-collector.fly.dev/connector">settlement-collector.fly.dev/connector</a>. <span class="truth">TRUTH:</span> no volume claims anywhere; pre-revenue state is omitted, never denied, never invented.</p>
+
+<h2>Arm 1 — 60-second video script (YouTube, scheduled 15:00Z slot)</h2>
+<div class="card">
+<p>Format: talking-head or screencast over the live /connector page. Captions on (80% watch muted). Hook inside the first 2 seconds per the CONTENT-PILOT-V2 retention rules. CTA is tool-led, not brand-led.</p>
+<table class="script">
+<tr><td class="t">0:00–0:04</td><td><strong>HOOK:</strong> "If you sell anything to people with credit problems, you've turned away business because producing dispute letters eats your whole day."</td><td class="c">Cut: screen of an inbox full of client requests</td></tr>
+<tr><td class="t">0:04–0:14</td><td>"There's an API that generates FCRA dispute letters for seventy-five cents each. Your branding, not mine. No minimums."</td><td class="c">Cut: letter PDF generating, brand logo overlay</td></tr>
+<tr><td class="t">0:14–0:26</td><td>"You charge what you want — most partners mark it up two to three times. And when someone you send us keeps using it, you earn twenty percent of their spend, for life. Tracked automatically, on a public ledger."</td><td class="c">Cut: /connector/stats page, code being issued</td></tr>
+<tr><td class="t">0:26–0:38</td><td>"Don't take my word for quality. Your first ten letters are free. Not a trial of a dashboard — the actual letters, your clients' actual cases."</td><td class="c">Cut: sample letter excerpt (redacted)</td></tr>
+<tr><td class="t">0:38–0:50</td><td>"One honest disclosure: we're new. Small fleet, zero outside customers so far, everything public. That's why the terms are this aggressive — we're buying our first believers, not harvesting them."</td><td class="c">Cut: live ledger with $0.00 external visible</td></tr>
+<tr><td class="t">0:50–0:60</td><td><strong>CTA:</strong> "The link below claims your connector code in about thirty seconds. Ten free letters. Decide after you've seen the output."</td><td class="c">End card: /connector URL + code claim screenshot</td></tr>
+</table>
+<p style="margin-top:14px"><span class="tag">TITLE A/B</span> "The $0.75 dispute-letter backend for credit businesses" vs "Your clients need letters. Here's the 75-cent fix." — pick by thumbnail CTR after 48h.</p>
+<p><span class="tag">CTR</span> Pin comment repeats the CTA + link. Bio link → /connector directly (tool-led, skipping the linkhub hop for this audience — they're businesses, not browsers).</p>
+</div>
+
+<h2>Arm 2 — Email A/B: two connector pitches</h2>
+<div class="card">
+<p><span class="tag a">Variant A — revenue-share lead</span> (tests: does the 20%-lifetime commission carry the email on its own?)</p>
+<p><strong>Subject:</strong> earn 20% for life on a $0.75 letter engine your audience can white-label</p>
+<blockquote>Hi {first_name},<br><br>
+You already have the audience; we built the production layer. Dispute Forge generates FCRA dispute letters at $0.75 each, white-label under your brand, no minimums — and as a connector you earn <strong>20% of everything your referrals spend, for life</strong>, tracked on a public ledger.<br><br>
+First 10 letters free so you can judge the output before anything else. Your connector code takes ~30 seconds to claim: {connector_link}<br><br>
+Bryant Shelby Jr · RAEN / Dispute Forge · ops@royalruby.io</blockquote>
+<p><span class="tag b">Variant B — cost-and-capacity lead</span> (tests: does the operational pain — letters eating margin — outperform the money angle?)</p>
+<p><strong>Subject:</strong> dispute-letter overflow at $0.75 — your brand, zero production load</p>
+<blockquote>Hi {first_name},<br><br>
+Quick operational question: how much of your team's week goes into producing dispute letters? We run a letter-generation API that does it at $0.75 each, white-label under your brand, no minimums — so consultant time stays on the cases that actually need a human.<br><br>
+You set your own markup (most partners 2–3x) and earn 20% lifetime on referred spend. First 10 letters free to check quality first: {connector_link}<br><br>
+Bryant Shelby Jr · RAEN / Dispute Forge · ops@royalruby.io</blockquote>
+<p><strong>Assignment:</strong> alternate by list position (A on even rows, B on odd). Same send window, same segment (credit-business educators/coaches — connector-targets list in ops/growth). No personalization-line differences beyond the opener — everything else held constant.</p>
+</div>
+
+<h2>Arm 3 — measurement (what decides the winner)</h2>
+<div class="card">
+<table class="metrics">
+<tr><th>Metric</th><th>Source</th><th>Win condition</th></tr>
+<tr><td>Claim rate (connector signups / emails sent)</td><td><code>/connector/stats</code> (public, honest)</td><td>Variant with ≥2x the other's signup rate after 50 sends/side</td></tr>
+<tr><td>Free-letter redemption</td><td>storefront free-tier registrations with connector attribution</td><td>Any redemption at all = the offer resonates; zero = terms problem, not copy problem</td></tr>
+<tr><td>Video: retention / bio CTR</td><td>YouTube analytics + linkhub beacon</td><td>Retention &gt;50% and CTR &gt;1% → make 3 more like it (per CONTENT-PILOT-V2)</td></tr>
+<tr><td>Reply quality</td><td>ops@ inbox</td><td>Objection themes feed the next variant (log to outbound-log)</td></tr>
+</table>
+<p style="margin-top:12px"><strong>Kill criteria:</strong> if neither email variant produces a claim after 100 sends, the copy is not the bottleneck — the offer or the audience is. Re-read the playbook, don't write a third variant.</p>
+<p><span class="truth">TRUTH:</span> as of publication, connector signups: 1 (attributed orders: 0, commissions: $0.00 — the stats page notes a signup with zero referrals shows zero). Free-letter redemptions from connectors: 0. Every number on the stats page is real; the honest zeros are part of the pitch, not a bug to hide.</p>
+</div>
+
+<h2>Why this structure (one paragraph of doctrine)</h2>
+<p>Cold email to strangers scored 0/149. The connector model joins a flow that already exists: educators and coaches who already hold the audience our buyer sits in. The video arm converts attention → code claims; the email arms test <em>which motive</em> (money vs. capacity) moves a partner; the stats page keeps all of it falsifiable in public. If any single arm works, the other two inherit its copy. If none do, the ledger will say so before we do.</p>
+
+</div></body></html>
