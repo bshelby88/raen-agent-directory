@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAEN paid API tools for GitHub Copilot / VS Code agent mode — x402 on Base</title>
+<meta name="description" content="Give VS Code Copilot agent mode real paid skills via MCP: law citations $0.05, contract analysis $0.05, dispute letters $0.75, image gen $0.01, summaries $1.00+. USDC on Base, x402 pay-per-call, no subscription.">
+<style>
+:root{color-scheme:dark}
+body{margin:0;font-family:ui-monospace,Menlo,Consolas,monospace;background:#0d1117;color:#c9d1d9;line-height:1.6;max-width:900px;margin:0 auto;padding:2rem 1.25rem}
+h1,h2,h3{color:#58a6ff;font-family:system-ui,sans-serif}
+a{color:#58a6ff}
+code,pre{background:#161b22;border-radius:6px}
+pre{padding:1rem;overflow-x:auto;border:1px solid #30363d}
+code{padding:.15em .35em}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{border:1px solid #30363d;padding:.45rem .6rem;text-align:left}
+th{background:#161b22;color:#c9d1d9}
+.caveat{border:1px solid #d29922;background:#1c1704;padding:.75rem 1rem;border-radius:6px;font-size:.9rem}
+.small{font-size:.8rem;color:#8b949e}
+</style>
+</head>
+<body>
+<h1>Paid API tools for GitHub Copilot / VS Code agent mode (x402 · Base USDC)</h1>
+<p>VS Code agent mode (GitHub Copilot) runs <a href="https://code.visualstudio.com/docs/copilot/chat/mcp-servers">MCP servers defined in <code>.vscode/mcp.json</code></a>. The RAEN MCP gateway exposes 5 paid tools — US consumer-law citations, dispute letters, contract risk analysis, image generation, market/ticker analysis — as one Streamable-HTTP MCP server. Copilot's agent calls them whenever a task needs that work, and each call is pay-per-call <strong>USDC on Base</strong> via <a href="https://www.x402.org/">x402</a>. No API keys, no subscription, no monthly plan: the payment is the authorization.</p>
+
+<h2>Step 1 — get a free dev key (email-verified, 30 days)</h2>
+<pre>curl -X POST https://raen-mcp-gateway.fly.dev/keys/request \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"you@example.com"}'</pre>
+<p class="small">You get a verification link by email; verifying returns a 30-day Bearer key. Rate limit 3 keys/day/IP. The key funds nothing — it identifies you; payments happen per-call from your own wallet.</p>
+
+<h2>Step 2 — add the gateway to <code>.vscode/mcp.json</code></h2>
+<pre>{
+  "servers": {
+    "raen-paid-tools": {
+      "type": "http",
+      "url": "https://raen-mcp-gateway.fly.dev/mcp",
+      "headers": {
+        "Authorization": "Bearer &lt;your-dev-key&gt;"
+      }
+    }
+  }
+}</pre>
+<p class="small">VS Code detects the config change and starts the server. Copilot agent mode then lists the 5 RAEN tools and can invoke them mid-task. Verify the server is alive: <code>GET https://raen-mcp-gateway.fly.dev/health</code> (200) and <code>GET /.well-known/agent.json</code> (the A2A agent card, 5 tools).</p>
+
+<h2>Step 3 — pay per call from your own wallet (raw HTTP, no gateway)</h2>
+<p>If you prefer no key at all, every fleet endpoint is directly callable with the two-POST x402 flow — a request without payment returns <code>402</code> with the challenge; you sign it (EIP-3009 <code>transferWithAuthorization</code>, USDC on Base) and re-send with the <code>PAYMENT-SIGNATURE</code> header:</p>
+<pre>import json, requests
+from eth_account import Account   # any EIP-3009 USDC signer works
+
+def x402_call(url, body, signer):
+    r = requests.post(url, json=body)
+    if r.status_code != 402:
+        return r.json()
+    # challenge is in the payment-required header AND the body (quote-fix deployed fleet-wide)
+    challenge = r.json().get("accepts") or json.loads(r.headers["payment-required"])["accepts"][0]
+    sig = sign_usdc_eip3009(signer, challenge)   # your wallet signs the transferWithAuthorization
+    return requests.post(url, json=body,
+                         headers={"PAYMENT-SIGNATURE": sig}).json()</pre>
+<p class="small">The <code>402</code> body now carries the full quote (scheme, price, asset USDC, network <code>eip155:8453</code>, payTo) — fleet-wide quote-fix, verified live 2026-11-13 — so any body-parsing agent works without header plumbing. VS Code's built-in fetch/API testing in agent mode can drive the same flow.</p>
+
+<h2>Endpoint catalog (live-verified 2026-11-13)</h2>
+<table>
+<tr><th>Endpoint</th><th>Price</th><th>What it does</th></tr>
+<tr><td><code>POST royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05</td><td>US consumer-law citations (FCRA/FDCPA/TILA/UDAP) with plain-English summaries (A/B test: some wallets see $0.03 — the 402 challenge states the exact price)</td></tr>
+<tr><td><code>POST contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td><td>Contract risk analysis: risk score, flagged clauses, severity, suggested edits</td></tr>
+<tr><td><code>POST dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.75</td><td>FCRA-compliant dispute letter + on-chain certificate</td></tr>
+<tr><td><code>POST nanobanana-x402.fly.dev/api/generate-image</code></td><td>$0.01</td><td>Gemini image generation from a text prompt (base64 PNG out)</td></tr>
+<tr><td><code>POST nanobanana-x402.fly.dev/api/edit-image</code></td><td>$0.01</td><td>Natural-language image editing (source image + prompt)</td></tr>
+<tr><td><code>POST dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td><td>Meta-router: natural-language intent → the right fleet service + ready request</td></tr>
+<tr><td><code>POST briefsnap-x402.fly.dev/api/summarize</code></td><td>$1.00</td><td>Document summarization (bullets / paragraph / executive)</td></tr>
+<tr><td><code>POST briefsnap-x402.fly.dev/api/extract-actions</code></td><td>$1.50</td><td>Action items, decisions, deadlines from notes</td></tr>
+<tr><td><code>POST sentry-forge-x402.fly.dev/api/dispute-pack</code></td><td>$5.00</td><td>Full dispute-package generation (paid variant)</td></tr>
+</table>
+<p class="small">Prices verified live from each service's own 402 quote this run (2026-11-13). Full manifest: every host serves <code>/.well-known/x402.json</code>.</p>
+
+<h2>Why this fits Copilot agent mode</h2>
+<ul>
+<li><strong>MCP-native:</strong> agent mode consumes <code>.vscode/mcp.json</code> servers directly — one config block, no extension.</li>
+<li><strong>Per-call economics:</strong> Copilot sessions are intermittent; per-call USDC beats a monthly plan when you use a tool twice a week.</li>
+<li><strong>Free first call:</strong> new wallets get a charge-and-rebate first call (pay the challenge, get it rebated) — try the flow risk-free.</li>
+</ul>
+
+<div class="caveat"><strong>TRUTH-law caveats:</strong> payments are real USDC on Base — fund a wallet before paid calls; there is no free tier beyond the first-call rebate. The <code>x-payer-address</code> header (your wallet address) on the first call triggers the rebate. Prices can change; the live 402 challenge is always the source of truth for what a call costs right now. Law and dispute outputs are information, not legal advice. The gateway is RAEN-operated; the fleet's public sales ledger is at <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a> — see what other buyers actually settled before you pay.</div>
+
+<p class="small">More integration guides: <a href="https://bshelby88.github.io/raen-agent-directory/">the RAEN agent directory</a> (LangChain, CrewAI, LlamaIndex, OpenAI Agents SDK, Semantic Kernel, n8n, and more). MCP clients (Claude Desktop, Cursor, Copilot) share this gateway: <a href="mcp-clients.html">MCP quickstart</a>.</p>
+</body>
+</html>
