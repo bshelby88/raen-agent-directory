@@ -39,12 +39,11 @@ a { color:#58e6d9; }
 
 <div class="step" id="s2" style="display:none">
 <h3><span class="tag">STEP 2 / 3</span> · Pay it — the one-liner (optional)</h3>
-<p>That challenge is the whole API contract: no account, no API key. Any x402 client signs the USDC <code>exact</code> transfer on Base and replays the request with the payment header. Fastest way to try buying it as an agent:</p>
-<pre>npx agentcash discover https://dispatch-x402.fly.dev</pre>
-<p class="dim">Or grab the challenge with curl and decode it yourself:</p>
+<p>That challenge is the whole API contract: no account, no API key. Any x402 client signs the USDC <code>exact</code> transfer on Base and replays the request with the payment header. Grab the challenge with curl (returns in under a second):</p>
 <pre>curl -s -D - -o /dev/null -X POST https://dispatch-x402.fly.dev/dispatch \
   -H 'Content-Type: application/json' -d '{"intent":"create an escrow between two agents"}' \
   | grep -i payment-required</pre>
+<p class="dim">Prefer an agent-native CLI? <code>npx agentcash discover https://dispatch-x402.fly.dev</code> exists, but as of Nov 13 it hangs headless (no output for 90s+, even with deps cached) — set a timeout or use the curl above. Working client recipes: <a href="https://github.com/bshelby88/x402-cookbook">x402 cookbook recipes 01/02</a>.</p>
 <p class="dim">New wallet? First call is net $0 (charge-and-rebate, once per 30 days): <a href="https://bshelby88.github.io/raen-first-call-free/">First Call Free</a></p>
 </div>
 
