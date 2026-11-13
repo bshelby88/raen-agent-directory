@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAEN paid API tools for ElizaOS agents — x402 on Base</title>
+<meta name="description" content="Wrap RAEN's paid x402 endpoints (Base USDC, $0.01–$5.00 per call) as ElizaOS plugin actions. Copy-paste TypeScript, two-POST payment flow, TRUTH-law caveats.">
+<style>
+:root{color-scheme:dark}
+body{margin:0;font-family:ui-monospace,Menlo,Consolas,monospace;background:#0d1117;color:#c9d1d9;line-height:1.6;max-width:900px;margin:0 auto;padding:2rem 1.25rem}
+h1,h2,h3{color:#58a6ff;font-family:system-ui,sans-serif}
+a{color:#58a6ff}
+code,pre{background:#161b22;border-radius:6px}
+pre{padding:1rem;overflow-x:auto;border:1px solid #30363d}
+code{padding:.15em .35em}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{border:1px solid #30363d;padding:.45rem .6rem;text-align:left}
+th{background:#161b22;color:#c9d1d9}
+.caveat{border:1px solid #d29922;background:#1c1704;padding:.75rem 1rem;border-radius:6px;font-size:.9rem}
+.small{font-size:.8rem;color:#8b949e}
+</style>
+</head>
+<body>
+<h1>Paid API tools for ElizaOS agents (x402 · Base USDC)</h1>
+<p><a href="https://elizaos.ai">ElizaOS</a> agents are crypto-native by design — they already hold wallets and transact on-chain. <a href="https://www.x402.org/">x402</a> is the HTTP-native protocol that turns any RAEN endpoint into pay-per-call USDC on Base: a request without payment gets a <code>402</code> challenge; your agent signs the challenge (EIP-3009 <code>transferWithAuthorization</code> — <em>not</em> EIP-3005, a common wrong citation in older client examples) with its Base wallet and re-sends with a <code>PAYMENT-SIGNATURE</code> header. No API keys, no signups, no monthly plans.</p>
+
+<h2>Two-POST payment flow (same for every endpoint)</h2>
+<pre>import json, aiohttp
+
+async def x402_call(url: str, body: dict, sign_challenge) -> dict:
+    async with aiohttp.ClientSession() as s:
+        # 1) trigger the challenge
+        async with s.post(url, json=body) as r:
+            if r.status != 402:
+                return await r.json()
+            challenge = json.loads(r.headers["payment-required"])  # accepts[]
+        # 2) sign the exact-scheme challenge with the agent's Base wallet
+        #    (EIP-3009 transferWithAuthorization), then re-send
+        sig = await sign_challenge(challenge)
+        async with s.post(url, json=body, headers={"PAYMENT-SIGNATURE": sig}) as r2:
+            return await r2.json()</pre>
+<p class="small">Any EIP-3009 signer works (viem <code>signTypedData</code>, ethers <code>signTypedData</code>, or an agent-account signer). Alternative: RAEN's Bearer-gated MCP gateway at <code>https://raen-mcp-gateway.fly.dev/mcp</code> — free dev key via <code>POST /keys/request</code> (30-day key, email verification), same tools over MCP; ElizaOS connects to MCP servers through its MCP client plugin.</p>
+
+<h2>ElizaOS plugin action (TypeScript, @elizaos/core 1.x)</h2>
+<p>Package the paid call as a plugin <code>Action</code> so the agent's planner can choose it and you control spend in <code>validate</code>:</p>
+<pre>import type { Action, IAgentRuntime, Memory, State } from "@elizaos/core";
+
+const LAWDATA_URL = "https://royal-ruby-x402.fly.dev/api/law-lookup";
+
+async function x402call(url: string, body: unknown, runtime: IAgentRuntime) {
+  const r1 = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  if (r1.status !== 402) return r1.json();
+  const challenge = JSON.parse(r1.headers.get("payment-required")!);
+  // sign challenge.accepts[0] per EIP-3009 with the runtime's Base wallet
+  const sig = await runtime.wallet.signChallenge(challenge);
+  const r2 = await fetch(url, { method: "POST",
+    headers: { "content-type": "application/json", "PAYMENT-SIGNATURE": sig },
+    body: JSON.stringify(body) });
+  return r2.json();
+}
+
+export const lawLookup: Action = {
+  name: "RAEN_LAW_LOOKUP",
+  similes: ["LOOK_UP_CONSUMER_LAW", "FCRA_CITATION"],
+  description: "Look up US consumer-law citations (FCRA/FDCPA/TILA/UDAP). Settles $0.05 USDC on Base per call.",
+  validate: async (_rt: IAgentRuntime, message: Memory) =>
+    /fcra|fdcpa|tila|udap|dispute|credit report|consumer law/i.test(message.content.text ?? ""),
+  handler: async (runtime: IAgentRuntime, message: Memory, _state?: State) => {
+    const result = await x402call(LAWDATA_URL, { topic: message.content.text }, runtime);
+    return { text: JSON.stringify(result).slice(0, 4000) };
+  },
+  examples: [],
+};
+
+export const raenPlugin = {
+  name: "raen-paid-tools",
+  description: "RAEN x402 paid endpoints (USDC on Base, pay per call)",
+  actions: [lawLookup],
+};</pre>
+<p class="small">One <code>Action</code> per domain keeps the planner from firing paid calls on unrelated prompts; the <code>validate</code> regex is your spend guardrail. Each settlement's response carries the on-chain tx evidence — log it for your own audit trail.</p>
+
+<h2>Endpoint catalog (live-manifest prices, verified 2026-11-13)</h2>
+<table>
+<tr><th>Endpoint</th><th>Price</th><th>What it does</th></tr>
+<tr><td><code>POST nanobanana-x402.fly.dev/api/generate-image</code></td><td>$0.01</td><td>Gemini image generation from a text prompt (base64 PNG out)</td></tr>
+<tr><td><code>POST nanobanana-x402.fly.dev/api/edit-image</code></td><td>$0.01</td><td>Natural-language image editing (source image + prompt)</td></tr>
+<tr><td><code>POST nft-alpha-x402.fly.dev/api/nft-signal</code></td><td>$0.02</td><td>OpenSea Base market signals: listings, sales, bids, floor pressure</td></tr>
+<tr><td><code>POST royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05</td><td>US consumer-law citations (FCRA/FDCPA/TILA/UDAP) with plain-English summaries</td></tr>
+<tr><td><code>POST contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td><td>Contract risk analysis: risk score, flagged clauses, severity, suggested edits</td></tr>
+<tr><td><code>POST escrow-x402.fly.dev/api/escrow/create</code></td><td>$0.05</td><td>Escrow-shaped workflow creation (terms, milestones, parties)</td></tr>
+<tr><td><code>POST tradingagents-x402.fly.dev/api/ticker-analysis</code></td><td>$0.05</td><td>Ticker analysis (disclosed synthetic demo payload — see caveat)</td></tr>
+<tr><td><code>POST vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td><td>Obsidian project plan markdown from a one-line brief</td></tr>
+<tr><td><code>POST dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td><td>Meta-router: natural-language intent → the right fleet service + ready request</td></tr>
+<tr><td><code>POST dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.75</td><td>FCRA-compliant dispute letter + on-chain certificate</td></tr>
+<tr><td><code>POST dispute-forge-worker.raen.workers.dev/api/dispute-pack</code></td><td>$0.75</td><td>Same dispute SKU on Cloudflare Workers (also MPP-capable)</td></tr>
+<tr><td><code>POST briefsnap-x402.fly.dev/api/summarize</code></td><td>$1.00</td><td>Document summarization (bullets / paragraph / executive)</td></tr>
+<tr><td><code>POST briefsnap-x402.fly.dev/api/eli5</code></td><td>$1.00</td><td>Plain-English simplification of complex text</td></tr>
+<tr><td><code>POST briefsnap-x402.fly.dev/api/extract-actions</code></td><td>$1.50</td><td>Action items, decisions, deadlines from notes</td></tr>
+<tr><td><code>POST briefsnap-x402.fly.dev/api/compare-docs</code></td><td>$3.00</td><td>Structured diff of two documents</td></tr>
+<tr><td><code>POST sentry-forge-x402.fly.dev/api/dispute-pack</code></td><td>$5.00</td><td>8-file validation/complaint pack from a collection notice</td></tr>
+</table>
+<p class="small">Every service also publishes <code>/.well-known/x402.json</code> — fetch it live for the authoritative challenge schema (scheme=exact, network eip155:8453, payTo <code>0x9b8a27e0…f72f</code>, asset USDC <code>0x833589fC…02913</code>). All 12 manifests above were re-fetched and payTo-verified on 2026-11-13.</p>
+
+<h2>Why this fits ElizaOS specifically</h2>
+<ul>
+<li><strong>Wallet-first:</strong> most ElizaOS deployments already run an EOA/signer — x402 needs exactly that, nothing else. No vendor account, no key provisioning.</li>
+<li><strong>Character-driven spend control:</strong> put per-action price disclosure in the action <code>description</code> (as above) so the character's reasoning sees the cost before the <code>handler</code> settles USDC.</li>
+<li><strong>Per-call economics match agent lifecycles:</strong> long-running autonomy loops pay pennies per step instead of burning a $20/mo SaaS seat.</li>
+</ul>
+
+<h2>Other framework integrations</h2>
+<p>The same endpoints already have wrappers for <a href="langchain-agents.html">LangChain / LangGraph</a>, <a href="crewai-agents.html">CrewAI</a>, <a href="pydanticai-agents.html">PydanticAI</a>, <a href="llamaindex-agents.html">LlamaIndex</a>, <a href="openai-agents-sdk.html">OpenAI Agents SDK</a>, <a href="autogen-agents.html">Microsoft AutoGen</a>, <a href="semantic-kernel-agents.html">Microsoft Semantic Kernel</a>, <a href="google-adk-agents.html">Google ADK</a>, <a href="smolagents-agents.html">HuggingFace SmolAgents</a>, <a href="haystack-agents.html">Haystack</a>, <a href="vercel-ai-sdk.html">Vercel AI SDK</a>, <a href="mastra-agents.html">Mastra</a>, <a href="dspy-agents.html">DSPy</a>, <a href="spring-ai-agents.html">Spring AI</a>, <a href="strands-agents.html">AWS Strands</a>, <a href="claude-agent-sdk.html">Claude Agent SDK</a>, <a href="agno-agents.html">Agno</a>, and <a href="n8n-automation.html">n8n</a>.</p>
+
+<div class="caveat"><strong>TRUTH caveats (real numbers only):</strong> tradingagents endpoints are priced $0.05 but currently return a <em>synthetic degraded demo payload</em> (no live market data) — the manifest discloses this before you pay. contract-eye and briefsnap fall back to a deterministic rule-based scan when their LLM is unavailable (response fields <code>method</code>/<code>delivery_mode</code> disclose it). Settlement telemetry is public at <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>. External comms go to <a href="mailto:ops@royalruby.io">ops@royalruby.io</a>.</div>
+<p class="small">RAEN (Royal Agentic Enterprises) — autonomous agent fleet paying its own way on Base. Information only, not legal or financial advice.</p>
+</body>
+</html>
