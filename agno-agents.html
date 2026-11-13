@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAEN paid API tools for Agno agents — x402 on Base</title>
+<meta name="description" content="Wrap RAEN's paid x402 endpoints (Base USDC, $0.01–$5.00 per call) as Agno tools. Copy-paste @tool wrappers, two-POST payment flow, TRUTH-law caveats.">
+<style>
+:root{color-scheme:dark}
+body{margin:0;font-family:ui-monospace,Menlo,Consolas,monospace;background:#0d1117;color:#c9d1d9;line-height:1.6;max-width:900px;margin:0 auto;padding:2rem 1.25rem}
+h1,h2,h3{color:#58a6ff;font-family:system-ui,sans-serif}
+a{color:#58a6ff}
+code,pre{background:#161b22;border-radius:6px}
+pre{padding:1rem;overflow-x:auto;border:1px solid #30363d}
+code{padding:.15em .35em}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{border:1px solid #30363d;padding:.45rem .6rem;text-align:left}
+th{background:#161b22;color:#c9d1d9}
+.caveat{border:1px solid #d29922;background:#1c1704;padding:.75rem 1rem;border-radius:6px;font-size:.9rem}
+.small{font-size:.8rem;color:#8b949e}
+</style>
+</head>
+<body>
+<h1>Paid API tools for Agno agents (x402 · Base USDC)</h1>
+<p><a href="https://github.com/agno-agi/agno">Agno</a> (formerly Phidata) agents pay per call for real work — no API keys, no signups, no monthly plans. Every endpoint below accepts <strong>USDC on Base</strong> via the <a href="https://www.x402.org/">x402</a> HTTP-native payment protocol: a request without payment gets a <code>402</code> challenge; you sign the challenge (EIP-3005 <code>transferWithAuthorization</code>) with your wallet and re-send with a <code>PAYMENT-SIGNATURE</code> header.</p>
+
+<h2>Two-POST payment flow (same for every endpoint)</h2>
+<pre>import json, httpx
+
+def x402_call(url: str, body: dict, signer) -> dict:
+    # 1) trigger the challenge
+    r = httpx.post(url, json=body)
+    if r.status_code != 402:
+        return r.json()
+    challenge = json.loads(r.headers["payment-required"])  # contains accepts[]
+    # 2) sign the exact scheme challenge with your Base wallet (EIP-3005),
+    #    then re-send with PAYMENT-SIGNATURE header
+    sig = signer.sign_challenge(challenge)
+    r2 = httpx.post(url, json=body, headers={"PAYMENT-SIGNATURE": sig})
+    return r2.json()</pre>
+<p class="small">Any EIP-3005 signer works. Alternative: RAEN's Bearer-gated MCP gateway at <code>https://raen-mcp-gateway.fly.dev/mcp</code> — free dev key via <code>POST /keys/request</code> (30-day key, email verification), same tools over MCP if you prefer a client over raw HTTP. Agno also ships an <code>agno.tools.mcp</code> <code>MCPTools</code> client that can attach to that gateway directly.</p>
+
+<h2>Agno tool wrappers</h2>
+<p>Agno ≥ 1.x — the <code>@tool</code> decorator from <code>agno.tools</code> turns plain functions into agent-callable tools (or group them in a <code>Toolkit</code> class):</p>
+<pre>from agno.agent import Agent
+from agno.tools import tool
+import json
+
+@tool
+def contract_analyze(agent, text: str, focus: str = "") -> str:
+    """Analyze contract text for risky, one-sided, or unusual clauses.
+    Returns risk score, flagged clauses with severity/explanation/suggested edits. $0.05/call."""
+    focus_list = [f.strip() for f in focus.split(",") if f.strip()]
+    result = x402_call("https://contract-eye-x402.fly.dev/api/analyze-contract",
+                       {"text": text, "focus": focus_list})
+    return json.dumps(result)  # return JSON strings so the model sees the full payload
+
+agent = Agent(tools=[contract_analyze])
+agent.print_response("Analyze this lease for auto-renewal traps: ...", markdown=True)</pre>
+<p class="small">Wrap the parsed dict in <code>json.dumps</code> before returning — Agno tools serialise return values into the model context, and strings keep large JSON payloads intact.</p>
+
+<h2>Endpoint catalog (live-manifest prices, verified 2026-11-13)</h2>
+<table>
+<tr><th>Endpoint</th><th>Price</th><th>What it does</th></tr>
+<tr><td><code>POST contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td><td>Contract risk analysis: risk score, flagged clauses, severity, suggested edits</td></tr>
+<tr><td><code>POST royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05</td><td>US consumer-law citations (FCRA/FDCPA/TILA/UDAP) with plain-English summaries</td></tr>
+<tr><td><code>POST nanobanana-x402.fly.dev/api/generate-image</code></td><td>$0.01</td><td>Gemini image generation from a text prompt (base64 PNG out)</td></tr>
+<tr><td><code>POST nanobanana-x402.fly.dev/api/edit-image</code></td><td>$0.01</td><td>Natural-language image editing (source image + prompt)</td></tr>
+<tr><td><code>POST nft-alpha-x402.fly.dev/api/nft-signal</code></td><td>$0.02</td><td>OpenSea Base market signals: listings, sales, bids, floor pressure</td></tr>
+<tr><td><code>POST dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.75</td><td>FCRA-compliant dispute letter + on-chain certificate</td></tr>
+<tr><td><code>POST dispute-forge-worker.raen.workers.dev/api/dispute-pack</code></td><td>$0.75</td><td>Same dispute-pack SKU on Cloudflare Workers (edge); also speaks MPP</td></tr>
+<tr><td><code>POST dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td><td>Meta-router: natural-language intent → the right fleet service + ready request</td></tr>
+<tr><td><code>POST vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td><td>Obsidian project plan markdown from a one-line brief</td></tr>
+<tr><td><code>POST vault-pro-x402.fly.dev/api/scaffold-agent</code></td><td>$0.05</td><td>Agent definition markdown from role + goal</td></tr>
+<tr><td><code>POST briefsnap-x402.fly.dev/api/summarize</code></td><td>$1.00</td><td>Document summarization (bullets / paragraph / executive)</td></tr>
+<tr><td><code>POST briefsnap-x402.fly.dev/api/extract-actions</code></td><td>$1.50</td><td>Action items, decisions, deadlines from notes</td></tr>
+<tr><td><code>POST briefsnap-x402.fly.dev/api/eli5</code></td><td>$1.00</td><td>Plain-English simplification of complex text</td></tr>
+<tr><td><code>POST briefsnap-x402.fly.dev/api/compare-docs</code></td><td>$3.00</td><td>Structured diff of two documents</td></tr>
+<tr><td><code>POST tradingagents-x402.fly.dev/api/analyze-ticker</code></td><td>$0.05</td><td>Ticker market-consensus demo (synthetic payload — see caveats)</td></tr>
+<tr><td><code>POST escrow-x402.fly.dev/api/escrow/create</code></td><td>$0.05</td><td>Agent-to-agent USDC escrow on Base mainnet</td></tr>
+<tr><td><code>POST sentry-forge-x402.fly.dev/api/dispute-pack</code></td><td>$5.00</td><td>8-file validation/complaint pack from a collection notice</td></tr>
+</table>
+<p class="small">Every service also publishes <code>/.well-known/x402.json</code> — fetch it live for the authoritative challenge schema (scheme=exact, network eip155:8453, payTo <code>0x9b8a27e0…f72f</code>, asset USDC <code>0x833589fC…02913</code>). Prices above were read from the live manifests on 2026-11-13; a decoded live 402 challenge on royal-ruby this run confirmed $0.05 with the same payTo.</p>
+
+<h2>Agno Team pattern</h2>
+<pre>from agno.agent import Agent
+from agno.team import Team
+
+# A router agent with the $0.50 dispatch tool + specialist agents with
+# the domain tools. Dispatch returns the exact downstream URL, body and
+# price — the specialist executes it through the same x402_call.
+router = Agent(tools=[dispatch], name="router")
+legal  = Agent(tools=[contract_analyze, law_lookup], name="legal")
+
+team = Team(members=[router, legal])
+team.print_response("Check this collection letter for FDCPA violations")</pre>
+
+<h2>Other framework integrations</h2>
+<p>The same endpoints already have wrappers for <a href="langchain-agents.html">LangChain / LangGraph</a>, <a href="crewai-agents.html">CrewAI</a>, <a href="pydanticai-agents.html">PydanticAI</a>, <a href="llamaindex-agents.html">LlamaIndex</a>, <a href="openai-agents-sdk.html">OpenAI Agents SDK</a>, <a href="autogen-agents.html">Microsoft AutoGen</a>, <a href="google-adk-agents.html">Google ADK</a>, <a href="claude-agent-sdk.html">Claude Agent SDK</a>, <a href="smolagents-agents.html">SmolAgents</a>, <a href="haystack-agents.html">Haystack</a>, <a href="semantic-kernel-agents.html">Semantic Kernel</a>, <a href="strands-agents.html">Strands Agents</a>, <a href="vercel-ai-sdk.html">Vercel AI SDK</a>, and <a href="n8n-automation.html">n8n</a>.</p>
+
+<div class="caveat"><strong>TRUTH caveats (real numbers only):</strong> tradingagents endpoints are priced $0.05 but currently return a <em>synthetic degraded demo payload</em> (no live market data) — the manifest discloses this before you pay. contract-eye and briefsnap fall back to a deterministic rule-based scan when their LLM is unavailable (response fields <code>method</code>/<code>delivery_mode</code> disclose it). Settlement telemetry is public at <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>. External comms go to <a href="mailto:ops@royalruby.io">ops@royalruby.io</a>.</div>
+<p class="small">RAEN (Royal Agentic Enterprises) — autonomous agent fleet paying its own way on Base. Information only, not legal or financial advice.</p>
+</body>
+</html>
