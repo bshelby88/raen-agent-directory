@@ -57,7 +57,7 @@ a { color:#58e6d9; }
 </ul>
 </div>
 
-<p class="dim" style="margin-top:1.5rem">Protocol: x402 v2 · Network: Base (eip155:8453) · Settlement: USDC · payTo <code>0x9b8a27e03CEbA490953cDa8AB1291c0E13bAf72f</code> · Full service directory: <a href="index.html">RAEN Tool Finder</a></p>
+<p class="dim" style="margin-top:1.5rem">Protocol: x402 v2 · Network: Base (eip155:8453) · Settlement: USDC · payTo <code>0x9b8a27e03CEbA490953cDa8AB1291c0E13bAf72f</code> · Full service directory: <a href="index.html">RAEN Tool Finder</a> · <a href="try-raen-ab-lab.html">This page runs a public A/B copy experiment</a></p>
 
 <script>
 const EXPECTED_PAYTO = "0x9b8a27e03CEbA490953cDa8AB1291c0E13bAf72f";
@@ -125,6 +125,41 @@ async function runDemo(){
   stopTimer();
 }
 </script>
-<img src="https://settlement-collector.fly.dev/hit?src=try-raen" alt="" width="1" height="1" style="display:none" data-page-hit>
+<script>
+/* ---- A/B copy experiment (see try-raen-ab-lab.html) ----
+   Control A = original mechanism framing; B = outcome framing.
+   Beacon funnel via settlement-collector /hit: page load = try-raen-{a|b},
+   demo click = try-raen-{a|b}-demo. Measured at /hits.json; conversion
+   cross-checked against /stats challenge->settle. */
+(function(){
+  var v;
+  try { v = sessionStorage.getItem('ab_try_raen'); } catch(e){}
+  if(v !== 'a' && v !== 'b'){
+    v = Math.random() < 0.5 ? 'a' : 'b';
+    try { sessionStorage.setItem('ab_try_raen', v); } catch(e){}
+  }
+  document.body.setAttribute('data-ab-variant', v);
+  new Image().src = 'https://settlement-collector.fly.dev/hit?src=try-raen-' + v;
+  var COPY = {
+    a: {
+      h1: 'Try RAEN in 60 seconds',
+      sub: 'One click. A real HTTP 402 "Payment Required" challenge, fetched live from a paid AI-agent API on Base mainnet and decoded in your browser. No signup, no wallet, nothing to install — you only pay if <em>your agent</em> decides to.',
+      btn: '▶ Run the live 402 demo'
+    },
+    b: {
+      h1: 'Give your agent its first paid API call',
+      sub: 'In 60 seconds: fetch a real HTTP 402 payment challenge from a live paid API on Base, decode exactly what your agent would pay — then copy the one-line pattern that makes <em>your</em> agent call it. No signup, no wallet to look, nothing to install.',
+      btn: '▶ Prove it live'
+    }
+  };
+  var c = COPY[v];
+  document.querySelector('h1').textContent = c.h1;
+  document.querySelector('.sub').innerHTML = c.sub;
+  document.getElementById('go').textContent = c.btn;
+  document.getElementById('go').addEventListener('click', function(){
+    new Image().src = 'https://settlement-collector.fly.dev/hit?src=try-raen-' + v + '-demo';
+  });
+})();
+</script>
 </body>
 </html>
