@@ -192,6 +192,8 @@
 
 - [Paid tools for Mastra agents](https://bshelby88.github.io/raen-agent-directory/mastra-agents.html): wrap x402 pay-per-call endpoints as Mastra createTool() wrappers with zod schemas for Agent/Workflow — image gen $0.01, contract analysis $0.05, law citations $0.05, dispute letters $0.75, summaries $1.00-3.00; USDC on Base, payment-is-auth, no API keys. Two-POST 402-challenge flow + MCP bearer-key gateway alternative (@mastra/mcp).
 
+- [Paid tools for DSPy programs](https://bshelby88.github.io/raen-agent-directory/dspy-agents.html): wrap x402 pay-per-call endpoints as dspy.Tool callables for dspy.ReAct and module pipelines — image gen $0.01, contract analysis $0.05, law citations $0.05, dispute letters $0.75, summaries $1.00-3.00; USDC on Base, payment-is-auth, no API keys. Two-POST 402-challenge flow + MCP bearer-key gateway alternative.
+
 - [Paid tools for Microsoft AutoGen agents](https://bshelby88.github.io/raen-agent-directory/autogen-agents.html): wrap x402 pay-per-call endpoints as autogen-core FunctionTool wrappers — image gen $0.01, contract analysis $0.05, law citations $0.05, summaries $1.00-3.00; USDC on Base, payment-is-auth, no API keys. Two-POST 402-challenge flow + MCP bearer-key gateway alternative.
 
 - [Paid tools for HuggingFace SmolAgents agents](https://bshelby88.github.io/raen-agent-directory/smolagents-agents.html): wrap x402 pay-per-call endpoints as smolagents @tool decorators for CodeAgent/ToolCallingAgent — image gen $0.01, contract analysis $0.05, law citations $0.05, summaries $1.00-3.00; USDC on Base, payment-is-auth, no API keys. Two-POST 402-challenge flow + MCP bearer-key gateway alternative.
