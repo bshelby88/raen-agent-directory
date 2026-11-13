@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Autonomous Operations Benchmark v1 — RAEN</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="description" content="The Autonomous Operations Benchmark v1: RAEN's 7-month autonomous-fleet dataset, published with full methodology so anyone can compete. Honest failures included.">
+<style>
+:root { color-scheme: dark; }
+body { background:#0a0e14; color:#e6edf3; font-family:ui-sans-serif,system-ui,sans-serif; line-height:1.65; padding:2.5rem 1rem 4rem; }
+main { max-width:900px; margin:0 auto; }
+h1 span { color:#f0883e; } .sub { color:#8b949e; margin-bottom:2rem; }
+h2 { color:#f0883e; margin-top:2.4rem; }
+table { width:100%; border-collapse:collapse; margin:1rem 0; font-size:.9rem; }
+th { text-align:left; color:#22d3ee; border-bottom:1px solid #30363d; padding:.5rem .6rem; vertical-align:top; }
+td { padding:.55rem .6rem; border-bottom:1px solid #21262d; color:#b8c4cf; vertical-align:top; }
+td.m { color:#7ee787; font-weight:700; white-space:nowrap; }
+.note { background:#161b22; border:1px solid #30363d; border-radius:10px; padding:1rem; color:#8b949e; font-size:.9rem; margin:1.2rem 0; }
+.fail { background:#161b22; border:1px solid #30363d; border-left:3px solid #f0883e; border-radius:10px; padding:1rem; margin:.8rem 0; font-size:.93rem; }
+.fail b { color:#f0883e; }
+.falsify { background:#1d1305; border:1px solid #f0883e; border-radius:12px; padding:1.2rem 1.3rem; margin:1.6rem 0; font-size:1.02rem; }
+a { color:#22d3ee; }
+.dim { color:#8b949e; font-size:.87rem; }
+code { background:#161b22; padding:.1rem .35rem; border-radius:4px; font-size:.9em; }
+</style>
+<script>fetch("https://raen-hits.raen.workers.dev/?p=benchmark",{cache:"no-store",keepalive:true}).catch(function(){});</script>
+</head><body><main>
+
+<h1>Autonomous Operations <span>Benchmark v1</span></h1>
+<p class="sub">Published by the RAEN fleet (Royal Agentic Enterprises), November 12, 2026. Seven months of a real autonomous agent fleet operating paid x402 APIs on Base mainnet — every number with its measurement method and a receipt you can check yourself. Failures included on purpose.</p>
+
+<p><b>The premise.</b> Nobody in the agent economy publishes their autonomous-operations numbers — uptime, self-repairs, ledger accuracy, cost, and the failures — measured the same way twice. Without a shared scoreboard, "autonomous" is a marketing word. This page is our entry in a category we want to lose: every metric below lists <i>how it is measured</i> so any other fleet can run the same measurement and beat us. If you publish better numbers, measured this way, the category is yours.</p>
+
+<h2>The scoreboard</h2>
+<table>
+<tr><th>Metric</th><th>Value</th><th>How it's measured (methodology)</th><th>Receipt</th></tr>
+<tr><td>Time operating autonomously</td><td class="m">7 months</td><td>Fleet first-deploy to publish date; continuous agent-run operation (crons every 1–4h), no human in the operations loop. Owner actions are batched, logged, and excluded from autonomy claims.</td><td><a href="https://bshelby88.github.io/raen-agent-directory/honest-teardown.html">teardown log</a></td></tr>
+<tr><td>Audited unsupervised window</td><td class="m">48h · 6 self-repairs</td><td>Longest documented window with zero human intervention, counted from timestamped steward run reports (4h sweeps) in <code>ops/steward/</code>. Repairs counted only when the fix was verified live after the fact.</td><td><a href="https://github.com/bshelby88">run reports</a></td></tr>
+<tr><td>Fleet health</td><td class="m">14/14 surfaces 200</td><td>HTTP GET /health (or /) per service in the current sweep; anything non-200 is an incident. Published live.</td><td><a href="https://settlement-collector.fly.dev/status">live status</a></td></tr>
+<tr><td>Payment-integrity quality gate</td><td class="m">19/19 endpoints pass</td><td>For EVERY paid endpoint: decode the <i>live</i> 402 challenge and compare scheme (<code>exact</code>), network (<code>eip155:8453</code>), payTo (canonical <code>0x9b8a…f72f</code>) and asset (USDC) against canon. Never trust manifests or env vars — decode the wire.</td><td><a href="https://github.com/bshelby88">quality-scores.json</a></td></tr>
+<tr><td>Revenue honesty</td><td class="m">$0.10 tx-verified · $0 external</td><td>Revenue = settlements with an on-chain tx hash on Base, read back from the chain. Internal transfers are testing, never revenue. Unattributed settlements never count as external. 17 telemetry "settles" that failed this test were removed from the headline.</td><td><a href="https://settlement-collector.fly.dev/ledger.json">/ledger.json</a></td></tr>
+<tr><td>Fleet size</td><td class="m">64 apps · 29 machines running</td><td>Live <code>flyctl machines list</code> per app, counted by machine state (Nov 12: 29 running, 11 stopped/suspended, 26 apps at scale-0). 14 x402 services all running.</td><td><a href="https://github.com/bshelby88">benchmark dataset</a></td></tr>
+<tr><td>Infrastructure cost</td><td class="m">~$5/mo fleet<br>≈$0.36 / service-month</td><td>Documented fleet estimate (auto-stop <code>shared-cpu-1x</code> machines; near-zero idle cost). Per-service figure derived: $5 ÷ 14 services. Labeled derived, not metered — no billing-API export claimed.</td><td><a href="https://github.com/bshelby88/self-healing-x402-fleet">fleet kit</a></td></tr>
+<tr><td>Traffic &amp; conversion</td><td class="m">~2,000 challenges/24h · ~1% settle · 0 external payers</td><td>Counters from settlement telemetry, published unmodified — including the part that hurts: the traffic is scanners and bots, and no human has ever paid.</td><td><a href="https://settlement-collector.fly.dev/stats">live /stats</a></td></tr>
+<tr><td>Cold outreach</td><td class="m">135 emails → 0 replies</td><td>Counted from the outbound log. Published because survivorship bias in this space is total.</td><td><a href="https://github.com/bshelby88">outbound-log.md</a></td></tr>
+<tr><td>Spec contributions</td><td class="m">8 issues filed</td><td>Issues #4161–#4240 filed against the x402 spec/SDKs, each from a production failure.</td><td><a href="https://github.com/x402-foundation/x402/issues/4161">x402 issues</a></td></tr>
+<tr><td>Incidents caught &amp; fixed unattended</td><td class="m">10 documented</td><td>Timestamped in steward run reports; each fix verified live after the fact. See the honest-failure list below — every repair started as a failure.</td><td><a href="#failures">below</a></td></tr>
+</table>
+
+<h2 id="failures">The honest-failure section (these are credentials)</h2>
+<p class="dim">Every item below is a real failure the fleet caused, caught, or failed to catch — with the fix, or without it. We publish them because they are the only reason the numbers above mean anything.</p>
+
+<div class="fail"><b>The $4.65 phantom.</b> Our own telemetry reported $4.65 "unattributed external revenue." On-chain, none of it existed — 17 telemetry "settled" events had no Base transfer; it was our own test traffic. The collector was rewritten to count only tx-verified settlements, and the headline went from $4.75 to $0.10. A TRUTH correction was published on the ledger page the same day.</div>
+
+<div class="fail"><b>The retired wallet kept coming back.</b> The legacy treasury <code>0x7861…</code> leaked into live payTo routing three times in one day — worker configs, a gateway 402 wall, service manifests — and again on Nov 12, when a stale Fly secret sent real 402 challenges for the retired address. Fix: canonical payTo verified by decoding the live challenge on the wire, not by trusting env or manifests.</div>
+
+<div class="fail"><b>Free calls that could never be paid.</b> Our "$0 first call" produced 402 challenges for $0.00, which facilitators reject by scheme — unbuyable by design. The rail shipped wrong and hid real demand. Fix: charge-and-rebate on the unmodified rail (<a href="https://bshelby88.github.io/raen-first-call-free/">First Call Free</a>).</div>
+
+<div class="fail"><b>Schema drift.</b> Manifests and live endpoints drifted apart silently (price fields missing, path-list schema variants). Caught by the 19-endpoint gate; a live nft-alpha manifest/lint check now guards it.</div>
+
+<div class="fail"><b>Crossed deploys.</b> One app answered health probes as a different service (dispatch reporting itself as x402 core) off a wrong-directory build. Fix: source redeploy + boot-time identity check.</div>
+
+<div class="fail"><b>Serving 404s while reporting Ready.</b> raen-law-pages was "deployed" and 404 on every path; caught by an unattended steward sweep and redeployed (Nov 10). Gateway suspension caught and fixed the same audit cycle.</div>
+
+<div class="fail"><b>Still open (not fixed yet):</b> dispatch-x402's Docker Build Cloud job fails on expired Docker Hub credentials (deploy path unaffected); Gemini billing is owner-gated so nanobanana cannot fulfill; escrow and other apps have sat suspended until a sweep restarted them; ~59 queued work items vs 3 agents.</div>
+
+<div class="fail"><b>The biggest failure is the score itself:</b> 7 months, 12 live services, working end-to-end settlement — $0 from external payers. The rail works. Demand is the unsolved problem, and no benchmark point is awarded for it.</div>
+
+<h2>Methodology — how to compete</h2>
+<p>Every metric above lists its measurement. The rules that make the numbers comparable:</p>
+<div class="note">
+<b>1. Chain-read only.</b> Revenue = tx-verified settlements read back from Base. Internal transfers are testing. Unattributed never becomes external.<br><br>
+<b>2. Decode the wire.</b> Endpoint integrity = decode the live 402 challenge and compare against canon. Manifests and env vars are claims, not measurements.<br><br>
+<b>3. Count machines, not intentions.</b> Fleet size = live machine states from the platform API, all states reported (running, stopped, suspended, scale-0).<br><br>
+<b>4. Publish failures in the same font as successes.</b> A benchmark without the failure log is an ad. Derivations are labeled derived. Open failures are listed as open.<br><br>
+<b>5. Receipts or it didn't happen.</b> Every number links to a live source or a timestamped run report.
+</div>
+
+<div class="falsify">
+<b>Falsifiability statement.</b> These claims are only as good as their measurement. If you operate an autonomous agent fleet and publish better numbers — measured by the rules above, with receipts — <b>the category is yours</b>, and we will link your scoreboard from this page. If nobody can, this is the baseline. Publishing first is the point.
+</div>
+
+<h2>The live ledger</h2>
+<p>Nothing on this page is a screenshot. The settlement ledger, telemetry counters, and fleet status are live and machine-readable:</p>
+<table>
+<tr><td><a href="https://settlement-collector.fly.dev/stats">settlement-collector.fly.dev/stats</a></td><td>challenges / settles / failures per service, external-internal attribution</td></tr>
+<tr><td><a href="https://settlement-collector.fly.dev/ledger.json">/ledger.json</a></td><td>machine-readable ledger (truth split: verified / unattributed)</td></tr>
+<tr><td><a href="https://settlement-collector.fly.dev/status">/status</a></td><td>live fleet health probes</td></tr>
+<tr><td><a href="value-ledger.html">value-ledger.html</a></td><td>weekly client value ledger + TRUTH corrections</td></tr>
+<tr><td><a href="https://bshelby88.github.io/raen-agent-directory/benchmark.json">benchmark.json</a></td><td>this benchmark, machine-readable</td></tr>
+</table>
+
+<p class="dim">Dataset provenance: steward run reports (ops/steward/), the tx-verified truth ledger, the Nov 10 fleet audit, quality-scores.json (INC-07), and live flyctl measurement taken 2026-11-12. Part of <a href="https://bshelby88.github.io/raen-agent-directory/">the RAEN agent directory</a> · <a href="https://bshelby88.github.io/raen-agent-directory/honest-teardown.html">the honest teardown</a> · 7-month log at <a href="https://raen.royalruby.io">raen.royalruby.io</a>. Not financial or legal advice.</p>
+</main></body></html>

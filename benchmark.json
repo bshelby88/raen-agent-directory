@@ -1,0 +1,65 @@
+{
+ "benchmark": "Autonomous Operations Benchmark v1",
+ "publisher": "RAEN (Royal Agentic Enterprises)",
+ "published": "2026-11-12",
+ "page": "https://bshelby88.github.io/raen-agent-directory/benchmark.html",
+ "measurement_rules": [
+  "revenue = tx-verified settlements read from Base (eip155:8453); internal transfers are testing, never revenue; unattributed never counts as external",
+  "endpoint integrity = decode the live 402 challenge per endpoint, compare scheme/network/payTo/asset against canon (exact / eip155:8453 / 0x9b8a27e03CEbA490953cDa8AB1291c0E13bAf72f / USDC)",
+  "fleet size = live flyctl machines list per app, all machine states reported",
+  "failures published alongside successes; derivations labeled derived; every number linked to a receipt"
+ ],
+ "metrics": {
+  "operating_span_months": 7,
+  "operating_window": "April - November 2026",
+  "audited_unsupervised_window_hours": 48,
+  "self_repairs_in_window": 6,
+  "fleet_health_surfaces_green": 14,
+  "fleet_health_surfaces_total": 14,
+  "quality_gate_endpoints_pass": 19,
+  "quality_gate_endpoints_total": 19,
+  "revenue_all_time_tx_verified_usdc": 0.1,
+  "revenue_external_usdc": 0.0,
+  "external_payers_all_time": 0,
+  "fly_apps_total": 64,
+  "machines_running": 29,
+  "machines_stopped_or_suspended": 11,
+  "apps_scale_zero": 26,
+  "x402_services_running": 14,
+  "infra_cost_documented_usd_per_month": 5.0,
+  "cost_per_service_month_usd_derived": 0.36,
+  "challenges_last_24h": 2151,
+  "settled_last_24h": 1,
+  "conversion_all_time_pct_approx": 1,
+  "cold_emails_sent": 135,
+  "cold_email_replies": 0,
+  "x402_spec_issues_filed": 8,
+  "spec_issue_range": "#4161-#4240"
+ },
+ "incidents_caught_and_fixed_unattended": [
+  "sentry-forge crash x2 (lockfile pinned)",
+  "raen-law-pages 404-on-all-paths redeploy (2026-11-10)",
+  "gateway suspension caught+fixed (2026-11-10 audit)",
+  "nft-alpha live 402 routed to retired treasury via stale Fly secret; payTo corrected and verified live (2026-11-12, commit e09915a)",
+  "retired-wallet payTo leaks x3 in one day",
+  "facilitator mismatch: unified facilitatorClient for challenge+settle across 10 apps",
+  "phantom revenue $4.65 reclassified; collector now counts tx-verified only",
+  "ledger payer-attribution gap INC-03 closed via Base RPC receipt resolution",
+  "nft-alpha CI test rejecting telemetry COPY fixed (commit 8517140, CI green)",
+  "crossed deploy: dispatch answered probes as x402 core; fixed via source redeploy + boot identity check"
+ ],
+ "open_failures": [
+  "dispatch-x402 Docker Build Cloud job fails on expired Docker Hub creds (deploy path unaffected)",
+  "Gemini billing owner-gated; nanobanana cannot fulfill",
+  "0 external payers in 7 months; ~1% conversion is bot/scanner traffic",
+  "escrow + other apps have sat suspended until sweep restarts"
+ ],
+ "live_ledger": {
+  "stats": "https://settlement-collector.fly.dev/stats",
+  "ledger_json": "https://settlement-collector.fly.dev/ledger.json",
+  "status": "https://settlement-collector.fly.dev/status",
+  "weekly_value_ledger": "https://bshelby88.github.io/raen-agent-directory/value-ledger.html"
+ },
+ "falsifiability": "If you publish better autonomous-operations numbers measured by these rules, with receipts, the category is yours and we will link your scoreboard here.",
+ "notes": "Machine count measured live 2026-11-12 via flyctl machines list per app. The '46->24 machine' narrative circulating internally was not verifiable in records and is NOT used. Infra cost is a documented estimate, not a billing export."
+}

@@ -2,6 +2,10 @@
 
 > Twelve production x402 micropayment services on Base Mainnet, plus a Bearer-gated MCP gateway exposing 5 flagship tools. Every service returns a standards-compliant HTTP 402 payment challenge (EIP-3005 / x402 scheme `exact`, network `eip155:8453`, USDC).
 
+## Benchmark & Proof
+- [Autonomous Operations Benchmark v1](https://bshelby88.github.io/raen-agent-directory/benchmark.html): the fleet's 7-month autonomous-ops dataset with measurement methodology — 19/19 endpoint quality gate, 14/14 fleet health, 29 machines across 64 apps, $0.10 tx-verified revenue, $0 external, every incident and open failure published. Compete: measure your fleet the same way and publish better numbers with receipts.
+- Machine-readable: [benchmark.json](https://bshelby88.github.io/raen-agent-directory/benchmark.json).
+
 ## Company
 - [RAEN Blog](https://raen.royalruby.io): essays on agentic commerce, the x402 protocol, and the 2014 heritage story (historic tx 53e24ff4).
 - [RAEN Law Pages](https://raen-law-pages.vercel.app): 36 plain-English statute pages. Free, machine-readable legal reference.
