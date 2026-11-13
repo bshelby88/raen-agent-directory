@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAEN paid API tools for Letta (MemGPT) agents — x402 on Base</title>
+<meta name="description" content="Give Letta (formerly MemGPT) agents paid tools: RAEN x402 endpoints priced $0.01–$5.00 per call in Base USDC. Custom Python tools with the two-POST 402 flow, or the RAEN MCP gateway via Letta's MCP server support. TRUTH-law caveats.">
+<style>
+:root{color-scheme:dark}
+body{margin:0;font-family:ui-monospace,Menlo,Consolas,monospace;background:#0d1117;color:#c9d1d9;line-height:1.6;max-width:900px;margin:0 auto;padding:2rem 1.25rem}
+h1,h2,h3{color:#58a6ff;font-family:system-ui,sans-serif}
+a{color:#58a6ff}
+code,pre{background:#161b22;border-radius:6px}
+pre{padding:1rem;overflow-x:auto;border:1px solid #30363d}
+code{padding:.15em .35em}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{border:1px solid #30363d;padding:.45rem .6rem;text-align:left}
+th{background:#161b22;color:#c9d1d9}
+.caveat{border:1px solid #d29922;background:#1c1704;padding:.75rem 1rem;border-radius:6px;font-size:.9rem}
+.small{font-size:.8rem;color:#8b949e}
+</style>
+</head>
+<body>
+<h1>Paid API tools for Letta agents (x402 · Base USDC)</h1>
+<p>Letta (formerly MemGPT — <code>letta</code> / <code>letta-client</code>, the memory-tiered agent framework) agents can pay per call for real work — no API keys, no signups, no monthly plans. Every endpoint below accepts <strong>USDC on Base</strong> via the <a href="https://www.x402.org/">x402</a> HTTP-native payment protocol: a request without payment gets a <code>402</code> challenge; you sign the challenge (EIP-3009 <code>transferWithAuthorization</code>) with your wallet and re-send with a <code>PAYMENT-SIGNATURE</code> header.</p>
+
+<h2>Path 1 — custom Python tool (two-POST 402 flow)</h2>
+<pre>import json, requests
+
+def x402_call(url: str, body: dict, signer) -> dict:
+    # 1) trigger the challenge
+    r = requests.post(url, json=body, timeout=60)
+    if r.status_code != 402:
+        return r.json()
+    challenge = json.loads(r.headers["payment-required"])  # contains accepts[]
+    # 2) sign the exact-scheme challenge with your Base wallet (EIP-3009
+    #    transferWithAuthorization), then re-send with the payment header
+    sig = signer.sign_challenge(challenge)
+    r2 = requests.post(url, json=body, headers={"PAYMENT-SIGNATURE": sig}, timeout=120)
+    return r2.json()</pre>
+<p class="small">Any EIP-3009 signer works. Register the wrapper as a Letta custom tool: <code>client.tools.upsert_from_function(func=law_lookup, ...)</code> (Python SDK) or paste the source into the Letta ADE tool editor — Letta stores the tool and your agent calls it like any other.</p>
+
+<h2>Path 2 — RAEN MCP gateway via Letta's MCP server support</h2>
+<p>Letta agents can consume MCP servers directly. Point one at RAEN's Bearer-gated gateway — same tools, no wallet code in the agent:</p>
+<pre># Dev key first: POST https://raen-mcp-gateway.fly.dev/keys/request
+# (email verification, 30-day Bearer key — free-first-call charge-and-rebate)
+{
+  "tools": [
+    {
+      "type": "mcp",
+      "server_name": "raen",
+      "mcp_server_type": "streamable_http",
+      "server_url": "https://raen-mcp-gateway.fly.dev/mcp",
+      "auth_headers": {"Authorization": "Bearer &lt;your-dev-key&gt;"}
+    }
+  ]
+}</pre>
+<p class="small">MCP keeps payment machinery out of the agent entirely — the gateway settles and the agent sees only tool results. Verify the gateway is alive first: <code>GET https://raen-mcp-gateway.fly.dev/health</code>.</p>
+
+<h2>Endpoint catalog (live 402 challenges + manifests, verified 2026-11-13)</h2>
+<table>
+<tr><th>Endpoint</th><th>Price</th><th>What it does</th></tr>
+<tr><td><code>POST contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td><td>Contract risk analysis: risk score, flagged clauses, severity, suggested edits</td></tr>
+<tr><td><code>POST royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05</td><td>US consumer-law citations (FCRA/FDCPA/TILA/UDAP) with plain-English summaries</td></tr>
+<tr><td><code>POST nanobanana-x402.fly.dev/api/generate-image</code></td><td>$0.01</td><td>Gemini image generation from a text prompt (base64 PNG out)</td></tr>
+<tr><td><code>POST nanobanana-x402.fly.dev/api/edit-image</code></td><td>$0.01</td><td>Natural-language image editing (source image + prompt)</td></tr>
+<tr><td><code>POST nft-alpha-x402.fly.dev/api/nft-signal</code></td><td>$0.02</td><td>OpenSea Base market signals: listings, sales, bids, floor pressure</td></tr>
+<tr><td><code>POST dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.75</td><td>FCRA-compliant dispute letter + on-chain certificate</td></tr>
+<tr><td><code>POST dispute-forge-worker.raen.workers.dev/api/dispute-pack</code></td><td>$0.75</td><td>Same dispute letter + SVG certificate (Cloudflare Workers origin, dual x402/MPP 402)</td></tr>
+<tr><td><code>POST dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td><td>Meta-router: natural-language intent → the right fleet service + ready request</td></tr>
+<tr><td><code>POST vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td><td>Obsidian project plan markdown from a one-line brief</td></tr>
+<tr><td><code>POST vault-pro-x402.fly.dev/api/scaffold-agent</code></td><td>$0.05</td><td>Agent definition markdown from role + goal</td></tr>
+<tr><td><code>POST escrow-x402.fly.dev/api/escrow/create</code></td><td>$0.05</td><td>Agent-to-agent USDC escrow on Base mainnet</td></tr>
+<tr><td><code>POST tradingagents-x402.fly.dev/api/analyze-ticker</code></td><td>$0.05</td><td>Synthetic ticker consensus demo (degraded demo payload — see caveats)</td></tr>
+<tr><td><code>POST tradingagents-x402.fly.dev/api/analyze-arbitrage</code></td><td>$0.05</td><td>Synthetic arbitrage-consensus demo (degraded demo payload — see caveats)</td></tr>
+<tr><td><code>POST briefsnap-x402.fly.dev/api/summarize</code></td><td>$1.00</td><td>Document summarization (bullets / paragraph / executive)</td></tr>
+<tr><td><code>POST briefsnap-x402.fly.dev/api/extract-actions</code></td><td>$1.50</td><td>Action items, decisions, deadlines from notes</td></tr>
+<tr><td><code>POST briefsnap-x402.fly.dev/api/eli5</code></td><td>$1.00</td><td>Plain-English simplification of complex text</td></tr>
+<tr><td><code>POST briefsnap-x402.fly.dev/api/compare-docs</code></td><td>$3.00</td><td>Structured diff of two documents</td></tr>
+<tr><td><code>POST sentry-forge-x402.fly.dev/api/dispute-pack</code></td><td>$5.00</td><td>8-file validation/complaint pack from a collection notice</td></tr>
+</table>
+<p class="small">Every service also publishes <code>/.well-known/x402.json</code> — fetch it live for the authoritative challenge schema (scheme=exact, network eip155:8453, payTo <code>0x9b8a27e0…f72f</code>, asset USDC <code>0x833589fC…02913</code>). Prices above were decoded from each endpoint's live 402 challenge (or its manifest, for the two schema-validating tradingagents routes) on 2026-11-13.</p>
+
+<h2>Why Letta + x402</h2>
+<p>Letta agents persist memory across sessions and run indefinitely — exactly the shape where per-call micropayments beat API keys: a long-running personal agent can pay $0.05 for a law citation and $1.00 for a document summary with no billing relationship, no card, and no rate-limit account. The <code>402 → sign → re-send</code> loop lives entirely inside a tool, so the core agent never sees payment machinery; with the MCP gateway path the agent doesn't even see the tool wrapper.</p>
+
+<h2>Cost control for memory-driven agents</h2>
+<p>Start every paid tool with a spend guardrail — Letta tool source is just Python, so enforce a per-run cap inside the wrapper:</p>
+<pre>_SPENT = {"usd": 0.0}
+BUDGET_USD = 1.00  # per-process cap; Letta re-imports tools on edit
+
+PRICE = {"https://briefsnap-x402.fly.dev/api/summarize": 1.00, ...}
+
+def x402_call(url, body, signer):
+    if _SPENT["usd"] + PRICE.get(url, 0.05) > BUDGET_USD:
+        return {"error": "budget exhausted for this run", "spent_usd": _SPENT["usd"]}
+    result = x402_call_raw(url, body, signer)
+    _SPENT["usd"] += PRICE.get(url, 0.05)
+    return result</pre>
+
+<h2>Other framework integrations</h2>
+<p>The same endpoints already have wrappers for <a href="langchain-agents.html">LangChain / LangGraph</a>, <a href="crewai-agents.html">CrewAI</a>, <a href="autogen-agents.html">Microsoft AutoGen</a>, <a href="pydanticai-agents.html">PydanticAI</a>, <a href="llamaindex-agents.html">LlamaIndex</a>, <a href="openai-agents-sdk.html">OpenAI Agents SDK</a>, <a href="google-adk-agents.html">Google ADK</a>, <a href="haystack-agents.html">Haystack</a>, <a href="semantic-kernel-agents.html">Semantic Kernel</a>, <a href="smolagents-agents.html">smolagents</a>, <a href="strands-agents.html">AWS Strands</a>, <a href="spring-ai-agents.html">Spring AI</a>, <a href="camel-ai-agents.html">Camel-AI</a>, <a href="agno-agents.html">Agno</a>, <a href="mastra-agents.html">Mastra</a>, <a href="elizaos-agents.html">ElizaOS</a>, <a href="dspy-agents.html">DSPy</a>, <a href="vercel-ai-sdk.html">Vercel AI SDK</a>, <a href="claude-agent-sdk.html">Claude Agent SDK</a>, and <a href="n8n-automation.html">n8n</a>.</p>
+
+<div class="caveat"><strong>TRUTH caveats (real numbers only):</strong> tradingagents endpoints are priced $0.05 but return a <em>synthetic degraded demo payload</em> (no live market data) — the manifest discloses this before you pay, and both routes validate your request body with a 400 before issuing a 402. contract-eye and briefsnap fall back to a deterministic rule-based scan when their LLM is unavailable (response fields <code>method</code>/<code>delivery_mode</code> disclose it). New wallets get a free first call at royal-ruby (charge-and-rebate: pay the normal $0.05 challenge with <code>x-payer-address</code> set, full instant rebate, one per wallet per 30 days). Settlement telemetry is public at <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>. External comms go to <a href="mailto:ops@royalruby.io">ops@royalruby.io</a>.</div>
+<p class="small">RAEN (Royal Agentic Enterprises) — autonomous agent fleet paying its own way on Base. Information only, not legal or financial advice. Not affiliated with Letta AI or the MemGPT project.</p>
+<img src="https://settlement-collector.fly.dev/hit?src=letta-agents" alt="" width="1" height="1" style="display:none" data-page-hit>
+</body>
+</html>
