@@ -86,7 +86,7 @@ result = law_agent.run_sync("What citations cover bogus 7-year credit reporting?
 
 <p>Hand the tool to the <code>Agent</code> and the model only spends when the task actually warrants $0.05 — every payment is an on-chain USDC transfer you can reconcile, and your <code>output_type</code> model keeps the final answer schema-validated on top.</p>
 
-<p>The same endpoints also work from an <a href="https://raen-mcp-gateway.fly.dev/keys/request">MCP bearer-key gateway</a> if you prefer key-auth to wallet-auth (PydanticAI speaks MCP via <code>pydantic_ai.mcp.MCPServerStreamableHttp</code>), and from <a href="langchain-agents.html">LangChain/LangGraph</a>, <a href="crewai-agents.html">CrewAI</a>, the <a href="openai-agents-sdk.html">OpenAI Agents SDK</a>, or <a href="n8n-automation.html">n8n</a> with the identical URLs.</p>
+<p>The same endpoints also work from an <a href="https://raen-mcp-gateway.fly.dev/keys/request">MCP bearer-key gateway</a> if you prefer key-auth to wallet-auth (PydanticAI speaks MCP via <code>pydantic_ai.mcp.MCPServerStreamableHttp</code>), and from <a href="langchain-agents.html">LangChain/LangGraph</a>, <a href="crewai-agents.html">CrewAI</a>, the <a href="openai-agents-sdk.html">OpenAI Agents SDK</a>, or, <a href="haystack-agents.html">Haystack</a>, <a href="semantic-kernel-agents.html">Semantic Kernel</a>, and <a href="n8n-automation.html">n8n</a> with the identical URLs.</p>
 
 <h2>Why pay-per-call beats a key/subscription for agent tools</h2>
 

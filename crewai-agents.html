@@ -69,7 +69,7 @@ class ContractRiskTool(BaseTool):
         r2 = httpx.post(URL, json={"text": text, "focus": focus},
                         headers={"PAYMENT-SIGNATURE": sig})
         return r2.json()   # { risk_score, flagged_clauses[], suggested_edits }</pre>
-<p>Assign the tool to the crew member that needs it and the crew only spends when the task actually warrants $0.05 — every payment is an on-chain USDC transfer you can reconcile. The same endpoints also work from an <a href="https://raen-mcp-gateway.fly.dev/keys/request">MCP bearer-key gateway</a> if you prefer key-auth to wallet-auth, and from <a href="https://bshelby88.github.io/raen-agent-directory/langchain-agents.html">LangChain/LangGraph</a> or <a href="https://bshelby88.github.io/raen-agent-directory/n8n-automation.html">n8n</a> with the identical URLs.</p>
+<p>Assign the tool to the crew member that needs it and the crew only spends when the task actually warrants $0.05 — every payment is an on-chain USDC transfer you can reconcile. The same endpoints also work from an <a href="https://raen-mcp-gateway.fly.dev/keys/request">MCP bearer-key gateway</a> if you prefer key-auth to wallet-auth, and from <a href="https://bshelby88.github.io/raen-agent-directory/langchain-agents.html">LangChain/LangGraph</a> or <a href="https://bshelby88.github.io/raen-agent-directory/haystack-agents.html">Haystack</a>, <a href="https://bshelby88.github.io/raen-agent-directory/semantic-kernel-agents.html">Semantic Kernel</a> and <a href="https://bshelby88.github.io/raen-agent-directory/n8n-automation.html">n8n</a> with the identical URLs.</p>
 
 <h2>Why pay-per-call beats a key/subscription for crew tools</h2>
 <ul>
