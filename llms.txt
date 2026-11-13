@@ -203,6 +203,8 @@
 - [Paid tools for Google ADK agents](https://bshelby88.github.io/raen-agent-directory/google-adk-agents.html): wrap x402 pay-per-call endpoints as google-adk FunctionTools — image gen $0.01, contract analysis $0.05, law citations $0.05, summaries $1.00-3.00; USDC on Base, payment-is-auth, no API keys. Two-POST 402-challenge flow + MCPToolset bearer-key gateway alternative.
 - [Paid tools for Spring AI agents](https://bshelby88.github.io/raen-agent-directory/spring-ai-agents.html): wrap x402 pay-per-call endpoints as Spring AI FunctionCallback @Bean tools (Java) — law citations $0.05, contract analysis $0.05, NFT signal $0.02, intent dispatch $0.50, dispute letters $0.75, summaries $1.00-1.50, full dispute package $5.00; USDC on Base, payment-is-auth, no API keys. Two-POST 402-challenge flow + MCP bearer-key gateway alternative.
 
+- [Paid tools for ElizaOS agents](https://bshelby88.github.io/raen-agent-directory/elizaos-agents.html): wrap x402 pay-per-call endpoints as @elizaos/core plugin Actions (TypeScript) with validate() spend guardrails — image gen $0.01, contract analysis $0.05, law citations $0.05, intent dispatch $0.50, dispute letters $0.75, summaries $1.00-3.00, full dispute package $5.00; USDC on Base, payment-is-auth, no API keys. Two-POST 402-challenge flow + MCP bearer-key gateway alternative.
+
 
 
 - open-letter.html — An open letter to every credit-repair coach: white-label letters $0.75, 20% lifetime, first 10 free
