@@ -22,7 +22,7 @@ th{background:#161b22;color:#c9d1d9}
 </head>
 <body>
 <h1>Paid API tools for Semantic Kernel agents (x402 · Base USDC)</h1>
-<p>Microsoft <code>semantic-kernel</code> agents and .NET / Python automations pay per call for real work — no API keys, no signups, no monthly plans. Every endpoint below accepts <strong>USDC on Base</strong> via the <a href="https://www.x402.org/">x402</a> HTTP-native payment protocol: a request without payment gets a <code>402</code> challenge; you sign the challenge (EIP-3005 <code>transferWithAuthorization</code>) with your wallet and re-send with a <code>PAYMENT-SIGNATURE</code> header.</p>
+<p>Microsoft <code>semantic-kernel</code> agents and .NET / Python automations pay per call for real work — no API keys, no signups, no monthly plans. Every endpoint below accepts <strong>USDC on Base</strong> via the <a href="https://www.x402.org/">x402</a> HTTP-native payment protocol: a request without payment gets a <code>402</code> challenge; you sign the challenge (EIP-3009 <code>transferWithAuthorization</code>) with your wallet and re-send with a <code>PAYMENT-SIGNATURE</code> header.</p>
 
 <h2>Two-POST payment flow (same for every endpoint)</h2>
 <pre>import json, httpx
@@ -33,12 +33,12 @@ def x402_call(url: str, body: dict, signer) -> dict:
     if r.status_code != 402:
         return r.json()
     challenge = json.loads(r.headers["payment-required"])  # contains accepts[]
-    # 2) sign the exact scheme challenge with your Base wallet (EIP-3005),
+    # 2) sign the exact scheme challenge with your Base wallet (EIP-3009),
     #    then re-send with PAYMENT-SIGNATURE header
     sig = signer.sign_challenge(challenge)
     r2 = httpx.post(url, json=body, headers={"PAYMENT-SIGNATURE": sig})
     return r2.json()</pre>
-<p class="small">Any EIP-3005 signer works. Alternative: RAEN's Bearer-gated MCP gateway at <code>https://raen-mcp-gateway.fly.dev/mcp</code> — free dev key via <code>POST /keys/request</code> (30-day key, email verification), same tools over MCP if you prefer a client over raw HTTP. Semantic Kernel has first-class MCP support via <code>McpStdioClientAdapter</code> / <code>McpHttpClientPlugin</code> if you'd rather connect that way.</p>
+<p class="small">Any EIP-3009 signer works. Alternative: RAEN's Bearer-gated MCP gateway at <code>https://raen-mcp-gateway.fly.dev/mcp</code> — free dev key via <code>POST /keys/request</code> (30-day key, email verification), same tools over MCP if you prefer a client over raw HTTP. Semantic Kernel has first-class MCP support via <code>McpStdioClientAdapter</code> / <code>McpHttpClientPlugin</code> if you'd rather connect that way.</p>
 
 <h2>Semantic Kernel plugin (Python)</h2>
 <p><code>semantic-kernel</code> ≥ 1.x — plain plugin class with <code>@kernel_function</code> methods, registered with <code>add_plugin</code> and callable through automatic function calling:</p>
