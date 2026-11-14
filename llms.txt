@@ -139,6 +139,7 @@
 
 - [Try RAEN in 60 seconds](https://bshelby88.github.io/raen-agent-directory/try-raen.html): one click fetches a live HTTP 402 challenge from dispatch-x402 and decodes it in-browser (price, network, payTo — canonical-wallet verified), plus the agentcash one-liner and public ledger links. No signup.
 
+- [Local LLMs for legal drafting — the honest eval](https://bshelby88.github.io/raen-agent-directory/local-llm-legal-eval.html): we graded qwen2.5 3b/7b on 20 FCRA/FDCPA/CROA prompts against statute ground truth — grounded drafting 10/11 PASS, ungrounded recall hallucinates citations (1681o, 1681n), 7b wrote an illegal guaranteed-deletion letter, contract analysis 0.5/6 with a fabricated case cite. Decision rule + hosted paid alternatives ($0.75 dispute letter, $0.05 contract analysis, live-verified).
 - [The honest teardown](https://bshelby88.github.io/raen-agent-directory/honest-teardown.html): RAEN's real 7-month revenue log — $0.10 all-time, $0.00 external, what broke (phantom revenue, legacy payTo leaks, crossed deploys, unpayable free calls), what was fixed, every receipt linked (ledger, live stats, code, spec issues).
 
 - [Proof of Commerce](https://settlement-collector.fly.dev/proof): live settlement telemetry.

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>We tested local LLMs for legal drafting — here is exactly what fails</title>
+<meta name="description" content="qwen2.5 3B and 7B on CPU, 20 graded FCRA/FDCPA/CROA prompts, statute-grounded ground truth: grounded mode 10/11, ungrounded recall hallucinates citations, contract-risk analysis 0.5/6 with a fabricated case cite. Full results and the decision rule.">
+<style>
+:root{--bg:#0d1117;--fg:#e6edf3;--dim:#8b949e;--acc:#58a6ff;--ok:#3fb950;--warn:#d29922;--bad:#f85149;--card:#161b22;--bd:#30363d}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 -apple-system,'Segoe UI',Roboto,sans-serif;max-width:880px;margin:0 auto;padding:2rem 1.25rem}
+h1,h2,h3{line-height:1.25}
+h1{font-size:1.9rem}h2{font-size:1.35rem;margin-top:2.2rem;border-bottom:1px solid var(--bd);padding-bottom:.35rem}
+a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
+code,pre{font:13px/1.5 ui-monospace,Consolas,monospace}
+code{background:var(--card);padding:.15em .4em;border-radius:4px}
+pre{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:1rem;overflow-x:auto}
+table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.92rem}
+th,td{border:1px solid var(--bd);padding:.5rem .65rem;text-align:left}
+th{background:var(--card)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:1rem 1.25rem;margin:1rem 0}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--bd);border-radius:99px;padding:.15rem .7rem;font-size:.8rem;color:var(--dim);margin:.15rem}
+small,.small{color:var(--dim)}
+.beacon{display:none}
+</style>
+</head>
+<body>
+<h1>We tested local LLMs for legal drafting — here is exactly what fails</h1>
+<p class="small">RAEN (Royal Agentic Enterprises) runs paid x402 APIs for credit-repair and contract workflows on Base. Before deciding our product had to be a hosted API, we graded two small local models against real statutes. This page is the full verdict, every number real, every failure named — because the local-LLM-for-legal discourse is full of vibes and short of receipts.</p>
+
+<div class="card">
+<strong>The one-paragraph verdict</strong>: qwen2.5:3b (Q4, CPU-only) with statute context <span class="ok">passed 10 of 11 grounded prompts</span> — dispute letters and statute recall are usable. The same model with <em>no</em> context <span class="bad">hallucinates citations</span> and a <span class="bad">fabricated court case</span>, and 7b (the "bigger is safer" assumption) <span class="bad">wrote an illegal guaranteed-deletion letter</span> that 3b refused. Contract-risk analysis scored <span class="bad">0.5/6</span>. Ungrounded legal recall and contract analysis are not shippable at this size. Grounded drafting, or a hosted API — pick one, never the middle.
+</div>
+
+<h2>Setup (so you can replicate or critique it)</h2>
+<ul>
+<li><strong>Hardware:</strong> CPU-only. Ollama 0.40.15 GPU discovery segfaults on all backends on this box, so a Quadro P1000 4GB sat unused. This is the realistic floor for the "just run it locally" crowd.</li>
+<li><strong>Models:</strong> qwen2.5:3b (Q4) — full 20-prompt suite; qwen2.5:7b (Q4) — 6-prompt subset + calibration.</li>
+<li><strong>Grading:</strong> 20 prompts across three tracks — dispute letters (D1–D6), statute questions (L1–L8), contract-risk analysis (C1–C6). Ground truth: FCRA/FDCPA/CROA text (15 U.S.C. 1681 et seq., 1692, 1679) as served by our own statute API.</li>
+<li><strong>When:</strong> graded Nov 12, 2026.</li>
+</ul>
+
+<h2>The scoreboard</h2>
+<table>
+<tr><th>Track</th><th>qwen2.5:3b</th><th>Shippable?</th></tr>
+<tr><td>Dispute letters (grounded)</td><td class="ok">4/5 PASS (D4 ungrounded → FAIL)</td><td>Yes, grounded only</td></tr>
+<tr><td>Statute recall (grounded)</td><td class="ok">6/6 PASS</td><td>Yes</td></tr>
+<tr><td>Statute recall (ungrounded)</td><td class="bad">hallucinated cites (1681o, 1681n)</td><td class="bad">No</td></tr>
+<tr><td>Contract-risk analysis</td><td class="bad">0.5/6</td><td class="bad">No — not at this size, on CPU</td></tr>
+</table>
+<p>Headline for the full 20: <strong>11 PASS / 1 PARTIAL / 8 FAIL</strong>.</p>
+
+<h2>Three failures worth naming precisely</h2>
+
+<h3>1. The hallucinated citation is the killer, and grounding fixes it</h3>
+<p>Ungrounded, 3b cited <strong>1681o</strong> (negligent noncompliance) as the bankruptcy time-limit rule — the fact pattern was right, the citation invented. It cited <strong>1681n(a)</strong> as the 30-day reinvestigation rule; the real provision is <strong>1681i</strong>. With the statute text in context, the same model went 6/6 on statute questions: 1681i (30/45-day reinvestigation), 1692g (5-day validation window), 1681c-2 (4-business-day identity-theft block), 1681s-2 (30-day furnisher duty), 1692c, 1666. <strong>Every ungrounded failure became a grounded pass.</strong> If you ship a local model for legal drafting, RAG over primary sources is not an optimization — it is the product.</p>
+
+<h3>2. The bigger model was <em>less</em> safe on the compliance trap</h3>
+<p>We asked both models for a guaranteed-deletion letter — the thing CROA §1679b makes unlawful to promise. <strong>3b caught the trap</strong> and refused the guarantee. <strong>7b wrote the letter as asked</strong> — "we will ensure all negative accounts are removed within 90 days", no legality flag, plus a garbage citation (<code>1681etse</code>). If your threat model is "compliance exposure from a small model", parameter count did not buy safety here. This matches what credit-repair operators get fined for: the model will happily generate the letter that costs you the business.</p>
+
+<h3>3. Contract analysis fabricated a court case</h3>
+<p>On contract tracks, 3b went <strong>0.5/6</strong>: it missed the dominant credit-repair clause risk entirely (CROA 1679b(b) bars payment before services are fully performed — the model said FCRA/FDCPA/TILA "do not regulate setup fees"), and on the arbitration-clause prompt it produced a <strong>fabricated case</strong>: "AT&amp;T Mobility LLC v. Los Angeles Lawyers' Trustee Servs. (2010)". The real case is Concepcion (2011). A fabricated case name in a contract review is worse than no answer — it is a confident wrong answer a human will cite.</p>
+
+<h2>Latency: the part nobody puts in the thumbnail</h2>
+<p>3b: ~3–5 tok/s on CPU — a single dispute letter takes <strong>60–120 seconds</strong>. 7b: 1.3–2.4 tok/s warm, letters estimated 4–8 minutes. A batch of 50 letters is an afternoon on a machine that cannot use its GPU. Fine for a hobby; fatal for a fulfillment SLA.</p>
+
+<h2>The decision rule we adopted (take it, it's free)</h2>
+<ol>
+<li><strong>Grounded or nothing.</strong> Statute-context-injected drafting passed 10/11. Ungrounded recall is disqualified — permanently, not pending better models.</li>
+<li><strong>Contract analysis: don't.</strong> 0.5/6 with a fabricated case cite. No prompt engineering rescues a model that invents case law.</li>
+<li><strong>Test the trap, not the demo.</strong> The guaranteed-deletion prompt separates real compliance posture from marketing. A model that writes the illegal letter fails, whatever its benchmark score.</li>
+<li><strong>Per-call economics beat local latency</strong> once volume is real. Our own fleet charges $0.75 per FCRA-compliant dispute letter and $0.05 per contract risk analysis — at 3–5 tok/s on CPU, the paid API is also the <em>faster</em> option, not just the safer one.</li>
+</ol>
+
+<h2>If you want the hosted version of the grounded path</h2>
+<p>These are the endpoints whose prices we re-verified from live manifests and a decoded live 402 challenge the day this page was published ($0.05, scheme exact, eip155:8453, USDC, canonical payTo):</p>
+<table>
+<tr><th>Endpoint</th><th>Price</th><th>What you get</th></tr>
+<tr><td><code>POST dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.75</td><td>FCRA-compliant dispute letter + on-chain certificate</td></tr>
+<tr><td><code>POST contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td><td>Risk score + flagged clauses (deterministic fallback disclosed in-band when LLM enhancement is down)</td></tr>
+<tr><td><code>POST royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05</td><td>Statute lookup with correct citations (grounded by construction)</td></tr>
+</table>
+<p>Payment is x402: POST without payment, get a 402 challenge, sign an EIP-3009 <code>transferWithAuthorization</code> from any Base wallet, re-send. No API keys, no subscription. Full walkthrough: the <a href="https://bshelby88.github.io/x402-cookbook/">x402 cookbook</a>. If you'd rather use the MCP gateway with a free 30-day dev key: <code>POST https://raen-mcp-gateway.fly.dev/keys/request</code>. Prices and settled payments are public: <a href="https://settlement-collector.fly.dev/ledger">sales ledger</a> · <a href="https://settlement-collector.fly.dev/proof">proof page</a>.</p>
+
+<h2>Honest caveats (TRUTH law)</h2>
+<ul>
+<li>Sample is 20 prompts, one model family (qwen2.5), CPU-only, one GPU-less box. This is a floor test, not a survey of the local-LLM landscape — a 70B on a real GPU is a different experiment we haven't run.</li>
+<li>Our grading is ours. Ground truth came from statute text and our own API's grounded outputs; grading was manual against those sources.</li>
+<li>royal-ruby runs a disclosed A/B price experiment (most wallets $0.05, some $0.03) — the 402 challenge you receive is the exact price you pay.</li>
+<li>contract-eye discloses in-band when it returns the deterministic rule-based scan instead of LLM analysis.</li>
+<li><strong>Information only, not legal advice.</strong> Nothing here — ours or the models' — is a lawyer.</li>
+</ul>
+
+<p class="small">More on how we run this fleet: <a href="https://bshelby88.github.io/raen-agent-directory/honest-teardown.html">the honest teardown</a> · <a href="https://bshelby88.github.io/raen-agent-directory/">agent directory</a> · contact: ops@royalruby.io</p>
+<img class="beacon" src="https://settlement-collector.fly.dev/hit?src=local-llm-legal-eval" alt="" width="1" height="1">
+</body>
+</html>
