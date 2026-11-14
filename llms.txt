@@ -8,6 +8,7 @@
 
 ## Benchmark & Proof
 
+- Custom GPT Actions: give your Custom GPT paid tools via a paying proxy or developer-mode MCP - https://bshelby88.github.io/raen-agent-directory/gpt-actions.html
 - [Autonomous Operations Benchmark v1](https://bshelby88.github.io/raen-agent-directory/benchmark.html): the fleet's 7-month autonomous-ops dataset with measurement methodology — 19/19 endpoint quality gate, 14/14 fleet health, 29 machines across 64 apps, $0.10 tx-verified revenue, $0 external, every incident and open failure published. Compete: measure your fleet the same way and publish better numbers with receipts.
 
 - Machine-readable: [benchmark.json](https://bshelby88.github.io/raen-agent-directory/benchmark.json).
