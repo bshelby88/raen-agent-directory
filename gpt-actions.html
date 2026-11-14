@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAEN for Custom GPT Actions — paid tools your GPT can call</title>
+<meta name="description" content="Wire RAEN's paid x402 APIs into a Custom GPT via GPT Actions: a developer-side paying proxy, an OpenAPI Action schema, or ChatGPT developer-mode MCP. Real prices, real endpoints, honest constraints.">
+<style>
+:root{--bg:#0d1117;--fg:#e6edf3;--dim:#8b949e;--acc:#58a6ff;--ok:#3fb950;--warn:#d29922;--card:#161b22;--bd:#30363d}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 -apple-system,'Segoe UI',Roboto,sans-serif;max-width:880px;margin:0 auto;padding:2rem 1.25rem}
+h1,h2,h3{line-height:1.25}
+h1{font-size:1.9rem}h2{font-size:1.35rem;margin-top:2.2rem;border-bottom:1px solid var(--bd);padding-bottom:.35rem}
+a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
+code,pre{font:13px/1.5 ui-monospace,Consolas,monospace}
+code{background:var(--card);padding:.15em .4em;border-radius:4px}
+pre{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:1rem;overflow-x:auto}
+table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.92rem}
+th,td{border:1px solid var(--bd);padding:.5rem .65rem;text-align:left}
+th{background:var(--card)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:1rem 1.25rem;margin:1rem 0}
+.ok{color:var(--ok)}.warn{color:var(--warn)}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--bd);border-radius:99px;padding:.15rem .7rem;font-size:.8rem;color:var(--dim);margin:.15rem}
+small,.small{color:var(--dim)}
+.beacon{display:none}
+</style>
+</head>
+<body>
+<h1>Give your Custom GPT real paid tools</h1>
+<p class="small">RAEN (Royal Agentic Enterprises) runs 13 x402-paid API services on Base mainnet — every call settles in USDC on-chain. This page shows the two working ways to expose them to a Custom GPT via <strong>GPT Actions</strong>, with the constraints stated plainly.</p>
+<p><span class="tag">GPT Actions</span><span class="tag">OpenAPI schema</span><span class="tag">x402 / Base USDC</span><span class="tag">MCP developer mode</span></p>
+
+<div class="card">
+<strong>TL;DR</strong>
+<ul>
+<li>A Custom GPT Action cannot pay an x402 402 challenge and cannot sign EIP-3009 — OpenAI's Action runtime is plain HTTPS with static auth. Don't fight it.</li>
+<li><strong>Path 1 (recommended):</strong> you run a ~40-line paying proxy (your wallet, your spend cap); the GPT Action calls the proxy with an OpenAPI schema. Copy-paste code below.</li>
+<li><strong>Path 2:</strong> ChatGPT developer mode / connectors speak MCP — point it at the RAEN MCP gateway with a free 30-day dev key.</li>
+<li>Everything below was price-verified against each service's live x402 manifest and a decoded live 402 challenge on this page's publish date.</li>
+</ul>
+</div>
+
+<h2>The catalog (prices verified live)</h2>
+<p>All endpoints: <code>scheme=exact</code>, <code>network=eip155:8453</code> (Base), USDC <code>0x833589fC…2913</code>, payTo <code>0x9b8a27e03CEbA490953cDa8AB1291c0E13bAf72f</code>.</p>
+<table>
+<tr><th>Service</th><th>Endpoint</th><th>Price</th><th>What it does</th></tr>
+<tr><td>royal-ruby</td><td>POST /api/law-lookup</td><td>$0.05</td><td>US consumer-law citation lookup (FCRA/FDCPA/TILA/UDAP)</td></tr>
+<tr><td>dispatch</td><td>POST /dispatch</td><td>$0.50</td><td>Routes a natural-language intent to the right fleet API, returns ready-to-send request JSON</td></tr>
+<tr><td>nanobanana</td><td>POST /api/generate-image</td><td>$0.01</td><td>Image generation</td></tr>
+<tr><td>contract-eye</td><td>POST /api/analyze-contract</td><td>$0.05</td><td>Contract clause risk analysis</td></tr>
+<tr><td>briefsnap</td><td>POST /api/summarize</td><td>$1.00</td><td>Long-document summary</td></tr>
+<tr><td>dispute-forge</td><td>POST /api/dispute-pack</td><td>$0.75</td><td>Credit-dispute letter pack with citations</td></tr>
+<tr><td>nft-alpha</td><td>POST /api/nft-signal</td><td>$0.02</td><td>NFT market signal</td></tr>
+<tr><td>vault-pro</td><td>POST /api/scaffold-project</td><td>$0.05</td><td>Project/agent scaffolding</td></tr>
+<tr><td>escrow</td><td>POST /api/escrow/create</td><td>$0.05</td><td>Agent-to-agent escrow terms</td></tr>
+<tr><td>sentry-forge</td><td>GET /api/dispute-pack</td><td>$5.00</td><td>Full dispute evidence pack</td></tr>
+<tr><td>tradingagents</td><td>POST /api/analyze-ticker</td><td>$5.00</td><td>Multi-agent ticker analysis (synthetic demo mode — see caveats)</td></tr>
+</table>
+<p class="small">Hosts: <code>https://royal-ruby-x402.fly.dev</code>, <code>dispatch-x402.fly.dev</code>, <code>nanobanana-x402.fly.dev</code>, <code>contract-eye-x402.fly.dev</code>, <code>briefsnap-x402.fly.dev</code>, <code>dispute-forge-x402.fly.dev</code>, <code>nft-alpha-x402.fly.dev</code>, <code>vault-pro-x402.fly.dev</code>, <code>escrow-x402.fly.dev</code>, <code>sentry-forge-x402.fly.dev</code>, <code>staci-tradingagents.fly.dev</code>. Each exposes <code>/.well-known/x402.json</code> and a machine-readable GET quote (402 with JSON body) on its paid route.</p>
+
+<h2>Path 1 — developer-side paying proxy (recommended)</h2>
+<p>The pattern: <em>GPT Action → your proxy → x402 endpoint</em>. Your proxy holds a small hot wallet, pays each 402 challenge, and exposes ordinary bearer-token-authed REST to OpenAI. You control the spend ceiling; the GPT never sees a key that can move more than you loaded.</p>
+<p>Minimal Node/Express proxy with the official <code>x402-fetch</code> client (<a href="https://docs.x402.org/schemes/exact">EIP-3009 exact scheme</a>):</p>
+<pre>
+// npm i express x402-fetch viem
+import express from "express";
+import { wrapFetchWithPayment } from "x402-fetch";
+import { createWalletClient, http } from "viem";
+import { base } from "viem/chains";
+import { privateKeyToAccount } from "viem/accounts";
+
+const account = privateKeyToAccount(process.env.PAY_WALLET_KEY); // your proxy wallet
+const client = createWalletClient({ account, chain: base, transport: http() });
+const paid = wrapFetchWithPayment(fetch, client);
+
+const app = express();
+app.use(express.json());
+app.use((req, res, next) =>                 // your own auth + budget gate
+  req.header("authorization") === `Bearer ${process.env.GPT_TOKEN}` && spendOK()
+    ? next() : res.status(401).json({ error: "bad token or over budget" }));
+
+app.post("/law-lookup", async (req, res) => {
+  const r = await paid("https://royal-ruby-x402.fly.dev/api/law-lookup", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(req.body) });
+  res.status(r.status).json(await r.json());
+});
+app.listen(3000);
+</pre>
+<p>Then give the GPT an Action schema pointing at <em>your</em> proxy URL, e.g.:</p>
+<pre>
+openapi: 3.1.0
+info: { title: "RAEN Legal Research", version: "1.0.0" }
+servers: [{ url: "https://your-proxy.example.com" }]
+paths:
+  /law-lookup:
+    post:
+      operationId: lawLookup
+      summary: "US consumer-law citation lookup (FCRA, FDCPA, TILA, state UDAP)"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                topic: { type: string, description: "e.g. 'FCRA 1681s-b re-dispute window'" }
+              required: [topic]
+      responses:
+        "200": { description: "Structured citations and analysis" }
+components:
+  securitySchemes:
+    bearer: { type: http, scheme: bearer }
+security: [{ bearer: [] }]
+</pre>
+<div class="card">
+<strong>Free first call (royal-ruby):</strong> a wallet that has never paid gets its charge fully rebated after settlement (one per wallet per 30 days) — so the proxy's first law-lookup call is net $0. Set <code>x-payer-address: &lt;your 0x address&gt;</code> on the first request. See <a href="https://bshelby88.github.io/raen-first-call-free/">the step-by-step guide</a>.
+</div>
+
+<h2>Path 2 — ChatGPT developer mode via MCP</h2>
+<p>If you're building for developer mode / connectors rather than a store GPT, ChatGPT can attach remote MCP servers. RAEN runs one:</p>
+<pre>
+URL:    https://raen-mcp-gateway.fly.dev/mcp
+Auth:   Bearer &lt;dev key&gt;
+Dev key: POST https://raen-mcp-gateway.fly.dev/keys/request
+        (email verification; free, 30-day, rate-limited 3/day/IP)
+</pre>
+<p>The gateway fronts 5 tools covering the fleet and is itself x402-gated once the dev key expires — the Bearer key is the billing rail after the free window. Any MCP client (Claude Desktop, Cursor, VS Code agent mode, Goose, OpenHands) uses the same URL — config snippets per client are in the <a href="https://bshelby88.github.io/raen-agent-directory/llms.txt">agent directory</a>.</p>
+
+<h2>Honest constraints (read before building)</h2>
+<ul>
+<li><strong>A GPT Action cannot pay x402 directly.</strong> No wallet, no header-based 402 settlement, no EIP-3009 signing. Path 1 exists precisely because of this — the paying party is your server, not OpenAI's.</li>
+<li><strong>royal-ruby price experiment:</strong> wallets are deterministically bucketed — most see $0.05, some $0.03. The 402 challenge you receive is the exact price you pay; disclosed per TRUTH law in the manifest.</li>
+<li><strong>tradingagents</strong> currently ships a synthetic demo payload, disclosed in its manifest. Don't sell it to users as live market analysis.</li>
+<li><strong>contract-eye / briefsnap</strong> can return a deterministic fallback (mode=<code>statutory-baseline</code> / degraded) when their LLM enhancement is unavailable — responses say so in-band.</li>
+<li><strong>Information only, not legal advice</strong> — royal-ruby and dispute-forge are research/letter-drafting tools.</li>
+<li>Prices in the table were read from each service's live <code>/.well-known/x402.json</code> and a decoded live 402 challenge ($0.05, scheme exact, eip155:8453, canonical payTo) on publish day; manifests can change — always trust the live 402 quote.</li>
+</ul>
+
+<h2>Why bother with a paid API from a GPT at all?</h2>
+<p>Store GPTs have no revenue mechanism; Actions calling your proxy that calls a per-call-settled API is the cleanest way to put usage-based costs behind a product without subscriptions or Stripe. RAEN's <a href="https://settlement-collector.fly.dev/ledger">public sales ledger</a> and <a href="https://settlement-collector.fly.dev/proof">proof page</a> show every settlement on-chain — the same rails you'd build on.</p>
+<p class="small">More integration pages: <a href="https://bshelby88.github.io/raen-agent-directory/">agent directory</a> · <a href="https://bshelby88.github.io/x402-cookbook/">x402 cookbook</a> · contact: ops@royalruby.io</p>
+<img class="beacon" src="https://settlement-collector.fly.dev/hit?src=gpt-actions" alt="" width="1" height="1">
+</body>
+</html>
