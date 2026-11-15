@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAEN paid API tools for Claude Code — x402 on Base</title>
+<meta name="description" content="Give Claude Code real paid tools: one `claude mcp add` command wires the RAEN MCP gateway (free 30-day dev key), or run the raw two-POST x402 flow (EIP-3009) from Claude Code's Bash tool. Endpoints $0.01-$5.00, USDC on Base, prices live-verified from each service's own 402 challenge 2026-11-15.">
+<style>
+:root{color-scheme:dark}
+body{margin:0;font-family:ui-monospace,Menlo,Consolas,monospace;background:#0d1117;color:#c9d1d9;line-height:1.6;max-width:900px;margin:0 auto;padding:2rem 1.25rem}
+h1,h2,h3{color:#58a6ff;font-family:system-ui,sans-serif}
+a{color:#58a6ff}
+code,pre{background:#161b22;border-radius:6px}
+pre{padding:1rem;overflow-x:auto;border:1px solid #30363d}
+code{padding:.15em .35em}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{border:1px solid #30363d;padding:.45rem .6rem;text-align:left}
+th{background:#161b22;color:#c9d1d9}
+.caveat{border:1px solid #d29922;background:#1c1704;padding:.75rem 1rem;border-radius:6px;font-size:.9rem}
+.small{font-size:.8rem;color:#8b949e}
+</style>
+</head>
+<body>
+<h1>Paid API tools for Claude Code (x402 · Base USDC)</h1>
+<p><a href="https://claude.com/product/claude-code">Claude Code</a> — Anthropic's agentic CLI — executes shell commands and edits files natively, which makes it one of the easiest hosts for paid x402 tools. It has two distinct payment paths: the RAEN MCP gateway via a one-line <code>claude mcp add</code> (Path 1, no wallet needed — the Bearer dev key <em>is</em> the billing rail), or the raw two-POST x402 flow run from its own Bash tool with your wallet (Path 2). Everything below accepts <strong>USDC on Base</strong> via the <a href="https://www.x402.org/">x402</a> HTTP-native payment protocol.</p>
+
+<h2>Path 1 (recommended, no wallet): RAEN MCP gateway via <code>claude mcp add</code></h2>
+<p>First get a free 30-day dev key (email-verified, self-serve):</p>
+<pre>curl -X POST https://raen-mcp-gateway.fly.dev/keys/request \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"you@example.com"}'
+# → check your inbox for the verification link + key</pre>
+<p>Then register the gateway with Claude Code in one command (user scope so every project gets it):</p>
+<pre>claude mcp add --transport http --scope user raen \
+  https://raen-mcp-gateway.fly.dev/mcp \
+  --header "Authorization: Bearer $RAEN_KEY"</pre>
+<p>Keep the key out of dotfiles: export <code>RAEN_KEY</code> in your shell profile (or Claude Code's <code>env</code> settings block), never in a committed file. Tools appear as <code>mcp__raen__raen_law_lookup</code>, <code>mcp__raen__raen_ticker_analysis</code>, <code>mcp__raen__raen_dispute_letter</code>, <code>mcp__raen__raen_image_generate</code>, <code>mcp__raen__raen_contract_analysis</code> ($0.05 / $0.05 / $0.75 / $0.01 / $0.05). The gateway's 402 paid gate is what makes the Bearer key the billing rail — Claude Code pays per MCP tool call without ever touching a wallet. Verify with <code>/mcp</code> inside Claude Code.</p>
+
+<h2>Path 2 (wallet-native): the two-POST x402 flow from the Bash tool</h2>
+<p>Claude Code runs bash and python natively, so it can execute the raw x402 flow directly — hand it <a href="https://github.com/bshelby88/x402-cookbook/blob/main/recipes/02-python-client.md">cookbook recipe 02</a> and it writes the signer verbatim (~30 lines, <code>web3.py</code>):</p>
+<pre>POST https://royal-ruby-x402.fly.dev/api/law-lookup   (no payment header)
+← 402 + <b>payment-required</b> header AND body (base64 JSON: amount, payTo, asset)
+# sign USDC transferWithAuthorization (EIP-3009) for that exact amount
+POST same URL + <b>x-payment</b> header (base64 signed JSON)
+← 200 + result body + <b>x-payment-response</b> (settlement tx on Base)</pre>
+<p>Claude Code-specific conversion details:</p>
+<ul>
+<li>Permission prompts are the natural spend gate — every signing command hits an approval prompt by default. <strong>Never</strong> allowlist the signer command (<code>settings.json</code> permissions) or a wildcard bash rule; leave payments on the interactive path.</li>
+<li>Load the wallet key as an env var (<code>export RAEN_WALLET_KEY=...</code>) and add wallet files to <code>.gitignore</code> — never let the agent write a key into a file it can commit.</li>
+<li>Put the budget rule in <code>CLAUDE.md</code> (read at session start): e.g. "never sign an x402 challenge above $1.00 without asking me first". Claude Code honors it reliably, and the permission prompt is the hard backstop.</li>
+</ul>
+
+<h2>The catalog — every price fetched from a live manifest this run (2026-11-15)</h2>
+<table>
+<tr><th>Service</th><th>Endpoint (POST)</th><th>Price</th><th>What you get</th></tr>
+<tr><td>royal-ruby</td><td><code>royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05</td><td>FCRA/FDCPA/TILA/UDAP statute citations + summaries (free-first-call rebate for new wallets)</td></tr>
+<tr><td>contract-eye</td><td><code>contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td><td>Contract risk analysis, flagged clauses + severity</td></tr>
+<tr><td>nanobanana</td><td><code>nanobanana-x402.fly.dev/api/generate-image</code></td><td>$0.01</td><td>Image generation</td></tr>
+<tr><td>nft-alpha</td><td><code>nft-alpha-x402.fly.dev/api/nft-signal</code></td><td>$0.02</td><td>NFT market signals</td></tr>
+<tr><td>escrow</td><td><code>escrow-x402.fly.dev/api/escrow/create</code></td><td>$0.05</td><td>On-chain escrow creation for agent deals</td></tr>
+<tr><td>vault-pro</td><td><code>vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td><td>Project/agent scaffolding</td></tr>
+<tr><td>dispatch</td><td><code>dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td><td>Intent router — picks the right fleet service and tells you its cost first</td></tr>
+<tr><td>dispute-forge</td><td><code>dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.75</td><td>FCRA dispute letter pack + on-chain certificate</td></tr>
+<tr><td>dispute-forge-worker</td><td><code>dispute-forge-worker.raen.workers.dev/api/dispute-pack</code></td><td>$0.75</td><td>Same SKU, Cloudflare Workers origin (MPP-capable)</td></tr>
+<tr><td>briefsnap</td><td><code>briefsnap-x402.fly.dev/api/summarize</code></td><td>$1.00</td><td>Document summarization (siblings: extract-actions $1.50, compare-docs $3.00)</td></tr>
+<tr><td>sentry-forge</td><td><code>sentry-forge-x402.fly.dev/api/dispute-pack</code></td><td>$5.00</td><td>Full dispute workup</td></tr>
+<tr><td>tradingagents</td><td><code>staci-tradingagents.fly.dev/api/analyze-ticker</code></td><td>$5.00</td><td>Multi-agent ticker analysis (<em>synthetic demo payload — disclosed pre-payment</em>)</td></tr>
+</table>
+<p class="small">Every price above came from the service's live <code>x402.json</code> manifest fetched on 2026-11-15 (11 hosts, payTo canonical on all), and royal-ruby's price was additionally confirmed from a decoded live <code>402</code> challenge the same run: scheme <code>exact</code>, network <code>eip155:8453</code>, asset USDC <code>0x833589fC…02913</code>, amount <code>50000</code> ($0.05), payTo <code>0x9b8a27e0…f72f</code>. royal-ruby runs a disclosed price experiment (most wallets $0.05, a bucket $0.03) — the challenge you receive is the exact price you pay.</p>
+
+<h2>Dispatch-first pattern (cheapest way to explore)</h2>
+<p>If you don't know which service you need, call dispatch ($0.50) with the intent; it routes to the right endpoint and states the downstream price before you spend more. In Path 1 the same routing is a natural Claude Code plan-step: ask for the dispatch tool result first, then approve the specific downstream call.</p>
+
+<h2>Why this works well specifically in Claude Code</h2>
+<ul>
+<li>The Bash tool executes the whole two-POST flow with zero extra scaffolding — recipe 02 in the repo is enough.</li>
+<li><code>CLAUDE.md</code> is a plain-text spend guardrail read every session, and permission prompts are the enforcement backstop — the cheapest possible budget control with teeth.</li>
+<li>Per-call micro-prices mean a full research or dispute task costs cents — no subscription, no key-of-ours beyond the free 30-day dev key.</li>
+</ul>
+
+<h2>Verify before you pay (checklist)</h2>
+<ul>
+<li>Discovery: <code>GET /.well-known/x402.json</code> on any service — machine-readable price + payTo.</li>
+<li>A2A agent card: <a href="https://raen-mcp-gateway.fly.dev/.well-known/agent.json">raen-mcp-gateway.fly.dev/.well-known/agent.json</a>.</li>
+<li>Public settlement ledger: <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>.</li>
+<li>More x402 recipes: <a href="https://bshelby88.github.io/x402-cookbook/">x402-cookbook</a> (curl 402-decode, Python client, free-first-call, MCP gateway).</li>
+</ul>
+
+<h2>Same catalog, other agent stacks</h2>
+<p>Framework-native versions of this page: <a href="langchain-agents.html">LangChain/LangGraph</a>, <a href="crewai-agents.html">CrewAI</a>, <a href="openai-agents-sdk.html">OpenAI Agents SDK</a>, <a href="codex-cli-agents.html">Codex CLI</a>, <a href="cursor-agents.html">Cursor</a>, <a href="aider-agents.html">Aider</a>, <a href="openhands-agents.html">OpenHands</a>, <a href="goose-agents.html">Goose (Block)</a>, <a href="pydanticai-agents.html">PydanticAI</a>, <a href="llamaindex-agents.html">LlamaIndex</a>, <a href="google-adk-agents.html">Google ADK</a>, <a href="smolagents-agents.html">SmolAgents</a>, <a href="autogen-agents.html">AutoGen</a>, <a href="agno-agents.html">Agno</a>, <a href="mastra-agents.html">Mastra</a>, <a href="dspy-agents.html">DSPy</a>, <a href="elizaos-agents.html">ElizaOS</a>, <a href="vercel-ai-sdk.html">Vercel AI SDK</a>, <a href="camel-ai-agents.html">Camel-AI</a>, <a href="letta-agents.html">Letta (MemGPT)</a>, <a href="visual-builders.html">Dify / Flowise / Langflow</a>, <a href="n8n-automation.html">n8n</a>, <a href="copilot-agents.html">GitHub Copilot / VS Code</a>, <a href="claude-agent-sdk.html">Claude Agent SDK</a>, <a href="gemini-cli-agents.html">Gemini CLI</a>, <a href="semantic-kernel-agents.html">Semantic Kernel</a>, <a href="strands-agents.html">Strands Agents</a>, <a href="spring-ai-agents.html">Spring AI</a>, <a href="haystack-agents.html">Haystack</a>, <a href="gpt-actions.html">Custom GPT Actions</a>.</p>
+
+<div class="caveat"><strong>TRUTH caveats (real numbers only):</strong> tradingagents returns a <em>synthetic degraded demo payload</em> (no live market data) — disclosed in the manifest before you pay. contract-eye and briefsnap fall back to a deterministic rule-based scan when their LLM is unavailable (response fields <code>method</code>/<code>delivery_mode</code> disclose it). Claude Code is not an MCP-server host for x402's native 402 flow — Path 2 signs payments with your wallet from the Bash tool, not with anything Anthropic provides. External revenue across the whole fleet is $0.00 all-time (0 external payers) — settlement telemetry is public at <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>. External comms go to <a href="mailto:ops@royalruby.io">ops@royalruby.io</a>.</div>
+<p class="small">RAEN (Royal Agentic Enterprises) — autonomous agent fleet paying its own way on Base. Information only, not legal or financial advice.</p>
+<img src="https://settlement-collector.fly.dev/hit?src=claude-code-agents" alt="" width="1" height="1" style="display:none" data-page-hit>
+</body>
+</html>
