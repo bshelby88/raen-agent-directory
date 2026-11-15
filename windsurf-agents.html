@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAEN paid API tools for Windsurf (Cascade) — x402 on Base</title>
+<meta name="description" content="Give Windsurf's Cascade agent real paid tools: add the RAEN MCP gateway to ~/.codeium/windsurf/mcp_config.json (free 30-day dev key, Bearer header, no wallet on the platform) or run the raw two-POST x402 flow (EIP-3009) from Cascade's terminal. Endpoints $0.01-$5.00, USDC on Base, prices live-verified from each service's own manifest + a decoded 402 challenge 2026-11-15.">
+<style>
+:root{color-scheme:dark}
+body{margin:0;font-family:ui-monospace,Menlo,Consolas,monospace;background:#0d1117;color:#c9d1d9;line-height:1.6;max-width:900px;margin:0 auto;padding:2rem 1.25rem}
+h1,h2,h3{color:#58a6ff;font-family:system-ui,sans-serif}
+a{color:#58a6ff}
+code,pre{background:#161b22;border-radius:6px}
+pre{padding:1rem;overflow-x:auto;border:1px solid #30363d}
+code{padding:.15em .35em}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{border:1px solid #30363d;padding:.45rem .6rem;text-align:left}
+th{background:#161b22;color:#c9d1d9}
+.caveat{border:1px solid #d29922;background:#1c1704;padding:.75rem 1rem;border-radius:6px;font-size:.9rem}
+.small{font-size:.8rem;color:#8b949e}
+</style>
+</head>
+<body>
+<h1>Paid API tools for Windsurf / Cascade (x402 · Base USDC)</h1>
+<p><a href="https://windsurf.com/">Windsurf</a> — the agentic IDE with the <strong>Cascade</strong> agent — speaks MCP, which makes it a natural host for the RAEN paid-tool catalog. Two payment paths: the RAEN MCP gateway registered in <strong><code>~/.codeium/windsurf/mcp_config.json</code></strong> (Path 1, no wallet needed — the Bearer dev key <em>is</em> the billing rail), or the raw two-POST x402 flow executed from Cascade's terminal with your wallet (Path 2). Everything below accepts <strong>USDC on Base</strong> via the <a href="https://www.x402.org/">x402</a> HTTP-native payment protocol.</p>
+
+<h2>Path 1 (recommended, no wallet): RAEN MCP gateway in mcp_config.json</h2>
+<p>First get a free 30-day dev key (email-verified, self-serve):</p>
+<pre>curl -X POST https://raen-mcp-gateway.fly.dev/keys/request \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"you@example.com"}'
+# → check your inbox for the verification link + key</pre>
+<p>Then register the gateway as a remote (SSE/HTTP) MCP server — Windsurf → Settings → <strong>Windsurf Settings</strong> → <strong>MCP Servers</strong> → <em>View raw config</em>, or edit the file directly at <code>~/.codeium/windsurf/mcp_config.json</code>:</p>
+<pre>{
+  "mcpServers": {
+    "raen": {
+      "serverUrl": "https://raen-mcp-gateway.fly.dev/mcp",
+      "headers": { "Authorization": "Bearer ***" }
+    }
+  }
+}</pre>
+<p>Click <em>Refresh</em> in the MCP panel; the server should show a green status. Tools appear to Cascade as <code>raen__raen_law_lookup</code> (FCRA/FDCPA statute citations), <code>raen__raen_ticker_analysis</code>, <code>raen__raen_dispute_letter</code>, <code>raen__raen_image_generate</code>, <code>raen__raen_contract_analysis</code>. The gateway's 402 paid gate makes the Bearer key the billing rail — Cascade pays per MCP tool call without ever touching a wallet. Verify the handshake by asking Cascade "list your raen tools".</p>
+
+<h2>Path 2 (wallet-native): the two-POST x402 flow from Cascade's terminal</h2>
+<p>Cascade executes shell commands in the Windsurf terminal, so it can run the raw x402 flow directly — hand it <a href="https://github.com/bshelby88/x402-cookbook/blob/main/recipes/02-python-client.md">cookbook recipe 02</a> and it writes the signer verbatim (~30 lines, <code>web3.py</code>):</p>
+<pre>POST https://royal-ruby-x402.fly.dev/api/law-lookup   (no payment header)
+← 402 + <b>payment-required</b> header AND body (base64 JSON: amount, payTo, asset)
+# sign USDC transferWithAuthorization (EIP-3009) for that exact amount
+POST same URL + <b>x-payment</b> header (base64 signed JSON)
+← 200 + result body + <b>x-payment-response</b> (settlement tx on Base)</pre>
+
+<div class="caveat"><strong>Windsurf-specific spend guardrails:</strong> Cascade's command-execution approvals are your natural spend gate — leave terminal-command execution on <em>approve-always</em> (not auto-run) before enabling wallet-path payments, and review each command that touches the signer before approving. Load the wallet key as an env var (<code>export RAEN_WALLET_KEY=...</code>) and never let Cascade write a key into a file inside your repo. Put the budget rule in <code>.windsurfrules</code> (Cascade reads it every session): e.g. "never sign an x402 challenge above $1.00 — ask me first". Approval prompts are the hard backstop.</div>
+
+<h2>The catalog — every price fetched from a live manifest this run (2026-11-15)</h2>
+<table>
+<tr><th>Service</th><th>Endpoint (POST)</th><th>Price</th><th>What you get</th></tr>
+<tr><td>royal-ruby</td><td><code>royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05</td><td>FCRA/FDCPA/TILA/UDAP statute citations + summaries (free-first-call rebate for new wallets)</td></tr>
+<tr><td>contract-eye</td><td><code>contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td><td>Contract risk analysis, flagged clauses + severity</td></tr>
+<tr><td>nanobanana</td><td><code>nanobanana-x402.fly.dev/api/generate-image</code></td><td>$0.01</td><td>Image generation</td></tr>
+<tr><td>nft-alpha</td><td><code>nft-alpha-x402.fly.dev/api/nft-signal</code></td><td>$0.02</td><td>NFT market signals</td></tr>
+<tr><td>escrow</td><td><code>escrow-x402.fly.dev/api/escrow/create</code></td><td>$0.05</td><td>On-chain escrow creation for agent deals</td></tr>
+<tr><td>vault-pro</td><td><code>vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td><td>Project/agent scaffolding</td></tr>
+<tr><td>dispatch</td><td><code>dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td><td>Intent router — picks the right fleet service and tells you its cost first</td></tr>
+<tr><td>dispute-forge</td><td><code>dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.75</td><td>FCRA/FDCPA dispute packages (also on Cloudflare Workers: <code>dispute-forge-worker.raen.workers.dev</code>)</td></tr>
+<tr><td>briefsnap</td><td><code>briefsnap-x402.fly.dev/api/summarize</code> · <code>/api/eli5</code> · <code>/api/compare-docs</code></td><td>$1.00–$3.00</td><td>Summaries, ELI5 rewrites, doc comparisons</td></tr>
+<tr><td>sentry-forge</td><td><code>sentry-forge-x402.fly.dev/api/dispute-pack</code></td><td>$5.00</td><td>Full multi-step dispute workups</td></tr>
+<tr><td>tradingagents</td><td><code>staci-tradingagents.fly.dev/api/analyze-ticker</code></td><td>$5.00</td><td>Ticker analysis (synthetic demo payload disclosed per the manifest)</td></tr>
+</table>
+<p class="small">Prices are from each service's own /.well-known/x402.json manifest this run (2026-11-15; all 11 hosts advertise canonical payTo 0x9b8a…f72f, scheme=exact, network=eip155:8453, USDC); royal-ruby's $0.05 was additionally confirmed by decoding a live 402 <code>payment-required</code> challenge (amount 50000, scheme exact, eip155:8453, USDC, canonical payTo). Prices can change — the 402 challenge you receive at call time is the exact price you pay.</p>
+
+<h2>Verify before you spend</h2>
+<ul>
+<li><code>curl https://royal-ruby-x402.fly.dev/.well-known/x402.json</code> — every service publishes its manifest (scheme, network, payTo, price).</li>
+<li>A free-first-call rebate is available on royal-ruby for brand-new wallets: send <code>x-payer-address</code> on your first call, pay the challenge, and the full amount is rebated after settlement (one per wallet per 30 days). Guide: <a href="https://bshelby88.github.io/raen-first-call-free/">raen-first-call-free</a>.</li>
+<li>Public sales ledger (real settled numbers, TRUTH law): <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>.</li>
+</ul>
+
+<p class="small">RAEN is a pre-revenue x402 fleet on Base; external revenue to date is published honestly at the ledger link above. Operator: Royal Agentic Enterprises · contact jadedfocus@gmail.com · Information only, not legal or financial advice.</p>
+<script>
+try{new Image().src="https://settlement-collector.fly.dev/hit?src=windsurf-agents&ref="+encodeURIComponent(location.href);}catch(e){}
+</script>
+</body>
+</html>
