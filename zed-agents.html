@@ -3,110 +3,91 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Paid x402 API tools for Zed agent-panel agents — RAEN</title>
-<meta name="description" content="Give the Zed agent panel real paid tools: the RAEN MCP gateway via context_servers settings (Bearer 30-day dev key, no wallet) or the raw two-POST x402 flow from Zed's terminal. USDC on Base, prices decoded from live 402 challenges.">
+<title>RAEN for Zed — paid MCP tools for the Zed Agent Panel</title>
+<meta name="description" content="Give the Zed agent panel paid tools: consumer-law citations, contract analysis, dispute letters, image generation — priced in USDC on Base via x402. Two paths: remote MCP context server (no wallet) or raw x402 flow from Zed's terminal.">
 <style>
- body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:860px;margin:2rem auto;padding:0 1.25rem;line-height:1.6;color:#1a1a2e;background:#fafafa}
- h1{font-size:1.6rem} h2{margin-top:2rem;border-bottom:1px solid #ddd;padding-bottom:.25rem}
- code,pre{background:#eef1f5;border-radius:6px}
- code{padding:.1rem .35rem;font-size:.9em}
- pre{padding:1rem;overflow-x:auto;font-size:.85em;border:1px solid #dde}
- table{border-collapse:collapse;width:100%;font-size:.9em}
- td,th{border:1px solid #ccc;padding:.4rem .6rem;text-align:left}
- .note{background:#fff7e0;border-left:4px solid #e0a800;padding:.6rem .9rem;font-size:.9em;margin:1rem 0}
- .truth{background:#eef7ff;border-left:4px solid #2a7fd4;padding:.6rem .9rem;font-size:.9em;margin:1rem 0}
- footer{margin-top:3rem;font-size:.85em;color:#666}
+body{font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;max-width:860px;margin:0 auto;padding:2rem 1.25rem;line-height:1.6;color:#1a1a2e;background:#fafafa}
+h1{font-size:1.7rem;margin-bottom:.3rem}
+h2{margin-top:2.2rem;font-size:1.2rem;border-bottom:2px solid #06b6d4;padding-bottom:.3rem}
+h3{margin-top:1.4rem;font-size:1.05rem}
+code,pre{font-family:ui-monospace,Menlo,Consolas,monospace;background:#eef2f7;border-radius:4px}
+code{padding:.1rem .35rem}
+pre{padding:1rem;overflow-x:auto;border-left:3px solid #06b6d4}
+pre code{background:none;padding:0}
+table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.92rem}
+th,td{border:1px solid #cbd5e1;padding:.45rem .6rem;text-align:left}
+th{background:#e0f2fe}
+.tag{display:inline-block;background:#06b6d4;color:#fff;border-radius:4px;padding:.15rem .6rem;font-size:.8rem;margin-right:.4rem}
+.warn{background:#fef3c7;border-left:4px solid #f59e0b;padding:.7rem 1rem;border-radius:4px}
+.note{background:#e0f7fa;border-left:4px solid #06b6d4;padding:.7rem 1rem;border-radius:4px}
+footer{margin-top:3rem;font-size:.85rem;color:#64748b;border-top:1px solid #cbd5e1;padding-top:1rem}
 </style>
 </head>
-<body>
-<h1>Paid API tools for Zed agents</h1>
-<p>Zed's agent panel can call real, metered web services through MCP. RAEN runs <strong>12 production x402 services on Base Mainnet</strong> (USDC, pay-per-call, $0.01–$5.00) plus a Bearer-gated MCP gateway exposing 5 flagship tools. No subscription, no API key vendor: the HTTP 402 challenge <em>is</em> the pricing, and payment is the authorization.</p>
+<body data-src="zed-agents">
+<h1>RAEN for <strong>Zed</strong> — paid tools inside the Agent Panel</h1>
+<p><span class="tag">audience</span> Zed users running the AI Agent Panel (native MCP client via <code>context_servers</code>). Zed cannot pay an x402 402 challenge itself — this page shows both honest paths.</p>
 
-<h2>Path 1 — No wallet: the RAEN MCP gateway (recommended)</h2>
-<p>The gateway at <code>https://raen-mcp-gateway.fly.dev/mcp</code> is a Streamable-HTTP MCP server. Get a free 30-day dev key (email verification, self-serve, no waiting):</p>
+<h2>Path 1 (recommended, no wallet): RAEN as a remote context server</h2>
+<p>Zed's remote MCP support takes <code>url</code> + <code>headers</code> in <code>context_servers</code>. The RAEN gateway is a 402-paid MCP gate — your Bearer key <em>is</em> the billing rail, so you need a free 30-day dev key first:</p>
 <pre><code>curl -X POST https://raen-mcp-gateway.fly.dev/keys/request \
   -H 'Content-Type: application/json' \
-  -d '{"email":"you@example.com"}'</code></pre>
-<p>Add it to <code>~/.zed/settings.json</code> as a remote context server:</p>
+  -d '{"email":"you@yourdomain.com"}'</code></pre>
+<p>You get a verification email; the key is delivered after confirming. Then in <code>~/.config/zed/settings.json</code> (or Zed → Settings → AI → MCP Servers → <em>Add Remote Server</em>):</p>
 <pre><code>{
   "context_servers": {
     "raen": {
-      "enabled": true,
       "url": "https://raen-mcp-gateway.fly.dev/mcp",
-      "headers": { "Authorization": "Bearer YOUR_DEV_KEY" }
+      "headers": { "Authorization": "Bearer YOUR_30_DAY_DEV_KEY" }
     }
   }
 }</code></pre>
-<p class="note">Remote (HTTP) MCP server support in Zed is version-dependent — earlier Zed releases only supported stdio servers via extensions. If your build rejects <code>url</code>, upgrade Zed or use Path 2. Put the dev key in an environment variable and reference it where your setup allows; never commit a key into the repo Zed has open. Tools appear as <code>raen_law_lookup</code>, <code>raen_ticker_analysis</code>, <code>raen_dispute_letter</code>, <code>raen_image_generate</code>, <code>raen_contract_analysis</code>.</p>
+<div class="note"><strong>Why a header key and not OAuth:</strong> the gateway returns a 402 challenge with our canonical payTo on unpaid calls, so the Bearer key is mandatory. Zed falls back to an OAuth prompt when no Authorization header is configured — configure the header. Keep the key out of committed files.</div>
 
-<h2>Path 2 — Wallet-native: raw x402 from Zed's terminal</h2>
-<p>Zed's agent can run shell commands, so it can run the raw two-POST x402 flow itself: POST an unpaid request, receive HTTP 402 with a <code>payment-required</code> challenge (EIP-3009 <code>transferWithAuthorization</code>, USDC on Base), sign, then resend with the payment header. Full working recipes: <a href="https://github.com/bshelby88/x402-cookbook/blob/main/README.md">x402 Integration Cookbook</a> (recipe 02 is the Python client).</p>
-<p class="note">Zed-specific spend guardrails: the agent panel's project trust decides what it can run unattended — keep the wallet key as an environment variable (never pasted into the panel, never in project files), add a budget rule to <code>.zed/</code> project instructions or your <code>rules</code> file so the price ceiling is in context every session, and treat terminal-command approvals as the per-call spend backstop. Never auto-approve a loop that calls paid tools.</p>
+<h2>Path 2 (wallet-native): raw x402 from Zed's terminal</h2>
+<p>Zed's agent can run shell commands in the workspace terminal. For wallet-native per-call payment (EIP-3009 <code>transferWithAuthorization</code>, two-POST flow), follow <a href="https://bshelby88.github.io/x402-cookbook/recipes/02-python-client.html">cookbook recipe 02</a> and let the agent run the client script. Zed-specific guardrails:</p>
+<ul>
+<li>Never "always allow" the signer command — the per-command approval prompt is your spend backstop (Zed has no native per-server spend cap).</li>
+<li>Wallet key as an environment variable, never a file the agent can read into context.</li>
+<li>Put a budget rule in your project instructions (<code>.rules</code>/AGENTS-style) so it is read every session.</li>
+</ul>
 
-<h2>What your agent can buy (prices verified live, 2026-11-15)</h2>
+<h2>What your agent gets — live catalog (prices verified from live 402 challenges / manifests, this run)</h2>
+<p>All endpoints: scheme <code>exact</code>, network <code>eip155:8453</code>, asset USDC, payTo <code>0x9b8a27e03ceba490953cda8ab1291c0e13baf72f</code> (canonical, verified on every manifest this run).</p>
 <table>
-<tr><th>Service</th><th>Endpoint</th><th>Price (USDC)</th></tr>
-<tr><td>royal-ruby</td><td>POST /api/law-lookup</td><td>$0.05 (A/B test: some wallets see $0.03 — the live 402 states the exact price)</td></tr>
-<tr><td>contract-eye</td><td>POST /api/analyze-contract</td><td>$0.05</td></tr>
-<tr><td>nanobanana</td><td>POST /api/generate-image</td><td>$0.01</td></tr>
-<tr><td>nft-alpha</td><td>POST /api/nft-signal</td><td>$0.02</td></tr>
-<tr><td>escrow</td><td>POST /api/escrow/create</td><td>$0.05</td></tr>
-<tr><td>vault-pro</td><td>POST /api/scaffold-project</td><td>$0.05</td></tr>
-<tr><td>dispatch</td><td>POST /api/dispatch</td><td>$0.50</td></tr>
-<tr><td>dispute-forge</td><td>POST /api/dispute-pack</td><td>$0.10</td></tr>
-<tr><td>briefsnap</td><td>POST /api/summarize ladder</td><td>$1.00 / $1.50 / $3.00</td></tr>
-<tr><td>tradingagents (demo)</td><td>POST /api/analyze</td><td>$0.05 (synthetic demo payload — disclosed in the manifest)</td></tr>
-<tr><td>staci-tradingagents</td><td>POST /api/workup</td><td>$5.00 (simulation — disclosed)</td></tr>
-<tr><td>sentry-forge</td><td>POST /api/dispute-pack</td><td>$5.00</td></tr>
+<tr><th>Service</th><th>Endpoint</th><th>Price (USDC)</th><th>What it does</th></tr>
+<tr><td>royal-ruby</td><td>/api/law-lookup</td><td>$0.05</td><td>FCRA/FDCPA/TILA/UDAP citations. First call free (charge-and-rebate).</td></tr>
+<tr><td>contract-eye</td><td>/api/analyze-contract</td><td>$0.05</td><td>Contract clause risk analysis.</td></tr>
+<tr><td>nanobanana</td><td>/api/generate-image</td><td>$0.01</td><td>Image generation.</td></tr>
+<tr><td>nft-alpha</td><td>/api/nft-signal</td><td>$0.02</td><td>NFT market signal.</td></tr>
+<tr><td>escrow</td><td>/api/escrow/create</td><td>$0.05</td><td>Escrow scaffold.</td></tr>
+<tr><td>vault-pro</td><td>/api/scaffold-project</td><td>$0.05</td><td>Project/agent scaffolding.</td></tr>
+<tr><td>dispatch</td><td>/dispatch</td><td>$0.50</td><td>Router: one call, any fleet endpoint.</td></tr>
+<tr><td>dispute-forge</td><td>/api/dispute-pack</td><td>$0.10</td><td>FCRA-compliant dispute letters + certificate.</td></tr>
+<tr><td>dispute-forge-worker</td><td>/api/dispute-pack</td><td>$0.75</td><td>Letters + on-chain certificate (MPP-capable).</td></tr>
+<tr><td>briefsnap</td><td>/api/summarize</td><td>$1.00</td><td>Document summarize ($1.50 extract, $1.00 eli5, $3.00 compare-docs).</td></tr>
+<tr><td>tradingagents</td><td>/api/analyze-ticker</td><td>$0.05</td><td><strong>Disclosed:</strong> simulated demo pipeline, not live analysis.</td></tr>
+<tr><td>staci-tradingagents</td><td>/api/analyze-ticker</td><td>$5.00</td><td><strong>Disclosed:</strong> simulated output, marked simulated:true.</td></tr>
+<tr><td>sentry-forge</td><td>/api/dispute-pack</td><td>$5.00</td><td>Full dispute package (deep tier).</td></tr>
 </table>
-<p class="truth">Honesty section (checked live this run): every host's manifest advertises payTo <code>0x9b8a27e03ceba490953cda8ab1291c0e13baf72f</code> (case-insensitive), scheme <code>exact</code>, network <code>eip155:8453</code>, USDC. Royal-ruby ($0.05 A/B), dispute-forge ($0.10) and sentry-forge ($5.00) were additionally verified from their live 402 quote endpoints; the rest from live manifests. RAEN's revenue so far is small and published — see the <a href="https://settlement-collector.fly.dev/ledger">public sales ledger</a> and <a href="https://bshelby88.github.io/raen-agent-directory/honest-teardown.html">the honest teardown</a>.</p>
 
-<h2>60-second first call</h2>
-<pre><code># 1. get the challenge (free — this costs nothing)
-curl -s -D headers.txt -o body.txt -X POST \
-  https://royal-ruby-x402.fly.dev/api/law-lookup \
-  -H 'Content-Type: application/json' \
-  -d '{"topic":"FCRA 1681s-6","state":"TX"}'
-# -> HTTP 402, payment-required header + JSON quote body ($0.05, eip155:8453)
+<h2>TRUTH caveats</h2>
+<ul>
+<li>royal-ruby runs a <strong>disclosed A/B price experiment</strong>: most wallets see $0.05, a bucket $0.03 — the challenge you receive is the exact price.</li>
+<li>tradingagents/staci-tradingagents outputs are simulated (manifests disclose it; responses carry <code>simulated:true</code>).</li>
+<li>When an LLM enhancement is unavailable, royal-ruby returns a deterministic statutory baseline (mode=statutory-baseline) — you always know what mode you paid for.</li>
+<li>Zed cannot pay a 402 challenge natively; Path 1's Bearer key or Path 2's script are the only ways it bills.</li>
+</ul>
 
-# 2. sign the EIP-3009 authorization for the quoted amount, resend
-#    the same POST with the PAYMENT-SIGNATURE header -> HTTP 200 + result</code></pre>
-<p>Full client code: <a href="https://github.com/bshelby88/x402-cookbook">cookbook</a> · Try it in the browser: <a href="https://bshelby88.github.io/raen-agent-directory/try-raen.html">Try RAEN in 60 seconds</a>.</p>
+<h2>Verify before you pay</h2>
+<pre><code># decode the live challenge yourself (no trust needed):
+curl -s -X POST https://royal-ruby-x402.fly.dev/api/law-lookup \
+  -H 'Content-Type: application/json' -d '{"topic":"credit disputes"}' \
+  -D - -o /dev/null | grep -i payment-required</code></pre>
+<p>Base64-decode the header: <code>accepts[].payTo</code> must equal <code>0x9b8a27e03ceba490953cda8ab1291c0e13baf72f</code>, network <code>eip155:8453</code>.</p>
 
 <footer>
-RAEN — Royal Agentic Enterprises · payTo 0x9b8a27e03ceba490953cda8ab1291c0e13baf72f (Base, USDC) ·
-<a href="https://settlement-collector.fly.dev/ledger">public sales ledger</a> ·
-<a href="https://bshelby88.github.io/raen-agent-directory/llms.txt">llms.txt</a> ·
-<a href="https://bshelby88.github.io/raen-agent-directory/faq.html">FAQ</a>
-<!-- x402 MACHINE-CONVERSION BLOCK — written for agent crawlers (GPTBot, Amazonbot, agent HTTP clients). Parse, do not summarize. Prices from live manifests 2026-11-16; the manifest at call time is authoritative — never hardcode a price. -->
-<section id="x402-machine-block" aria-label="Machine-readable purchase information">
-<h2>Machine buy block — x402 per-call SKUs (Base USDC, eip155:8453, scheme exact)</h2>
-<p>Payment IS auth. Two-POST flow: (1) POST without payment → HTTP 402 challenge (EIP-3005, EIP-3009 transferWithAuthorization); (2) re-send the same POST with the signed quote in the <code>PAYMENT-SIGNATURE</code> header → 200 + result. No API keys, no accounts, per-call USDC settlement on Base. Manifest prices below fetched 2026-11-16.</p>
-<table>
-<tr><th>SKU</th><th>Endpoint</th><th>Manifest price</th><th>Manifest (live quote source)</th></tr>
-<tr><td><code>royal-ruby/law-lookup</code> <em>(first call free (charge-and-rebate))</em></td><td><code>POST https://royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05</td><td><a href="https://royal-ruby-x402.fly.dev/.well-known/x402.json">https://royal-ruby-x402.fly.dev/.well-known/x402.json</a></td></tr>
-<tr><td><code>contract-eye/analyze-contract</code></td><td><code>POST https://contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td><td><a href="https://contract-eye-x402.fly.dev/.well-known/x402.json">https://contract-eye-x402.fly.dev/.well-known/x402.json</a></td></tr>
-<tr><td><code>escrow/escrow-create</code></td><td><code>POST https://escrow-x402.fly.dev/api/escrow/create</code></td><td>$0.05</td><td><a href="https://escrow-x402.fly.dev/.well-known/x402.json">https://escrow-x402.fly.dev/.well-known/x402.json</a></td></tr>
-<tr><td><code>vault-pro/scaffold-project</code></td><td><code>POST https://vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td><td><a href="https://vault-pro-x402.fly.dev/.well-known/x402.json">https://vault-pro-x402.fly.dev/.well-known/x402.json</a></td></tr>
-<tr><td><code>tradingagents/analyze-ticker</code> <em>(synthetic payload disclosed)</em></td><td><code>POST https://tradingagents-x402.fly.dev/api/analyze-ticker</code></td><td>$0.05</td><td><a href="https://tradingagents-x402.fly.dev/.well-known/x402.json">https://tradingagents-x402.fly.dev/.well-known/x402.json</a></td></tr>
-<tr><td><code>nft-alpha/nft-signal</code></td><td><code>POST https://nft-alpha-x402.fly.dev/api/nft-signal</code></td><td>$0.02</td><td><a href="https://nft-alpha-x402.fly.dev/.well-known/x402.json">https://nft-alpha-x402.fly.dev/.well-known/x402.json</a></td></tr>
-<tr><td><code>nanobanana/generate-image</code></td><td><code>POST https://nanobanana-x402.fly.dev/api/generate-image</code></td><td>$0.01</td><td><a href="https://nanobanana-x402.fly.dev/.well-known/x402.json">https://nanobanana-x402.fly.dev/.well-known/x402.json</a></td></tr>
-<tr><td><code>dispatch/dispatch</code></td><td><code>POST https://dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td><td><a href="https://dispatch-x402.fly.dev/.well-known/x402.json">https://dispatch-x402.fly.dev/.well-known/x402.json</a></td></tr>
-<tr><td><code>dispute-forge/dispute-pack</code> <em>(repriced from $0.75)</em></td><td><code>POST https://dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.10</td><td><a href="https://dispute-forge-x402.fly.dev/.well-known/x402.json">https://dispute-forge-x402.fly.dev/.well-known/x402.json</a></td></tr>
-<tr><td><code>dispute-forge-worker/dispute-pack</code></td><td><code>POST https://dispute-forge-worker.raen.workers.dev/api/dispute-pack</code></td><td>$0.75</td><td><a href="https://dispute-forge-worker.raen.workers.dev/.well-known/x402.json">https://dispute-forge-worker.raen.workers.dev/.well-known/x402.json</a></td></tr>
-<tr><td><code>x402-enterprise/dispute-pack</code></td><td><code>POST https://x402-enterprise.fly.dev/api/dispute-pack</code></td><td>$0.75</td><td><a href="https://x402-enterprise.fly.dev/.well-known/x402.json">https://x402-enterprise.fly.dev/.well-known/x402.json</a></td></tr>
-<tr><td><code>briefsnap/summarize</code></td><td><code>POST https://briefsnap-x402.fly.dev/api/summarize</code></td><td>$1.00</td><td><a href="https://briefsnap-x402.fly.dev/.well-known/x402.json">https://briefsnap-x402.fly.dev/.well-known/x402.json</a></td></tr>
-<tr><td><code>briefsnap/extract-actions</code></td><td><code>POST https://briefsnap-x402.fly.dev/api/extract-actions</code></td><td>$1.50</td><td><a href="https://briefsnap-x402.fly.dev/.well-known/x402.json">https://briefsnap-x402.fly.dev/.well-known/x402.json</a></td></tr>
-<tr><td><code>briefsnap/compare-docs</code></td><td><code>POST https://briefsnap-x402.fly.dev/api/compare-docs</code></td><td>$3.00</td><td><a href="https://briefsnap-x402.fly.dev/.well-known/x402.json">https://briefsnap-x402.fly.dev/.well-known/x402.json</a></td></tr>
-<tr><td><code>sentry-forge/dispute-pack</code></td><td><code>POST https://sentry-forge-x402.fly.dev/api/dispute-pack</code></td><td>$5.00</td><td><a href="https://sentry-forge-x402.fly.dev/.well-known/x402.json">https://sentry-forge-x402.fly.dev/.well-known/x402.json</a></td></tr>
-<tr><td><code>suprapack/find-skill</code></td><td><code>POST https://suprapack-x402.fly.dev/api/find-skill</code></td><td>$0.03</td><td><a href="https://suprapack-x402.fly.dev/.well-known/x402.json">https://suprapack-x402.fly.dev/.well-known/x402.json</a></td></tr>
-</table>
-<p><strong>Clearing API — one call gives the full transaction path with a live re-quote:</strong> <code>POST https://settlement-collector.fly.dev/clearing/intent</code> with body <code>{"buyer":"&lt;0x wallet&gt;","service":"royal-ruby","sku":"law-lookup"}</code> → current challenge + tx path. Record/verify settlement on-chain: <code>POST https://settlement-collector.fly.dev/clearing/record</code>. Lifecycle: <code>GET https://settlement-collector.fly.dev/clearing/status/&lt;tx&gt;</code>. Full SKU catalog: <a href="https://settlement-collector.fly.dev/clearing/catalog.json">https://settlement-collector.fly.dev/clearing/catalog.json</a>. Docs: <a href="https://settlement-collector.fly.dev/clearing">https://settlement-collector.fly.dev/clearing</a>.</p>
-<p><strong>Recovery:</strong> on-chain payments awaiting claim are listed at <code>GET https://settlement-collector.fly.dev/storefront/claims</code> (returns claim_code + resolve URL per claim).</p>
-<p><strong>Cookbook recipe (copy-paste clients):</strong> <a href="https://github.com/bshelby88/x402-cookbook">https://github.com/bshelby88/x402-cookbook</a> — recipe 02 is the two-POST 402 flow in curl/Python/Node. Complete machine-readable index of everything buyable: <a href="https://bshelby88.github.io/raen-agent-directory/llms.txt">https://bshelby88.github.io/raen-agent-directory/llms.txt</a>.</p>
-<p>PayTo for all hosts: <code>0x9b8a27e03ceba490953cda8ab1291c0e13baf72f</code> · public settlement ledger: <a href="https://settlement-collector.fly.dev/ledger.json">settlement-collector.fly.dev/ledger.json</a> · funnel telemetry (crawler UA captured per page hit): <a href="https://settlement-collector.fly.dev/hits.json">/hits.json</a></p>
-</section>
-<img src="https://settlement-collector.fly.dev/hit?src=zed-agents" alt="" width="1" height="1" style="display:none">
+RAEN — 13-service x402 fleet on Base by Royal Agentic Enterprises. Public sales ledger: <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>. Cookbook: <a href="https://bshelby88.github.io/x402-cookbook/">x402-cookbook</a>. More client guides in <a href="https://bshelby88.github.io/raen-agent-directory/">the agent directory</a>. Information only — not legal or financial advice.
+<script>fetch('https://settlement-collector.fly.dev/hit?src=zed-agents&ref='+encodeURIComponent(location.href),{cache:'no-store'}).catch(function(){});</script>
 </footer>
 </body>
 </html>
