@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CrewAI Flows on paid rails — event-driven crews calling x402 micro-priced tools (Base USDC)</title>
+<style>
+:root{color-scheme:dark}
+body{font:16px/1.6 system-ui,sans-serif;max-width:880px;margin:0 auto;padding:2rem 1rem;background:#0d1117;color:#c9d1d9}
+h1,h2,h3{color:#58d5c9}
+a{color:#79c0ff}
+code,pre{font:0.9em ui-monospace,Consolas,monospace}
+pre{background:#161b22;border:1px solid #30363d;border-radius:6px;padding:1rem;overflow-x:auto}
+table{border-collapse:collapse;width:100%}
+td,th{border:1px solid #30363d;padding:.4rem .6rem;text-align:left;font-size:.9rem}
+.note{border-left:3px solid #58d5c9;padding:.5rem 1rem;background:#161b22;margin:1rem 0}
+.btn{display:inline-block;background:#1f6feb;color:#fff;padding:.6rem 1.2rem;border-radius:6px;text-decoration:none;font-weight:600}
+</style>
+</head>
+<body>
+<h1>CrewAI Flows on paid rails</h1>
+<p><strong>Companion page for the CrewAI Flows feature</strong> (the event-driven, structured-orchestration layer — not <code>Crew</code> kickoffs). This extends <a href="https://bshelby88.github.io/raen-agent-directory/crewai-agents.html">Paid tool calls in CrewAI</a> (tool wrappers) and <a href="https://bshelby88.github.io/raen-agent-directory/crewai-recipes.html">CrewAI recipes</a> (end-to-end crews) to the Flows programming model, where spending decisions are made at <em>state transitions</em> — the natural place for a budget gate.</p>
+
+<div class="note"><strong>60-second first paid call (no wallet):</strong> get a free 30-day dev key, then use the RAEN MCP gateway as a Flows tool —
+<pre>curl -s -X POST https://raen-mcp-gateway.fly.dev/keys/request \
+  -H 'Content-Type: application/json' -d '{"email":"you@example.com"}'
+# then in Flow code: any HTTP client POSTs to https://raen-mcp-gateway.fly.dev/mcp
+# with Authorization: Bearer &lt;key from your email&gt;</pre>
+The first call is charge-and-rebate on the API paths (you pay the challenge, the rebate returns it) — net $0 on the first call of each service.</div>
+
+<h2>Why Flows is the right place for paid tools</h2>
+<ul>
+<li><strong>@listen / @persist gates:</strong> paid calls live inside a <code>@listen("state_ready")</code> method, so a single wallet check runs before any spend — the flow structure <em>is</em> the spend guardrail.</li>
+<li><strong>Structured state:</strong> spent amounts accumulate on a Pydantic state field (<code>total_spent_usd</code>), giving you a per-flow budget ledger for free.</li>
+<li><strong>Router methods:</strong> decide between the cheap tool ($0.05) and the premium tool ($5.00) in <code>@router</code> — pricing is a routing decision, not a prompt hope.</li>
+</ul>
+
+<h2>Live endpoint price table (verified from each service's own 402 quote, 2026-11-16)</h2>
+<table>
+<tr><th>Service</th><th>Route</th><th>Price</th></tr>
+<tr><td>nanobanana</td><td>POST /api/generate-image</td><td>$0.01</td></tr>
+<tr><td>nft-alpha</td><td>POST /api/nft-signal</td><td>$0.02</td></tr>
+<tr><td>royal-ruby</td><td>POST /api/law-lookup</td><td>$0.05 (A/B test: some wallets see $0.03 — the challenge states the exact price)</td></tr>
+<tr><td>contract-eye</td><td>POST /api/analyze-contract</td><td>$0.05</td></tr>
+<tr><td>vault-pro</td><td>POST /api/scaffold-project</td><td>$0.05</td></tr>
+<tr><td>escrow</td><td>POST /api/escrow/create</td><td>$0.05</td></tr>
+<tr><td>tradingagents</td><td>POST /api/analyze-ticker</td><td>$0.05 (schema-validates pre-payment; demo payload disclosed)</td></tr>
+<tr><td>dispatch</td><td>POST /dispatch</td><td>$0.50</td></tr>
+<tr><td>dispute-forge</td><td>POST /api/dispute-pack</td><td>$0.10</td></tr>
+<tr><td>dispute-forge-worker</td><td>POST /api/dispute-pack</td><td>$0.75</td></tr>
+<tr><td>briefsnap</td><td>POST /api/summarize</td><td>$1.00 (ladder $1.00/$1.50/$3.00 by route)</td></tr>
+<tr><td>sentry-forge</td><td>POST /api/dispute-pack</td><td>$5.00</td></tr>
+<tr><td>staci-tradingagents</td><td>POST /api/analyze-ticker</td><td>$5.00 (simulation disclosed)</td></tr>
+</table>
+<p>All routes: scheme <code>exact</code>, network <code>eip155:8453</code> (Base), asset USDC (0x8335…2913), payTo <code>0x9b8a27e0…baf72f</code> — canonical on every one this run.</p>
+
+<h2>Pattern: a paid call inside a Flow state transition</h2>
+<pre>from crewai.flow import Flow, listen, start
+from pydantic import BaseModel
+import json, urllib.request
+
+GATEWAY = "https://raen-mcp-gateway.fly.dev/mcp"
+
+class S(BaseModel):
+    topic: str = "credit-report disputes"
+    total_spent_usd: float = 0.0
+
+def law_lookup(topic: str) -> dict:
+    body = json.dumps({"jsonrpc":"2.0","id":1,"method":"tools/call",
+        "params":{"name":"raen_law_lookup","arguments":{"topic":topic}}}).encode()
+    req = urllib.request.Request(GATEWAY, data=body, method="POST",
+        headers={"Content-Type":"application/json",
+                 "Authorization": f"Bearer {os.environ['RAEN_KEY']}"})   # key from POST /keys/request — never committed
+    return json.load(urllib.request.urlopen(req))
+
+class DisputeFlow(Flow[S]):
+    @start
+    def prepare(self):
+        return self.state.topic
+
+    @listen(prepare)
+    def cite_laws(self, topic):
+        if self.state.total_spent_usd &gt; 1.00:      # budget gate at the transition
+            raise RuntimeError("Flow budget exhausted")
+        out = law_lookup(topic)
+        self.state.total_spent_usd += 0.05
+        return out["result"]
+
+DisputeFlow().kickoff()</pre>
+
+<h2>Pattern 2: wallet-native path (raw x402, no gateway)</h2>
+<p>Flows running on infra with a signing key can skip the gateway and answer the 402 challenge directly — the same two-POST EIP-3009 flow documented in <a href="https://github.com/bshelby88/x402-cookbook/blob/main/recipes/02-python-client.md">cookbook recipe 02</a>. Flows-specific guardrails:</p>
+<ul>
+<li>Run the signer in one <code>@listen</code> method only; keep <code>private_key</code> in an env var (<code>os.environ["SIGNER_KEY"]</code>), never in Flow state — Flow state can be serialized/persisted.</li>
+<li><code>@persist</code> serializes state to disk: make sure the state schema excludes any key material.</li>
+<li>Put the budget check BEFORE the paid call in the same method — a router that already spent can't un-spend.</li>
+</ul>
+
+<h2>Honest caveats (TRUTH law)</h2>
+<ul>
+<li>royal-ruby runs a disclosed A/B price test — your wallet may see $0.03 instead of $0.05; the 402 challenge always states the exact amount.</li>
+<li>tradingagents and staci-tradingagents disclose that their payloads are synthetic demo data.</li>
+<li>contract-eye and briefsnap advertise degraded fallback modes when their LLM key is unhealthy.</li>
+<li>Per-call prices are the live manifest/402-quote prices as of 2026-11-16; verify the challenge amount at call time.</li>
+</ul>
+
+<h2>More audiences</h2>
+<ul>
+<li><a href="https://bshelby88.github.io/raen-agent-directory/crewai-agents.html">CrewAI tool wrappers (BaseTool)</a></li>
+<li><a href="https://bshelby88.github.io/raen-agent-directory/crewai-recipes.html">CrewAI recipes (5 end-to-end crews)</a></li>
+<li><a href="https://bshelby88.github.io/raen-agent-directory/index.html">Full RAEN agent directory</a> · <a href="https://bshelby88.github.io/x402-cookbook/">x402 cookbook</a></li>
+</ul>
+
+<p style="margin-top:2rem;font-size:.85rem;color:#8b949e">Beacon funnel: <a href="https://settlement-collector.fly.dev/hits.json">/hits.json</a></p>
+<script>new Image().src="https://settlement-collector.fly.dev/hit?src=crewai-flows";</script>
+<p><a class="btn" href="https://bshelby88.github.io/raen-agent-directory/try-raen.html">Give your flow its first paid call →</a></p>
+</body>
+</html>
