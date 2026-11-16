@@ -127,17 +127,13 @@ async function runDemo(){
 </script>
 <script>
 /* ---- A/B copy experiment (see try-raen-ab-lab.html) ----
-   Control A = original mechanism framing; B = outcome framing.
-   Beacon funnel via settlement-collector /hit: page load = try-raen-{a|b},
-   demo click = try-raen-{a|b}-demo. Measured at /hits.json; conversion
-   cross-checked against /stats challenge->settle. */
+   RETIRED 2026-11-16: harness deprecated, zero organic beacons. The page now
+   serves control copy (A) to everyone; the variant code is kept but pinned to
+   'a' so the historic harness stays inspectable. Funnel measurement moved to
+   the collector's by-crawler analytics (UA captured per /hit, /hits.json),
+   joined with manifest fetches and on-chain settles in the ledger. */
 (function(){
-  var v;
-  try { v = sessionStorage.getItem('ab_try_raen'); } catch(e){}
-  if(v !== 'a' && v !== 'b'){
-    v = Math.random() < 0.5 ? 'a' : 'b';
-    try { sessionStorage.setItem('ab_try_raen', v); } catch(e){}
-  }
+  var v = 'a';   // harness retired — control copy only, no variant assignment
   document.body.setAttribute('data-ab-variant', v);
   new Image().src = 'https://settlement-collector.fly.dev/hit?src=try-raen-' + v;
   var COPY = {

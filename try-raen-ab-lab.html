@@ -22,7 +22,8 @@ th { color:#8b949e; font-weight:600; }
 </head>
 <body>
 <h1>Try-RAEN A/B copy lab</h1>
-<p class="sub">RAEN's buyer funnel entry (<a href="try-raen.html">try-raen.html</a>) is running a public A/B copy experiment. This page is the experiment record: hypothesis, variants, measurement, decision rule. Last updated 2026-11-13 (experiment start).</p>
+<p class="sub"><strong style="color:#f0883e">DEPRECATED 2026-11-16 — human A/B harness retired.</strong> This experiment recorded zero organic beacons: real buyers on this surface are agent crawlers (Amazonbot, GPTBot), not humans reading copy. The harness below is kept for the public experiment record only — no variant traffic is being measured. Funnel measurement has moved to the collector's by-crawler analytics: each page beacon logs the requesting crawler's user-agent at <a href="https://settlement-collector.fly.dev/hits.json">settlement-collector.fly.dev/hits.json</a>, joined against manifest fetches and on-chain settles in the ledger — <em>which crawler → which page → which manifest fetch → which settle</em>. The <a href="https://bshelby88.github.io/raen-agent-directory/llms.txt">llms.txt</a> machine index + per-page machine buy blocks are the conversion surfaces now.</p>
+<p class="sub">RAEN's buyer funnel entry (<a href="try-raen.html">try-raen.html</a>) ran a public A/B copy experiment from 2026-11-13. This page was the experiment record: hypothesis, variants, measurement, decision rule.</p>
 
 <h2>Why this surface</h2>
 <p>try-raen.html is the funnel entry every buyer journey is pointed at — from the directory index, llms.txt, the cookbook, and the connector pages. Fleet telemetry (2026-11-13): ~2,300 challenges/24h with zero settles, so the leak to fix is attention&nbsp;→&nbsp;demo-run&nbsp;→&nbsp;paid call, not pricing. The first measurable step is the demo-run rate on this page.</p>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paid tool calls for AG2 agents (AutoGen successor) — x402 micro-priced endpoints (Base USDC)</title>
+<meta name="description" content="Register pay-per-call RAEN endpoints as AG2 registered functions your ConversableAgent / GroupChat can call: image generation $0.01, contract analysis $0.05, law citations $0.05, summaries $1.00+. USDC on Base via x402 — payment is the auth, no API keys.">
+<style>
+:root{--bg:#0d1117;--card:#161b22;--line:#30363d;--fg:#e6edf3;--dim:#8b949e;--accent:#1c9c72}
+*{box-sizing:border-box}body{margin:0;font:16px/1.6 -apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--fg)}
+main{max-width:860px;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-size:2rem;line-height:1.2}h2{margin-top:2.5rem;border-bottom:1px solid var(--line);padding-bottom:.4rem}
+a{color:#58a6ff}.kicker{color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-size:.85rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:1rem 1.25rem;margin:1rem 0}
+code,pre{background:#0a0d12;border:1px solid var(--line);border-radius:6px;font:13px/1.5 ui-monospace,Consolas,monospace}
+pre{padding:1rem;overflow-x:auto}code{padding:.1em .4em}
+table{border-collapse:collapse;width:100%}td,th{border:1px solid var(--line);padding:.5rem .7rem;text-align:left}
+.truth{color:var(--dim);font-size:.85rem}.btn{display:inline-block;background:var(--accent);color:#fff;padding:.6rem 1.2rem;border-radius:6px;text-decoration:none;font-weight:600}
+</style>
+</head>
+<body>
+<main>
+<p class="kicker">RAEN · x402 paid APIs on Base</p>
+<h1>Give your AG2 agent a wallet: registered tools, priced in cents</h1>
+<p>AG2 (the community continuation of Microsoft AutoGen, <code>pip install ag2</code>) is built for multi-agent workflows where agents execute code and call functions autonomously — exactly the profile that can hold a wallet and pay per call. The endpoints below are plain HTTPS POSTs costing <strong>$0.01–$3.00 per call</strong>, settled in USDC on Base via x402. The payment IS the auth: no API keys, no subscriptions. Register the wrapper once with <code>register_for_llm</code>/<code>register_for_execution</code> and every agent in the GroupChat can spend from the shared wallet.</p>
+
+<h2>The tool menu</h2>
+<table>
+<tr><th>What the agent can do</th><th>Endpoint</th><th>Price</th></tr>
+<tr><td>AI image generation — base64 PNG</td><td><code>POST nanobanana-x402.fly.dev/api/generate-image</code></td><td>$0.01</td></tr>
+<tr><td>Contract risk analysis — flagged clauses, severity</td><td><code>POST contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td></tr>
+<tr><td>US consumer-law citations (FCRA / FDCPA / TILA / UDAP)</td><td><code>POST royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05</td></tr>
+<tr><td>Route a natural-language intent to the right paid service</td><td><code>POST dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td></tr>
+<tr><td>Document summary / action extraction / doc comparison</td><td><code>POST briefsnap-x402.fly.dev/api/…</code></td><td>$1.00–$3.00</td></tr>
+</table>
+<p>Every endpoint publishes a machine-readable manifest at <code>https://&lt;host&gt;/.well-known/x402.json</code> — read it at call time for the live price and schema.</p>
+
+<h2>AG2 wrapper: a registered function with the two-POST 402 flow</h2>
+<pre>import os, httpx
+from autogen import ConversableAgent, config_list_from_json
+
+URL = "https://royal-ruby-x402.fly.dev/api/law-lookup"
+KEY = os.environ["RAEN_WALLET_KEY"]   # dedicated, thinly-funded key — never in chat
+
+def raen_law_lookup(query: str) -> dict:
+    """US consumer-law citation lookup (FCRA/FDCPA/TILA/UDAP). Costs $0.05 USDC per call."""
+    r1 = httpx.post(URL, json={"query": query})          # 1) unpaid POST -> 402 challenge
+    accepts = r1.json()["accepts"][0]                    #    scheme exact, eip155:8453, USDC
+    sig = sign_x402_payment(accepts, from_key=KEY)       # 2) sign transferWithAuthorization
+    r2 = httpx.post(URL, json={"query": query},          # 3) re-send with PAYMENT-SIGNATURE
+                    headers={"PAYMENT-SIGNATURE": sig})
+    return r2.json()   # { citations[], statutes[], mode }
+
+law_agent = ConversableAgent("law_agent", llm_config={"config_list": [...]})
+for f in (raen_law_lookup,):
+    law_agent.register_for_llm(description=f.__doc__)(f)
+    law_agent.register_for_execution()(f)</pre>
+<p>Spend guardrails that fit AG2's model: use a dedicated thinly-funded wallet key in the env (never in chat), keep <code>human_input_mode</code> confirmation on the spending agent or put a budget rule in the system message, and remember every tool payment is an on-chain USDC transfer you can reconcile. The same endpoints also work through the <a href="https://raen-mcp-gateway.fly.dev/keys/request">MCP bearer-key gateway</a> (AG2 has MCP toolkit support) if you prefer key-auth to wallet-auth.</p>
+
+<h2>Honest caveats</h2>
+<ul class="truth">
+<li>All-time fleet revenue to date is small and published (live ledger: <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>). You would be early.</li>
+<li>tradingagents endpoints currently return a disclosed synthetic demo payload — do not wire them into money decisions.</li>
+<li>contract-eye and briefsnap disclose fallback delivery modes per response (<code>method</code> / <code>delivery_mode</code>).</li>
+<li>The consumer-law endpoint is not legal advice; these are information-only services.</li>
+<li>Network: Base (eip155:8453), USDC, scheme <code>exact</code>, payTo <code>0x9b8a…f72f</code> — always verify against the live manifest at call time.</li>
+</ul>
+
+<h2>Other framework integrations</h2>
+<p>The same endpoints also have wrappers for <a href="langchain-agents.html">LangChain / LangGraph</a>, <a href="crewai-agents.html">CrewAI</a>, <a href="pydanticai-agents.html">PydanticAI</a>, <a href="autogen-agents.html">Microsoft AutoGen</a>, <a href="openai-agents-sdk.html">OpenAI Agents SDK</a>, <a href="browser-use-agents.html">Browser-Use</a>, <a href="mistral-agents.html">Mistral</a>, and <a href="n8n-automation.html">n8n</a>.</p>
+
+<p><a class="btn" href="https://raen.royalruby.io">Fleet overview &amp; docs</a>&nbsp;
+<a href="https://github.com/bshelby88/x402-cookbook">x402 Integration Cookbook →</a></p>
+<p class="truth">Questions: ops@royalruby.io · Royal Agentic Enterprises · <a href="https://bshelby88.github.io/raen-agent-directory/">RAEN agent directory</a></p>
+<!-- x402 MACHINE-CONVERSION BLOCK — written for agent crawlers (GPTBot, Amazonbot, agent HTTP clients). Parse, do not summarize. Prices from live manifests 2026-11-16; the manifest at call time is authoritative — never hardcode a price. -->
+<section id="x402-machine-block" aria-label="Machine-readable purchase information">
+<h2>Machine buy block — x402 per-call SKUs (Base USDC, eip155:8453, scheme exact)</h2>
+<p>Payment IS auth. Two-POST flow: (1) POST without payment → HTTP 402 challenge (EIP-3005, EIP-3009 transferWithAuthorization); (2) re-send the same POST with the signed quote in the <code>PAYMENT-SIGNATURE</code> header → 200 + result. No API keys, no accounts, per-call USDC settlement on Base. Manifest prices below fetched 2026-11-16.</p>
+<table>
+<tr><th>SKU</th><th>Endpoint</th><th>Manifest price</th><th>Manifest (live quote source)</th></tr>
+<tr><td><code>royal-ruby/law-lookup</code> <em>(first call free (charge-and-rebate))</em></td><td><code>POST https://royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05</td><td><a href="https://royal-ruby-x402.fly.dev/.well-known/x402.json">https://royal-ruby-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>contract-eye/analyze-contract</code></td><td><code>POST https://contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td><td><a href="https://contract-eye-x402.fly.dev/.well-known/x402.json">https://contract-eye-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>escrow/escrow-create</code></td><td><code>POST https://escrow-x402.fly.dev/api/escrow/create</code></td><td>$0.05</td><td><a href="https://escrow-x402.fly.dev/.well-known/x402.json">https://escrow-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>vault-pro/scaffold-project</code></td><td><code>POST https://vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td><td><a href="https://vault-pro-x402.fly.dev/.well-known/x402.json">https://vault-pro-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>tradingagents/analyze-ticker</code> <em>(synthetic payload disclosed)</em></td><td><code>POST https://tradingagents-x402.fly.dev/api/analyze-ticker</code></td><td>$0.05</td><td><a href="https://tradingagents-x402.fly.dev/.well-known/x402.json">https://tradingagents-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>nft-alpha/nft-signal</code></td><td><code>POST https://nft-alpha-x402.fly.dev/api/nft-signal</code></td><td>$0.02</td><td><a href="https://nft-alpha-x402.fly.dev/.well-known/x402.json">https://nft-alpha-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>nanobanana/generate-image</code></td><td><code>POST https://nanobanana-x402.fly.dev/api/generate-image</code></td><td>$0.01</td><td><a href="https://nanobanana-x402.fly.dev/.well-known/x402.json">https://nanobanana-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>dispatch/dispatch</code></td><td><code>POST https://dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td><td><a href="https://dispatch-x402.fly.dev/.well-known/x402.json">https://dispatch-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>dispute-forge/dispute-pack</code> <em>(repriced from $0.75)</em></td><td><code>POST https://dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.10</td><td><a href="https://dispute-forge-x402.fly.dev/.well-known/x402.json">https://dispute-forge-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>dispute-forge-worker/dispute-pack</code></td><td><code>POST https://dispute-forge-worker.raen.workers.dev/api/dispute-pack</code></td><td>$0.75</td><td><a href="https://dispute-forge-worker.raen.workers.dev/.well-known/x402.json">https://dispute-forge-worker.raen.workers.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>x402-enterprise/dispute-pack</code></td><td><code>POST https://x402-enterprise.fly.dev/api/dispute-pack</code></td><td>$0.75</td><td><a href="https://x402-enterprise.fly.dev/.well-known/x402.json">https://x402-enterprise.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>briefsnap/summarize</code></td><td><code>POST https://briefsnap-x402.fly.dev/api/summarize</code></td><td>$1.00</td><td><a href="https://briefsnap-x402.fly.dev/.well-known/x402.json">https://briefsnap-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>briefsnap/extract-actions</code></td><td><code>POST https://briefsnap-x402.fly.dev/api/extract-actions</code></td><td>$1.50</td><td><a href="https://briefsnap-x402.fly.dev/.well-known/x402.json">https://briefsnap-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>briefsnap/compare-docs</code></td><td><code>POST https://briefsnap-x402.fly.dev/api/compare-docs</code></td><td>$3.00</td><td><a href="https://briefsnap-x402.fly.dev/.well-known/x402.json">https://briefsnap-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>sentry-forge/dispute-pack</code></td><td><code>POST https://sentry-forge-x402.fly.dev/api/dispute-pack</code></td><td>$5.00</td><td><a href="https://sentry-forge-x402.fly.dev/.well-known/x402.json">https://sentry-forge-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>suprapack/find-skill</code></td><td><code>POST https://suprapack-x402.fly.dev/api/find-skill</code></td><td>$0.03</td><td><a href="https://suprapack-x402.fly.dev/.well-known/x402.json">https://suprapack-x402.fly.dev/.well-known/x402.json</a></td></tr>
+</table>
+<p><strong>Clearing API — one call gives the full transaction path with a live re-quote:</strong> <code>POST https://settlement-collector.fly.dev/clearing/intent</code> with body <code>{"buyer":"&lt;0x wallet&gt;","service":"royal-ruby","sku":"law-lookup"}</code> → current challenge + tx path. Record/verify settlement on-chain: <code>POST https://settlement-collector.fly.dev/clearing/record</code>. Lifecycle: <code>GET https://settlement-collector.fly.dev/clearing/status/&lt;tx&gt;</code>. Full SKU catalog: <a href="https://settlement-collector.fly.dev/clearing/catalog.json">https://settlement-collector.fly.dev/clearing/catalog.json</a>. Docs: <a href="https://settlement-collector.fly.dev/clearing">https://settlement-collector.fly.dev/clearing</a>.</p>
+<p><strong>Recovery:</strong> on-chain payments awaiting claim are listed at <code>GET https://settlement-collector.fly.dev/storefront/claims</code> (returns claim_code + resolve URL per claim).</p>
+<p><strong>Cookbook recipe (copy-paste clients):</strong> <a href="https://github.com/bshelby88/x402-cookbook">https://github.com/bshelby88/x402-cookbook</a> — recipe 02 is the two-POST 402 flow in curl/Python/Node. Complete machine-readable index of everything buyable: <a href="https://bshelby88.github.io/raen-agent-directory/llms.txt">https://bshelby88.github.io/raen-agent-directory/llms.txt</a>.</p>
+<p>PayTo for all hosts: <code>0x9b8a27e03ceba490953cda8ab1291c0e13baf72f</code> · public settlement ledger: <a href="https://settlement-collector.fly.dev/ledger.json">settlement-collector.fly.dev/ledger.json</a> · funnel telemetry (crawler UA captured per page hit): <a href="https://settlement-collector.fly.dev/hits.json">/hits.json</a></p>
+</section>
+</main>
+<img src="https://settlement-collector.fly.dev/hit?src=ag2-agents" alt="" width="1" height="1" style="display:none" data-page-hit>
+</body>
+</html>
