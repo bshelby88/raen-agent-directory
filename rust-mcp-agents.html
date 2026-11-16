@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paid tools for Rust agents — RAEN x402 endpoints as MCP tools and raw HTTP calls</title>
+<style>
+body{font-family:ui-monospace,'Cascadia Code',Menlo,Consolas,monospace;max-width:900px;margin:2rem auto;padding:0 1.25rem;line-height:1.6;color:#1a1a2e;background:#f7f7fb}
+h1,h2{color:#0f3460} code,pre{background:#e8eaf0;border-radius:4px} pre{padding:.9rem;overflow-x:auto;font-size:.85rem}
+table{border-collapse:collapse;width:100%}td,th{border:1px solid #c5c9d6;padding:.4rem .55rem;text-align:left;font-size:.85rem}
+.note{background:#fff3cd;border-left:4px solid #d4a017;padding:.7rem 1rem;margin:1rem 0}
+.cta{background:#0f3460;color:#fff;padding:.9rem 1.2rem;border-radius:6px;margin:1.5rem 0}
+</style>
+<script>
+(function(){var s=new Image();s.src='https://settlement-collector.fly.dev/hit?src=rust-mcp-agents&r='+encodeURIComponent(document.referrer||'');})();
+</script>
+</head>
+<body>
+<h1>Paid tools for Rust agents</h1>
+<p>RAEN runs a fleet of <strong>x402</strong> micro-priced API endpoints on Base (USDC). Payment is authentication: no API key, no signup, no account — an HTTP 402 challenge carries the price, you settle on-chain, you retry with the payment header. This page shows two ways to call them from Rust.</p>
+
+<div class="note"><strong>Honest framing.</strong> Rust has first-class HTTP (reqwest) but the native wallet-signing path needs EIP-3009 <code>transferWithAuthorization</code> signatures. If you do not want to sign payments in-process today, use the MCP-gateway path below with a free 30-day Bearer dev key — the gateway is the billing rail, your code never touches a wallet.</div>
+
+<h2>Path 1 (no wallet, recommended): RAEN MCP gateway from any Rust MCP client</h2>
+<p>The RAEN gateway is a remote streamable-HTTP MCP server at <code>https://raen-mcp-gateway.fly.dev/mcp</code>. Rust MCP SDKs (<a href="https://github.com/modelcontextprotocol/rust-sdk">official rust-sdk / rmcp</a>, and integrations in <a href="https://github.com/0xPlaygrounds/rig">rig</a> or <a href="https://github.com/swiftide-rs/swiftide">swiftide</a>) can attach it as a remote tool server with a Bearer header.</p>
+<p>Get a free 30-day dev key first — no wallet needed:</p>
+<pre>curl -X POST https://raen-mcp-gateway.fly.dev/keys/request \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"you@yourdomain.com"}'</pre>
+<p>You get a verification link by email, then a 30-day Bearer key. Wire it into rmcp's HTTP transport headers (env var, never committed):</p>
+<pre>// rmcp streamable-HTTP client with auth header
+// RAEN_KEY is read from the environment, never a dotfile
+let transport = StreamableHttpClientTransport::with_auth(
+    "https://raen-mcp-gateway.fly.dev/mcp".parse()?,
+    raen_key, // RAEN_KEY env var
+);
+// tools appear as raen_law_lookup, raen_dispute_pack, ...</pre>
+<p>Why the gateway exists: an MCP client cannot answer a 402 challenge. The gateway pays per-call on its own x402 rail and bills via the key, so the Bearer key <em>is</em> the spend surface. Guard it like a credit card.</p>
+
+<h2>Path 2 (wallet-native): raw two-POST x402 flow in Rust</h2>
+<p>For fully on-chain agents, the flow is two POSTs: the first returns <code>402</code> with a base64 <code>payment-required</code> header carrying the challenge; you sign a USDC <code>transferWithAuthorization</code> (EIP-3009) against it and retry with an <code>x-payment</code> header. In Rust: reqwest for HTTP, <code>alloy</code> for EIP-3009 signing.</p>
+<pre>let cli = reqwest::Client::new();
+// 1) get the challenge
+let r = cli.post("https://royal-ruby-x402.fly.dev/api/law-lookup")
+    .json(&amp;serde_json::json!({"topic":"credit-report disputes","state":"LA","scope":"both"}))
+    .send().await?;                       // 402
+let challenge_b64 = r.headers()["payment-required"].to_str()?;
+// 2) decode, sign EIP-3009 transferWithAuthorization with alloy,
+//    base64 the payload, retry with x-payment header
+// 3) the service settles on-chain and returns 200</pre>
+<p>Full walkthrough (language-agnostic): <a href="https://github.com/bshelby88/x402-cookbook/blob/main/recipes/02-python-client.md">x402-cookbook recipe 02</a>.</p>
+<p>Rust-specific guardrails: keep the signer key in an env var or OS keyring — never <code>include_str!</code> it into the binary; put a per-call/per-day cap on the signing function; never <code>unwrap()</code> on the 402 decode in production.</p>
+
+<h2>Catalog (prices decoded from live 402 challenges this run — 2026-11-16)</h2>
+<table>
+<tr><th>Endpoint</th><th>Price</th><th>What you get</th></tr>
+<tr><td>royal-ruby-x402.fly.dev /api/law-lookup</td><td>$0.05</td><td>FCRA/FDCPA/TILA/UDAP statute citations</td></tr>
+<tr><td>contract-eye-x402.fly.dev /api/analyze-contract</td><td>$0.05</td><td>contract risk analysis</td></tr>
+<tr><td>nanobanana-x402.fly.dev /api/generate-image</td><td>$0.01</td><td>image generation</td></tr>
+<tr><td>nft-alpha-x402.fly.dev /api/nft-signal</td><td>$0.02</td><td>NFT market signals</td></tr>
+<tr><td>escrow-x402.fly.dev /api/escrow/create</td><td>$0.05</td><td>on-chain escrow creation</td></tr>
+<tr><td>vault-pro-x402.fly.dev /api/scaffold-project</td><td>$0.05</td><td>project scaffolding</td></tr>
+<tr><td>dispatch-x402.fly.dev /dispatch</td><td>$0.50</td><td>task routing across the fleet</td></tr>
+<tr><td>dispute-forge-x402.fly.dev /api/dispute-pack</td><td>$0.10</td><td>credit-dispute letter packs (3 letters + citations)</td></tr>
+<tr><td>briefsnap-x402.fly.dev /api/summarize</td><td>$1.00</td><td>document summarization</td></tr>
+<tr><td>tradingagents-x402.fly.dev /api/analyze-ticker</td><td>$0.05</td><td>ticker brief (schema-validated pre-payment)</td></tr>
+<tr><td>staci-tradingagents.fly.dev /api/analyze-ticker</td><td>$5.00</td><td>multi-agent simulation (synthetic demo payload, disclosed)</td></tr>
+<tr><td>sentry-forge-x402.fly.dev /api/dispute-pack</td><td>$5.00</td><td>comprehensive dispute package</td></tr>
+</table>
+<p>All endpoints: scheme <code>exact</code>, network <code>eip155:8453</code>, USDC on Base, payTo the canonical RAEN treasury <code>0x9b8a...f72f</code>. Prices are the amounts decoded from each service's live 402 challenge this run — the challenge you receive is the exact price you pay.</p>
+
+<div class="cta"><strong>60-second start (no wallet):</strong> POST your email to <code>https://raen-mcp-gateway.fly.dev/keys/request</code>, click the link, attach the Bearer key to your Rust MCP client, call <code>raen_law_lookup</code>. First paid call can be net-$0 via charge-and-rebate on royal-ruby for new wallets.</div>
+
+<h2>Other stacks</h2>
+<p>Python (<a href="langchain-agents.html">LangChain</a>, <a href="crewai-agents.html">CrewAI</a>, <a href="pydanticai-agents.html">PydanticAI</a>, <a href="smolagents-agents.html">SmolAgents</a>), TypeScript (<a href="vercel-ai-sdk.html">Vercel AI SDK</a>, <a href="mastra-agents.html">Mastra</a>), Java (<a href="spring-ai-agents.html">Spring AI</a>, <a href="semantic-kernel-agents.html">Semantic Kernel</a>), Go (<a href="go-clients.html">Go clients</a>), MCP clients of every IDE (<a href="mcp-clients.html">index</a>). Full catalog: <a href="https://bshelby88.github.io/raen-agent-directory/llms.txt">llms.txt</a>.</p>
+<p><em>Information pages only — nothing here is legal or financial advice. Trading surfaces disclose synthetic demo payloads. Live ledger: <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>.</em></p>
+</body>
+</html>
