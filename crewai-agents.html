@@ -79,9 +79,18 @@ table{border-collapse:collapse;width:100%}td,th{border:1px solid var(--line);pad
 <p>Every endpoint publishes a machine-readable manifest at <code>https://&lt;host&gt;/.well-known/x402.json</code> — read it at call time for the live price and request schema rather than hardcoding either.</p>
 
 <h2>Wrapping one as a CrewAI tool</h2>
-<p>x402 is a two-POST flow: the first POST returns <code>402</code> with a <code>payment-required</code> header (a challenge naming price, payee, and network); your wallet signs a USDC <code>transferWithAuthorization</code> on Base and you re-send with a <code>PAYMENT-SIGNATURE</code> header. The <a href="https://github.com/coinbase/x402">x402 python SDK</a> handles the signing; you just wrap it as a <code>BaseTool</code>:</p>
-<pre>from crewai.tools import BaseTool
+<p>x402 is a two-POST flow: the first POST returns <code>402</code> with a <code>PAYMENT-REQUIRED</code> header (a challenge naming price, payee, and network); your wallet signs a USDC <code>transferWithAuthorization</code> on Base and you re-send with a <code>PAYMENT-SIGNATURE</code> header. The official <a href="https://github.com/x402-foundation/x402">x402 python SDK</a> (<code>pip install "x402[httpx,evm]"</code>) handles the challenge, signature, and retry for you — the tool below is complete and runnable, no placeholder signer:</p>
+<pre>import json, os
+from crewai.tools import BaseTool
+from eth_account import Account
+from x402 import x402ClientSync
+from x402.http import x402HTTPClientSync
+from x402.http.clients import x402_requests
+from x402.mechanisms.evm import EthAccountSigner
+from x402.mechanisms.evm.exact.register import register_exact_evm_client
 from pydantic import BaseModel
+
+URL = "https://contract-eye-x402.fly.dev/api/analyze-contract"
 
 class ContractInput(BaseModel):
     text: str
@@ -95,21 +104,22 @@ class ContractRiskTool(BaseTool):
     args_schema: type = ContractInput
 
     def _run(self, text: str, focus: list[str] = []) -> dict:
-        # 1) First POST — read the 402 challenge
-        r = httpx.post(URL, json={"text": text, "focus": focus})
-        if r.status_code != 402:
-            return {"error": "unexpected status", "status": r.status_code}
-        challenge = json.loads(base64.b64decode(r.headers["payment-required"]))
-        accepts = challenge["accepts"][0]   # scheme exact, eip155:8453, USDC
-
-        # 2) Sign the USDC transferWithAuthorization (x402 SDK or your signer)
-        sig = sign_x402_payment(accepts, from_key=AGENT_KEY)
-
-        # 3) Re-send with PAYMENT-SIGNATURE
-        r2 = httpx.post(URL, json={"text": text, "focus": focus},
-                        headers={"PAYMENT-SIGNATURE": sig})
-        return r2.json()   # { risk_score, flagged_clauses[], suggested_edits }</pre>
-<p>Assign the tool to the crew member that needs it and the crew only spends when the task actually warrants $0.05 — every payment is an on-chain USDC transfer you can reconcile. The same endpoints also work from an <a href="https://raen-mcp-gateway.fly.dev/keys/request">MCP bearer-key gateway</a> if you prefer key-auth to wallet-auth, and from <a href="https://bshelby88.github.io/raen-agent-directory/langchain-agents.html">LangChain/LangGraph</a> or <a href="https://bshelby88.github.io/raen-agent-directory/haystack-agents.html">Haystack</a>, <a href="https://bshelby88.github.io/raen-agent-directory/semantic-kernel-agents.html">Semantic Kernel</a> and <a href="https://bshelby88.github.io/raen-agent-directory/n8n-automation.html">n8n</a> with the identical URLs.</p>
+        account = Account.from_key(os.environ["EVM_PRIVATE_KEY"])
+        client = x402ClientSync().set_spend_controls(
+            {"max_amount_per_payment": "$1"})   # crew-wide spend cap, SDK-enforced
+        register_exact_evm_client(client, EthAccountSigner(account))
+        with x402_requests(client) as session:
+            r = session.post(URL, json={"text": text, "focus": focus})
+        r.raise_for_status()   # 402 intercepted, signed, retried automatically
+        http = x402HTTPClientSync(client)
+        settle = http.get_payment_settle_response(lambda n: r.headers.get(n))
+        out = r.json()
+        out["payment_tx"] = settle.transaction   # on-chain receipt for reconciliation
+        return out</pre>
+<div class="card" style="border-color:var(--accent)">
+<p style="margin:0 0 .5rem"><strong>Crew budget guardrail (SDK-enforced, one line).</strong> <code>set_spend_controls({"max_amount_per_payment": "$1"})</code> makes the SDK refuse to sign any single charge above your cap — a runaway crew loop physically cannot overpay per call. Verify the price before wiring a tool by curling the endpoint without payment: the 402 challenge header (<code>PAYMENT-REQUIRED</code>, base64 JSON) names the exact amount and payee before you commit.</p>
+</div>
+<p>Assign the tool to the crew member that needs it and<p>Assign the tool to the crew member that needs it and the crew only spends when the task actually warrants $0.05 — every payment is an on-chain USDC transfer you can reconcile. The same endpoints also work from an <a href="https://raen-mcp-gateway.fly.dev/keys/request">MCP bearer-key gateway</a> if you prefer key-auth to wallet-auth, and from <a href="https://bshelby88.github.io/raen-agent-directory/langchain-agents.html">LangChain/LangGraph</a> or <a href="https://bshelby88.github.io/raen-agent-directory/haystack-agents.html">Haystack</a>, <a href="https://bshelby88.github.io/raen-agent-directory/semantic-kernel-agents.html">Semantic Kernel</a> and <a href="https://bshelby88.github.io/raen-agent-directory/n8n-automation.html">n8n</a> with the identical URLs.</p>
 
 <h2>Why pay-per-call beats a key/subscription for crew tools</h2>
 <ul>
@@ -121,7 +131,7 @@ class ContractRiskTool(BaseTool):
 
 <h2>Honest caveats</h2>
 <ul class="truth">
-<li>All-time fleet revenue to date: $0.10 internal test settlements; 0 external payers so far (live ledger: <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>). You would be early.</li>
+<li>All-time fleet revenue to date: $2.15 in internal test settlements (live ledger); 0 external payers so far (live ledger: <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>). You would be early.</li>
 <li>Market-analysis endpoints currently return a disclosed synthetic demo payload — do not wire them into money decisions.</li>
 <li>contract-eye discloses its delivery mode per response: if LLM analysis is unavailable it returns a deterministic rule-based clause scan (fields <code>method</code> / <code>delivery_mode</code> tell you which). briefsnap discloses fallback mode the same way (<code>mode</code> / <code>delivery_mode</code>).</li>
 <li>The consumer-law endpoint is not legal advice; these are information-only services.</li>
