@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAEN A/B lab — crewai-agents.html headline test</title>
+<style>
+:root{--bg:#0d1117;--card:#161b22;--line:#30363d;--fg:#e6edf3;--dim:#8b949e;--accent:#1c9c72}
+*{box-sizing:border-box}body{margin:0;font:16px/1.6 -apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--fg)}
+main{max-width:860px;margin:0 auto;padding:2rem 1.25rem 4rem}
+h2{margin-top:2.5rem;border-bottom:1px solid var(--line);padding-bottom:.4rem}
+a{color:#58a6ff}.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:1rem 1.25rem;margin:1rem 0}
+code,pre{background:#0a0d12;border:1px solid var(--line);border-radius:6px;font:13px/1.5 ui-monospace,Consolas,monospace}
+pre{padding:1rem;overflow-x:auto}
+table{border-collapse:collapse;width:100%}td,th{border:1px solid var(--line);padding:.5rem .7rem;text-align:left}
+.truth{color:var(--dim);font-size:.85rem}
+</style>
+</head>
+<body>
+<main>
+<p class="truth">RAEN · conversion lab · started 2026-11-16</p>
+<h1>A/B: crewai-agents.html headline</h1>
+<p>The CrewAI page is RAEN's empirically highest-traffic funnel surface (collector /hits.json: 10 real-browser hits, 4x the next source, as of 2026-11-16). This test changes only the headline + lede framing; everything below the fold is identical.</p>
+
+<div class="card">
+<h2 style="margin-top:0">Hypothesis</h2>
+<p><strong>A (control) — mechanism framing:</strong> "Give your CrewAI crew a wallet: per-call tools, priced in cents". Leads with the wallet/payment mechanism.</p>
+<p><strong>B (variant) — outcome framing:</strong> "Your crew decides when to spend. This makes the spending part 30 lines." Leads with the agent's own decision-making plus the small integration cost.</p>
+<p>Betting: builders converting on this page are shopping for a capability ("my crew can now pay for things"), not for a payment rail. Outcome-first copy should convert more of them to the walkthrough.</p>
+</div>
+
+<h2>Decision rule (pre-registered, no peeking adjustments)</h2>
+<table>
+<tr><th>Gate</th><th>Rule</th></tr>
+<tr><td>Sample</td><td>≥100 page-loads per variant (src=crewai-agents-a / crewai-agents-b in /hits.json)</td></tr>
+<tr><td>Adopt B</td><td>B demo-click rate ≥ 1.5x A's</td></tr>
+<tr><td>Kill B</td><td>B demo-click rate ≤ 1.0x A's</td></tr>
+<tr><td>Else</td><td>Extend sample or declare no-winner and try a third framing</td></tr>
+</table>
+<p>Primary metric: demo-click rate (crewai-agents-demo-a / crewai-agents-demo-b per variant loads). Down-funnel cross-check against settlement-collector /stats (a click that never becomes a paid call still informs copy, but the money metric stays external settles).</p>
+
+<h2>Live counts</h2>
+<pre id="out">loading /hits.json …</pre>
+<p class="truth">Counts are raw beacon hits: crawler + smoke traffic is included and is expected to be symmetric across variants, so <em>rates</em> (demo/loads per variant), not raw counts, are the comparison. TRUTH law: numbers come straight from the collector, unedited.</p>
+
+<script>
+fetch('https://settlement-collector.fly.dev/hits.json').then(r=>r.json()).then(j=>{
+  var by={}; (j.by_src||j.sources||[]).forEach(function(e){ by[e.src||e.source]=e.count||e.hits; });
+  function g(s){ return by[s]||0; }
+  var la=g('crewai-agents-a'), lb=g('crewai-agents-b'),
+      da=g('crewai-agents-demo-a'), db=g('crewai-agents-demo-b');
+  var ra=la? (da/la):null, rb=lb? (db/lb):null;
+  var txt='crewai-agents-a loads: '+la+' | demo clicks: '+da+' | rate: '+(ra===null?'n/a':(ra*100).toFixed(1)+'%')+'\n'
+         +'crewai-agents-b loads: '+lb+' | demo clicks: '+db+' | rate: '+(rb===null?'n/a':(rb*100).toFixed(1)+'%')+'\n'
+         +'(pre-decision: sample gate not met until both sides ≥100)';
+  document.getElementById('out').textContent=txt;
+}).catch(function(e){ document.getElementById('out').textContent='hits.json fetch failed: '+e; });
+</script>
+
+<p class="truth">Test surface: <a href="crewai-agents.html">crewai-agents.html</a> · Telemetry: <a href="https://settlement-collector.fly.dev/hits.json">/hits.json</a> · Predecessor test (try-raen A/B) runs independently on its own surface.</p>
+</main>
+</body>
+</html>
