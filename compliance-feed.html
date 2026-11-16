@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What is a compliance certificate — and why would your agent verify one? | RAEN</title>
+<meta name="description" content="The RAEN Compliance Feed: $0.01 per check buys an Ed25519-signed, machine-readable certificate of a service's live state — manifest integrity, quote validity, health, settlement and delivery evidence. Story for humans, endpoints and verification pseudocode for machines.">
+<style>
+:root{--bg:#0d1117;--fg:#e6edf3;--dim:#8b949e;--acc:#58a6ff;--ok:#3fb950;--warn:#d29922;--bad:#f85149;--card:#161b22;--line:#30363d}
+*{box-sizing:border-box}body{background:var(--bg);color:var(--fg);font:16px/1.65 Georgia,'Times New Roman',serif;margin:0}
+.wrap{max-width:800px;margin:0 auto;padding:32px 20px 80px}
+h1{font-size:34px;line-height:1.25;margin:0 0 8px}
+.kicker{color:var(--dim);font-style:italic;margin-bottom:28px}
+h2{border-bottom:1px solid var(--line);padding-bottom:6px;margin-top:44px;font-size:22px}
+h2.machine{font-family:ui-monospace,SFMono-Regular,monospace;letter-spacing:1px;text-transform:uppercase;font-size:16px;color:var(--acc)}
+code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+code{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-size:.88em}
+pre{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;overflow-x:auto;font-size:13px;line-height:1.55}
+table{border-collapse:collapse;width:100%;font-family:ui-monospace,monospace;font-size:13px;margin:16px 0}
+td,th{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--card);color:var(--acc);font-weight:600}
+a{color:var(--acc);word-break:break-all}
+.box{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px 20px;margin:18px 0}
+.truth{color:var(--warn)}
+.dim{color:var(--dim)}
+.small{color:var(--dim);font-size:13px}
+</style>
+</head>
+<body><div class="wrap">
+
+<h1>What is a compliance certificate — and why would your agent verify one?</h1>
+<p class="kicker">The RAEN Compliance Feed · product story, told in two registers: one for you, one for your machines.</p>
+
+<h2>For humans</h2>
+
+<p>Your agent is about to spend money on a stranger's API. The stranger's website says the price is $0.05. The manifest says pay-to wallet <em>X</em>. The marketing says "production-ready." None of that is evidence — it's all the seller talking about itself. When the only other party in the deal is a machine, nobody can be charmed, pressured, or reassured. There is only evidence, or the absence of it.</p>
+
+<p>A <strong>compliance certificate</strong> is a signed, machine-readable statement of what a service is <em>actually doing right now</em>: that its payment manifest matches what its endpoints really challenge for, that the advertised price is the price the live 402 response quotes, that the health endpoint answers, that past customers' settlements settled on-chain and were delivered. Not a badge. Not a promise. A snapshot with a signature on it, taken minutes ago, checkable by anyone.</p>
+
+<p>Why would your agent verify one? Because <strong>manifests can lie</strong> — we know, because we run twelve of them and we've caught our own drifting. Because quotes go stale: we repriced dispute-forge from $0.75 to $0.10 in a day when the evidence showed the old price converted nobody. Because an agent with a budget needs receipts before spend, the same way a person with a wallet does. A certificate turns "trust me" into "check me."</p>
+
+<p>And because we learned this the hard way, publicly: on November 15, 2026, an autonomous crawler paid RAEN $0.05 — our first external payment, ever. It settled correctly on-chain. We delivered nothing, because our 402 responses never told it how to finish. The money is still sitting in an open claim. We publish that story in full below, because a company selling evidence should show its worst evidence first. Then we fixed the gap, and we built this product.</p>
+
+<p>The Compliance Feed is RAEN's honest self-application: every certificate is generated from live probes and our own tx-verified ledger, the verdict is never inflated, and if no indexer ever buys it, we will publish that failure too — the kill test is on record for <strong>~December 15, 2026</strong>.</p>
+
+<div class="box">
+<p style="margin:0"><strong>If you operate a crawler or indexer:</strong> this is also an open letter to you — <a href="open-letter-crawler-operators.html">"An open letter to the operators of agent crawlers."</a> It tells the $0.05 story in full and what the Feed gives your machines.</p>
+</div>
+
+<h2 class="machine">For machines — the facts</h2>
+
+<table>
+<tr><th>Field</th><th>Value</th></tr>
+<tr><td>product</td><td>RAEN Compliance Feed</td></tr>
+<tr><td>version</td><td>raen-compliance-feed/v1</td></tr>
+<tr><td>certify (paid)</td><td>GET https://settlement-collector.fly.dev/certify/{service} — <strong>$0.01/check</strong>, USDC, network eip155:8453 (Base), x402 scheme <code>exact</code>, payTo <code>0x9b8a27e03ceba490953cda8ab1291c0e13baf72f</code>, facilitator https://raen-facilitator.fly.dev/facilitator</td></tr>
+<tr><td>discovery (free)</td><td>GET https://settlement-collector.fly.dev/certify — product, version, price, service list, signature method</td></tr>
+<tr><td>public key (free)</td><td>GET https://settlement-collector.fly.dev/certify/.well-known/pubkey.pem (also <a href="https://settlement-collector.fly.dev/certify/.well-known/pubkey.json">pubkey.json</a>) — Ed25519, key_id <code>settlement-collector-certify-v1</code>, key created 2026-11-16T05:18:42Z</td></tr>
+<tr><td>services covered</td><td>royal-ruby-x402, tradingagents-x402, dispute-forge-x402, nanobanana-x402, nft-alpha-x402, escrow-x402, vault-pro-x402, dispatch-x402, contract-eye-x402, briefsnap-x402, sentry-forge-x402, settlement-collector, raen-mcp-gateway</td></tr>
+<tr><td>certificate fields</td><td>manifest (sha256 of live /.well-known/x402.json) · quote (advertised price/network/payTo + validity from the LIVE 402 challenge, not the manifest) · health (probe + latency) · settlement (last tx-verified settle from the collector ledger) · delivery (tx-verified settled/200 counts) · claims (open storefront claims, fleet-wide, labeled as such) · verdict (live | degraded | down)</td></tr>
+<tr><td>signature</td><td>Ed25519 over the certificate's canonical JSON (recursively sorted keys, compact separators), excluding <code>signature</code> and <code>signing_key_id</code>; <code>signature</code> is base64; <code>verify</code> points at the pubkey URL</td></tr>
+</table>
+
+<h3>Verification pseudocode</h3>
+
+<pre><code>import base64, json, urllib.request
+from cryptography.hazmat.primitives.serialization import load_pem_public_key
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+
+BASE = "https://settlement-collector.fly.dev"
+cert = get_json(f"{BASE}/certify/royal-ruby")            # paid: $0.01 x402 challenge
+pem  = get_text(f"{BASE}/certify/.well-known/pubkey.pem") # free
+
+payload = {k: v for k, v in cert.items()
+           if k not in ("signature", "signing_key_id")}
+message = canon(payload)          # recursively sorted keys, separators=(",", ":")
+sig     = base64.b64decode(cert["signature"])
+
+pub: Ed25519PublicKey = load_pem_public_key(pem.encode())
+pub.verify(sig, message.encode())   # raises InvalidSignature on any mismatch
+
+# then read the fields you actually care about:
+assert cert["verdict"] in ("live", "degraded", "down")
+assert cert["quote"]["payTo"] == "0x9b8a27e03ceba490953cda8ab1291c0e13baf72f"</code></pre>
+
+<p class="small">Flow to pay: send the GET unpaid → decode the 402 <code>PAYMENT-REQUIRED</code> challenge → sign a USDC EIP-3009 <code>transferWithAuthorization</code> → resend with the <code>PAYMENT-SIGNATURE</code> header. Same two-POST pattern as every RAEN service; recipes in the <a href="https://github.com/bshelby88/x402-cookbook">x402 Cookbook</a>.</p>
+
+<div class="box">
+<p><span class="truth">TRUTH POLICY:</span> the verdict is derived only from live probe outcomes; settlement and delivery fields come from the collector's own tx-verified ledger (<a href="https://settlement-collector.fly.dev/ledger.json">ledger.json</a>). No inflated verdicts, no invented fields. <span class="truth">KILL TEST ON RECORD:</span> if no indexer buys the Compliance Feed by ~2026-12-15, RAEN's machine-economy thesis is falsified and we will say so on the same ledger that published our zeros.</p>
+</div>
+
+<p class="small">Live-verified 2026-11-16: /certify (200, JSON), pubkey.pem (200, PEM), /certify/royal-ruby (402 challenge, PAYMENT-REQUIRED header). First paid check: tx 0xe650ceb6…905b, verdict <code>live</code>. Subscribe to fleet events: <a href="feed.xml">The RAEN Wire (Atom)</a> · <a href="feed.json">JSON Feed 1.1</a>. Machine edition of the Daily Ledger: <a href="ledger-issue-003.json">ledger-issue-003.json</a>.</p>
+
+<p class="small">RAEN (Royal Agentic Enterprises) · ops@royalruby.io · <a href="index.html">directory</a> · <a href="open-letter-crawler-operators.html">open letter to crawler operators</a></p>
+
+</div><img src="https://settlement-collector.fly.dev/hit?src=compliance-feed" alt="" width="1" height="1" style="display:none" data-page-hit>
+</body></html>

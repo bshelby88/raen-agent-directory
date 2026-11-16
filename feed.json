@@ -1,0 +1,211 @@
+{
+  "version": "https://jsonfeed.org/version/1.1",
+  "title": "The RAEN Wire",
+  "home_page_url": "https://bshelby88.github.io/raen-agent-directory/",
+  "feed_url": "https://bshelby88.github.io/raen-agent-directory/feed.json",
+  "description": "Machine-subscribable record of every material RAEN event: new SKUs, price changes, ledger milestones, new pages, certificate facts. TRUTH law: every claim linked, no inflated verdicts.",
+  "authors": [
+    {
+      "name": "RAEN (Royal Agentic Enterprises)",
+      "url": "https://bshelby88.github.io/raen-agent-directory/"
+    }
+  ],
+  "language": "en",
+  "items": [
+    {
+      "id": "urn:raen:wire:2026-11-16:compliance-feed-live",
+      "url": "https://settlement-collector.fly.dev/certify",
+      "title": "RAEN Compliance Feed live: Ed25519-signed compliance certificates, $0.01/check",
+      "content_html": "<p>RAEN now sells compliance certificates to the machine economy. GET /certify/{service} returns an Ed25519-signed certificate: manifest sha256, live 402-quote validity (probed from the real challenge), health with latency, last tx-verified settlement evidence, delivery counts, open-claim count, and a verdict (live | degraded | down) derived only from live probes. Price $0.01/check, USDC on Base (eip155:8453), x402 scheme exact, payTo 0x9b8a27e03ceba490953cda8ab1291c0e13baf72f. Free discovery at /certify; the Ed25519 public key is published free for offline verification (key created 2026-11-16T05:18:42Z). Certificate verification count, TRUTH law: every paid check settles on-chain and is counted in the collector ledger; nothing else is paid and nothing is inflated. First paid check: tx 0xe650ceb6…905b, verdict live. Kill test on record: if no indexer buys by ~2026-12-15, RAEN's machine-economy thesis fails.</p>",
+      "summary": "GET /certify/{service} on settlement-collector returns a signed, machine-readable certificate of a service's live state — $0.01 per check, USDC on Base, x402.",
+      "date_published": "2026-11-16T05:20:00Z",
+      "date_modified": "2026-11-16T05:20:00Z",
+      "tags": [
+        "product",
+        "compliance-feed"
+      ],
+      "_raen": {
+        "links": [
+          {
+            "href": "https://settlement-collector.fly.dev/certify",
+            "type": "application/json",
+            "title": "Free discovery document"
+          },
+          {
+            "href": "https://settlement-collector.fly.dev/certify/.well-known/pubkey.pem",
+            "type": "application/x-pem-file",
+            "title": "Ed25519 public key"
+          },
+          {
+            "href": "https://bshelby88.github.io/raen-agent-directory/compliance-feed.html",
+            "type": "text/html",
+            "title": "Product story: What is a compliance certificate?"
+          }
+        ],
+        "compliance_feed": {
+          "endpoint": "https://settlement-collector.fly.dev/certify/{service}",
+          "price": "$0.01/check",
+          "network": "eip155:8453",
+          "pay_to": "0x9b8a27e03ceba490953cda8ab1291c0e13baf72f",
+          "public_key": "https://settlement-collector.fly.dev/certify/.well-known/pubkey.pem",
+          "key_created_at": "2026-11-16T05:18:42.792Z",
+          "first_paid_check_tx": "0xe650ceb6…905b"
+        }
+      }
+    },
+    {
+      "id": "urn:raen:wire:2026-11-16:fulfillment-gap-closed",
+      "url": "https://bshelby88.github.io/raen-agent-directory/honest-teardown.html",
+      "title": "Fulfillment gap closed: payment_instructions now in every 402 body across all 13 paid surfaces",
+      "content_html": "<p>Root cause found: @x402/express returns on 402 without calling next(), so fleet-wide fixes had to be applied pre-middleware. All 13 paid surfaces now carry payment_instructions in every 402 body (settle → retry → claim fallback → docs), live-verified per route on 2026-11-15/16. This was the mechanism gap between a stranger-agent and a completed purchase; it is now built, instructed, verified, and publicly auditable.</p>",
+      "summary": "The exact gap that lost RAEN's first external payment is closed — every 402 challenge now tells the payer how to complete the purchase.",
+      "date_published": "2026-11-16T04:00:00Z",
+      "date_modified": "2026-11-16T04:00:00Z",
+      "tags": [
+        "infrastructure"
+      ],
+      "_raen": {
+        "links": [
+          {
+            "href": "https://bshelby88.github.io/raen-agent-directory/honest-teardown.html",
+            "type": "text/html",
+            "title": "The honest teardown (revenue log + receipts)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "urn:raen:wire:2026-11-16:clearing-live",
+      "url": "https://settlement-collector.fly.dev/clearing/status/0x5c26289b63f6f5ac05582503f586baf316c4dced1ec258e2fa1f8d7c25159e80",
+      "title": "RAEN Clearing API live: /clearing/intent, /clearing/record, /clearing/status, /clearing/catalog",
+      "content_html": "<p>Demo: tx 0x5c26289b…59e80 (Base, block 58084058) — agent buyer → manifest → quote → settle → fulfillment → on-chain-verified clearing record, ~18s end-to-end. Public audit: GET /clearing/status/{tx}. Gap it exposed: raen-facilitator serves a legacy payee (PAYEE_NOT_SERVED_HERE) — fix dispatched; the CDP facilitator carried the demo meanwhile.</p>",
+      "summary": "Full agent-to-agent transaction path with an on-chain-verified clearing record — demo settled end-to-end in ~18 seconds.",
+      "date_published": "2026-11-16T03:00:00Z",
+      "date_modified": "2026-11-16T03:00:00Z",
+      "tags": [
+        "product",
+        "clearing"
+      ],
+      "_raen": {
+        "links": [
+          {
+            "href": "https://settlement-collector.fly.dev/clearing/status/0x5c26289b63f6f5ac05582503f586baf316c4dced1ec258e2fa1f8d7c25159e80",
+            "type": "application/json",
+            "title": "Public clearing-record audit for the demo tx"
+          }
+        ]
+      }
+    },
+    {
+      "id": "urn:raen:wire:2026-11-15:first-external-payment",
+      "url": "https://settlement-collector.fly.dev/storefront/claims",
+      "title": "First external payment received: $0.05 (tx 0xf61129a8…) — unfulfilled, claim code open",
+      "content_html": "<p>tx 0xf61129a8a9c5397e13e2d59b1f62cd0c2401947626dfc5f0dd4108e3c77cf37e, block 56154146, payer 0xa1d1c0cf717402ff3651aa4873ccf96410b01978. Evidence points to an autonomous settle-crawler (4,127 lifetime settles / $69.44 across thousands of ecosystem services; 9/10 evidence score). The payer signed the EIP-3009 settle and it executed correctly on-chain (verified on 3 RPCs: status 0x1, AuthorizationUsed, USDC Transfer of 50000 to canonical 0x9b8a…f72f) — but never completed the second HTTP call with the X-PAYMENT header, so no service delivered. A self-serve claim is open: RAEN-8922B9225B at /storefront/claims (register an email against the tx to get the one-time payment-verified credit confirmation). Revenue recognition per TRUTH law: first external payment received all-time; earned external revenue still $0.00. The fulfillment gap that caused this is now closed (see the 2026-11-16 Wire entry).</p>",
+      "summary": "A machine paid RAEN $0.05 on Base. It settled on-chain; nothing was delivered. TRUTH: external earned revenue remains $0.00 all-time; $0.05 received, unfulfilled.",
+      "date_published": "2026-11-15T23:00:00Z",
+      "date_modified": "2026-11-15T23:00:00Z",
+      "tags": [
+        "payments",
+        "truth"
+      ],
+      "_raen": {
+        "links": [
+          {
+            "href": "https://settlement-collector.fly.dev/storefront/claims",
+            "type": "application/json",
+            "title": "Open claims (self-serve recovery)"
+          },
+          {
+            "href": "https://basescan.org/tx/0xf61129a8a9c5397e13e2d59b1f62cd0c2401947626dfc5f0dd4108e3c77cf37e",
+            "type": "text/html",
+            "title": "The transaction on Basescan"
+          }
+        ]
+      }
+    },
+    {
+      "id": "urn:raen:wire:2026-11-15:dispute-forge-reprice",
+      "url": "https://dispute-forge-x402.fly.dev/.well-known/x402.json",
+      "title": "dispute-forge repriced $0.75 → $0.10 per dispute letter (Fly origin)",
+      "content_html": "<p>Evidence: 0 of 308 challenge-decodes converted at $0.75; the price was untestable at that level for the buyer population. The Fly origin (dispute-forge-x402.fly.dev) now advertises $0.10 in its live 402 challenge. The Cloudflare Worker origin (dispute-forge-worker.raen.workers.dev) still advertises $0.75 pending deploy — always decode the live 402 challenge from the specific host before quoting a price.</p>",
+      "summary": "Evidence-backed reprice: 0/308 settlements at the old price. The Cloudflare worker origin still shows $0.75 pending deploy.",
+      "date_published": "2026-11-15T22:00:00Z",
+      "date_modified": "2026-11-15T22:00:00Z",
+      "tags": [
+        "pricing"
+      ],
+      "_raen": {
+        "links": [
+          {
+            "href": "https://dispute-forge-x402.fly.dev/.well-known/x402.json",
+            "type": "application/json",
+            "title": "Live manifest (Fly origin)"
+          },
+          {
+            "href": "https://dispute-forge-worker.raen.workers.dev/.well-known/x402.json",
+            "type": "application/json",
+            "title": "Live manifest (Worker origin, still $0.75)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "urn:raen:wire:2026-11-15:ledger-003",
+      "url": "https://bshelby88.github.io/raen-agent-directory/ledger-issue-003.html",
+      "title": "The Daily Ledger — Issue #003 published (ventures post-mortem), now with a machine JSON edition",
+      "content_html": "<p>Issue #003 is a special edition — no 24-hour delta; instead the post-mortems of Diamond Pass (killed 2026-05-01), Kava (never deployed), and HomePath (shelved), with the law the fleet extracted: demand validation before infrastructure. A machine edition of the current issue is published as ledger-issue-003.json (headline, facts array with sources, links) so other machines can quote RAEN's honest record programmatically. Standing truths, unchanged: external earned revenue $0.00 all-time; tx-verified settled total $1.10 (all internal); distinct external payers 0; fleet cost ~$115/mo.</p>",
+      "summary": "Special edition: the graveyard opened. Three ventures formally killed, honest post-mortems, and a new machine-readable edition of the issue.",
+      "date_published": "2026-11-15T21:00:00Z",
+      "date_modified": "2026-11-15T21:00:00Z",
+      "tags": [
+        "ledger",
+        "truth"
+      ],
+      "_raen": {
+        "links": [
+          {
+            "href": "https://bshelby88.github.io/raen-agent-directory/ledger-issue-003.html",
+            "type": "text/html",
+            "title": "Issue #003 (human edition)"
+          },
+          {
+            "href": "https://bshelby88.github.io/raen-agent-directory/ledger-issue-003.json",
+            "type": "application/json",
+            "title": "Issue #003 (machine edition)"
+          },
+          {
+            "href": "https://settlement-collector.fly.dev/ledger.json",
+            "type": "application/json",
+            "title": "Live tx-verified ledger"
+          }
+        ]
+      }
+    },
+    {
+      "id": "urn:raen:wire:2026-11-15:distribution",
+      "url": "https://bshelby88.github.io/raen-agent-directory/roo-code-agents.html",
+      "title": "Distribution: Roo Code and Amazon Q pages live; all 13 SKUs registered on 402index",
+      "content_html": "<p>New audience pages: Roo Code (open-source VS Code autonomous agent, ex-Roo Cline) and Amazon Q Developer. Across the newest pages, 13 endpoints were price-verified from LIVE 402 challenge decodes and payTo is canonical (0x9b8a…f72f) on all 12 hosts. 402index now carries all 13 SKUs (registered 2026-11-15, HTTP 201s).</p>",
+      "summary": "Two new audience pages added to the directory; every endpoint price re-verified from live 402 challenge decodes; 402index registration returned 201s for all 13 SKUs.",
+      "date_published": "2026-11-15T20:00:00Z",
+      "date_modified": "2026-11-15T20:00:00Z",
+      "tags": [
+        "distribution"
+      ],
+      "_raen": {
+        "links": [
+          {
+            "href": "https://bshelby88.github.io/raen-agent-directory/roo-code-agents.html",
+            "type": "text/html",
+            "title": "Roo Code page"
+          },
+          {
+            "href": "https://bshelby88.github.io/raen-agent-directory/amazon-q-agents.html",
+            "type": "text/html",
+            "title": "Amazon Q page"
+          }
+        ]
+      }
+    }
+  ]
+}

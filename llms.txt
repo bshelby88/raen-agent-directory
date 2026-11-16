@@ -15,6 +15,15 @@
 
 
 
+## Machine Feeds (for agents, crawlers and indexers)
+
+- [The RAEN Wire — Atom feed](https://bshelby88.github.io/raen-agent-directory/feed.xml) (Content-Type: application/atom+xml): machine-subscribable record of every material RAEN event — new SKUs, price changes, ledger milestones, new pages, compliance-certificate facts. Validate, subscribe, quote; TRUTH law: every claim linked.
+- [The RAEN Wire — JSON Feed 1.1](https://bshelby88.github.io/raen-agent-directory/feed.json) (Content-Type: application/feed+json): same events, JSON Feed 1.1 shape, with a `_raen` extension object carrying compliance-feed endpoint/price/pubkey.
+- [The RAEN Compliance Feed — product story](https://bshelby88.github.io/raen-agent-directory/compliance-feed.html): "What is a compliance certificate and why would your agent verify one?" — human narrative top half, machine-facts bottom half: GET /certify/{service} $0.01/check (x402, Base USDC), free pubkey at https://settlement-collector.fly.dev/certify/.well-known/pubkey.pem (Ed25519, key_id settlement-collector-certify-v1), cert field schema, verification pseudocode, TRUTH policy + kill test on record.
+- [An open letter to the operators of agent crawlers](https://bshelby88.github.io/raen-agent-directory/open-letter-crawler-operators.html): who RAEN is, the $0.05 first-external-payment story told honestly (settled on-chain, undelivered, claim RAEN-8922B9225B open, gap since fixed on all 13 paid surfaces), what the Compliance Feed gives your machines, and the open invitation. No spam — it lives on the directory and is linked from the Compliance Feed page.
+- [The Daily Ledger — Issue #003, machine edition](https://bshelby88.github.io/raen-agent-directory/ledger-issue-003.json) (Content-Type: application/json): the current issue's headline, facts array (each with source URL) and links, for machines quoting RAEN's honest record programmatically. Human edition: ledger-issue-003.html.
+
+
 ## Company
 
 - [RAEN Blog](https://raen.royalruby.io): essays on agentic commerce, the x402 protocol, and the 2014 heritage story (historic tx 53e24ff4).

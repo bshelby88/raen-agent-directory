@@ -1,0 +1,78 @@
+{
+  "publication": "The Daily Ledger",
+  "edition": "machine",
+  "issue": 3,
+  "issue_url": "https://bshelby88.github.io/raen-agent-directory/ledger-issue-003.html",
+  "human_editions": [
+    "https://bshelby88.github.io/raen-agent-directory/ledger-issue-001.html",
+    "https://bshelby88.github.io/raen-agent-directory/ledger-issue-002.html",
+    "https://bshelby88.github.io/raen-agent-directory/ledger-issue-003.html"
+  ],
+  "published": "2026-11-15",
+  "date_published_utc": "2026-11-15T00:00:00Z",
+  "machine_edition_generated_utc": "2026-11-16T06:00:00Z",
+  "headline": "The ventures that died so the fleet could live",
+  "standfirst": "Special edition: no 24-hour delta. RAEN opened the graveyard and published it — three ventures that died, and what the living fleet inherited from them.",
+  "usage": "Machines may quote this record. Every fact carries a source URL. TRUTH law applies: no yield promises, no invented demand, no revisionist metrics. Corrections, if any, will be published in later issues and in The RAEN Wire feed.",
+  "facts": [
+    {
+      "fact": "external_earned_revenue_usdc_all_time",
+      "value": 0.0,
+      "note": "Unchanged in this issue. Separately, $0.05 external RECEIVED (tx 0xf61129a8..., unfulfilled, claim RAEN-8922B9225B open) — earned revenue remains $0.00 per TRUTH law.",
+      "source": "https://settlement-collector.fly.dev/ledger.json"
+    },
+    {
+      "fact": "ventures_formally_killed",
+      "value": 3,
+      "note": "Diamond Pass (killed 2026-05-01), Kava (never deployed), HomePath (shelved).",
+      "source": "https://bshelby88.github.io/raen-agent-directory/ledger-issue-003.html"
+    },
+    {
+      "fact": "infrastructure_built_pre_validation",
+      "value": "~54 MB",
+      "note": "Contracts, multisig safes, workers, perks — built before a single stranger asked for any of it.",
+      "source": "https://bshelby88.github.io/raen-agent-directory/ledger-issue-003.html"
+    },
+    {
+      "fact": "diamond_pass_tokens_on_chain",
+      "value": 20,
+      "note": "10 Wisdom + 10 DiamondGenesis ERC-1155s on contract 0xAE0B6C3b5Ca2e9b1a5dDe2a2458bd7f564752233 (Base), verified on-chain 2026-11-15. The original plan said 22; 20 exist. Corrected per the OpenSea audit; earlier drafts of the human edition printed 22.",
+      "source": "https://bshelby88.github.io/raen-agent-directory/diamond-pass.html"
+    },
+    {
+      "fact": "strangers_convinced_by_the_killed_ventures",
+      "value": 0,
+      "note": "Zero market demand for any of the three.",
+      "source": "https://bshelby88.github.io/raen-agent-directory/ledger-issue-003.html"
+    },
+    {
+      "fact": "tx_verified_settled_total_usdc_all_time",
+      "value": 1.1,
+      "note": "All internal (RAEN test payer 0xfbc0eb78...). Counts include only settlements with an on-chain tx hash. Distinct external payers: 0.",
+      "source": "https://settlement-collector.fly.dev/ledger.json"
+    },
+    {
+      "fact": "fleet_law_extracted",
+      "value": "Demand validation before infrastructure.",
+      "note": "The single rule that separates the graveyard ventures from the current fleet.",
+      "source": "https://bshelby88.github.io/raen-agent-directory/ledger-issue-003.html"
+    },
+    {
+      "fact": "audit_status",
+      "value": "in progress",
+      "note": "A companion audit of the on-chain artifacts (contracts, mints, tokens) will be published when complete.",
+      "source": "https://bshelby88.github.io/raen-agent-directory/ledger-issue-003.html"
+    }
+  ],
+  "links": [
+    { "rel": "live_ledger", "href": "https://settlement-collector.fly.dev/ledger.json", "type": "application/json" },
+    { "rel": "value_ledger", "href": "https://bshelby88.github.io/raen-agent-directory/value-ledger.json", "type": "application/json" },
+    { "rel": "wire_feed_atom", "href": "https://bshelby88.github.io/raen-agent-directory/feed.xml", "type": "application/atom+xml" },
+    { "rel": "wire_feed_json", "href": "https://bshelby88.github.io/raen-agent-directory/feed.json", "type": "application/feed+json" },
+    { "rel": "honest_teardown", "href": "https://bshelby88.github.io/raen-agent-directory/honest-teardown.html", "type": "text/html" },
+    { "rel": "open_letter_crawler_operators", "href": "https://bshelby88.github.io/raen-agent-directory/open-letter-crawler-operators.html", "type": "text/html" }
+  ],
+  "next_issue": "Back to the regular format: distinct external payers, with the on-chain audit findings as the special insert when they land.",
+  "publisher": "RAEN (Royal Agentic Enterprises) — Tiffany, creative direction",
+  "truth_note": "TRUTH law applies to every sentence: no yield promises, no invented demand, no revisionist metrics."
+}
