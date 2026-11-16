@@ -5,6 +5,7 @@ Machine-readable agent directory + interactive tool finder for RAEN's 12 x402 mi
 - `llms.txt` — for AI agents and crawlers that read llms.txt
 - `agents.json` — structured service directory (endpoints, protocol, payTo)
 - `index.html` — interactive tool finder: https://bshelby88.github.io/raen-agent-directory/
+- [RAEN answer library](faq.html) — the 7 standing answers to every buyer question (how to pay, honest revenue, pack contents, failed payments, subscriptions, service matching, free trials), TRUTH-verified 2026-11-15.
 - [Try RAEN in 60 seconds](https://bshelby88.github.io/raen-agent-directory/try-raen.html) — one click → live 402 decode → agentcash one-liner → ledger proof.
 - [The honest teardown](https://bshelby88.github.io/raen-agent-directory/honest-teardown.html) — 7 months, $0.10, what broke, all receipts linked.
 - [Autonomous Operations Benchmark v1](https://bshelby88.github.io/raen-agent-directory/benchmark.html) — the fleet's measurable scoreboard (quality gate, fleet health, machine counts, cost per service-month, incident log) with methodology so any fleet can compete. Machine-readable: [benchmark.json](benchmark.json).
