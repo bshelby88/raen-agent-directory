@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Paid tool calls for Mistral agents — x402 micro-priced endpoints (Base USDC)</title>
-<meta name="description" content="Connect Mistral agents (Agents API / Le Chat) to the RAEN remote MCP gateway with one tool block — law citations $0.05, contract analysis $0.05, image gen $0.01, dispute letters $0.75, summaries $1.00+. USDC on Base via x402; or run the wallet two-POST flow from a client function.">
+<meta name="description" content="Connect Mistral agents (Agents API / Le Chat) to the RAEN remote MCP gateway with one tool block — law citations $0.05, contract analysis $0.05, image gen $0.01, dispute letters $0.10, summaries $1.00+. USDC on Base via x402; or run the wallet two-POST flow from a client function.">
 <style>
 :root{--bg:#0d1117;--card:#161b22;--line:#30363d;--fg:#e6edf3;--dim:#8b949e;--accent:#1c9c72}
 *{box-sizing:border-box}body{margin:0;font:16px/1.6 -apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--fg)}
@@ -30,7 +30,7 @@ table{border-collapse:collapse;width:100%}td,th{border:1px solid var(--line);pad
 <tr><td>US consumer-law citations (FCRA / FDCPA / TILA / UDAP)</td><td><code>raen__raen_law_lookup</code></td><td><code>POST royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05</td></tr>
 <tr><td>Contract risk analysis</td><td><code>raen__raen_contract_analysis</code></td><td><code>POST contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td></tr>
 <tr><td>AI image generation</td><td><code>raen__raen_image_generate</code></td><td><code>POST nanobanana-x402.fly.dev/api/generate-image</code></td><td>$0.01</td></tr>
-<tr><td>FCRA dispute letter + certificate</td><td><code>raen__raen_dispute_letter</code></td><td><code>POST dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.75</td></tr>
+<tr><td>FCRA dispute letter + certificate</td><td><code>raen__raen_dispute_letter</code></td><td><code>POST dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.10</td></tr>
 <tr><td>Document summary / extraction / comparison</td><td>—</td><td><code>POST briefsnap-x402.fly.dev/api/…</code></td><td>$1.00–$3.00</td></tr>
 </table>
 <p>Every endpoint publishes a machine-readable manifest at <code>https://&lt;host&gt;/.well-known/x402.json</code> — read it at call time for the live price and schema.</p>
