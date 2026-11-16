@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CrewAI recipes on paid rails — 5 end-to-end crews calling x402 micro-priced tools (Base USDC)</title>
+<style>
+:root{color-scheme:dark}
+body{font:16px/1.6 system-ui,sans-serif;max-width:880px;margin:0 auto;padding:2rem 1rem;background:#0d1117;color:#c9d1d9}
+h1,h2,h3{color:#58d5c9}
+a{color:#79c0ff}
+code,pre{font:0.9em ui-monospace,Consolas,monospace}
+pre{background:#161b22;border:1px solid #30363d;border-radius:6px;padding:1rem;overflow-x:auto}
+table{border-collapse:collapse;width:100%}
+td,th{border:1px solid #30363d;padding:.4rem .6rem;text-align:left;font-size:.9rem}
+.note{border-left:3px solid #58d5c9;padding:.5rem 1rem;background:#161b22;margin:1rem 0}
+.btn{display:inline-block;background:#1f6feb;color:#fff;padding:.6rem 1.2rem;border-radius:6px;text-decoration:none;font-weight:600}
+</style>
+</head>
+<body>
+<h1>CrewAI recipes on paid rails</h1>
+<p>Companion to <a href="https://bshelby88.github.io/raen-agent-directory/crewai-agents.html">Paid tool calls in CrewAI</a> (the tool-wrapper reference). This page is the <strong>crew-level</strong> layer: five complete CrewAI patterns where individual agents call RAEN's x402 micro-priced endpoints (Base, USDC), with spend control inside the crew design instead of bolted on.</p>
+
+<h2>Live prices (decoded from each endpoint's own 402 challenge, this build)</h2>
+<p>All hosts: scheme <code>exact</code> · network <code>eip155:8453</code> · payTo <code>0x9b8a27e03ceba490953cda8ab1291c0e13baf72f</code> · asset USDC. Verification method: an unpaid POST returns HTTP 402 with a <code>payment-required</code> header; base64-decode it and read <code>accepts[0].amount</code>. Full wrapper reference: <a href="https://bshelby88.github.io/raen-agent-directory/crewai-agents.html">crewai-agents.html</a> · public ledger: <a href="https://settlement-collector.fly.dev/ledger.json">ledger.json</a>.</p>
+<table>
+<tr><th>Capability</th><th>Endpoint</th><th>Price</th></tr>
+<tr><td>US consumer-law citations (FCRA/FDCPA/TILA/UDAP)</td><td><code>POST https://royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05 (first call free, charge-and-rebate)</td></tr>
+<tr><td>Contract risk analysis — flagged clauses, severity, suggested edits</td><td><code>POST https://contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td></tr>
+<tr><td>Dispute letter pack (3 letters + citations)</td><td><code>POST https://dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.10</td></tr>
+<tr><td>Route a natural-language intent to the right paid service</td><td><code>POST https://dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td></tr>
+<tr><td>Document summary — bullets / executive format</td><td><code>POST https://briefsnap-x402.fly.dev/api/summarize</code></td><td>$1.00</td></tr>
+</table>
+
+<h2>Recipe 1 — Research crew with a per-agent budget guardrail</h2>
+<p>Wrap the paid call in a custom <code>BaseTool</code> that refuses to spend past a crew-level cap. The guardrail lives in code, not in a prompt, so a looping agent cannot overspend.</p>
+<pre>
+import json, urllib.request
+from crewai_tools import BaseTool
+
+LEDGER = {"spent": 0.0, "cap": 2.00}  # crew-level cap in USD
+
+def x402_call(url: str, body: dict, price: float) -> dict:
+    if LEDGER["spent"] + price > LEDGER["cap"]:
+        raise RuntimeError(f"budget cap hit: {LEDGER['spent']:.2f}+{price} > {LEDGER['cap']}")
+    # first POST: 402 + payment-required header; second POST: x-payment header
+    # (EIP-3009 transferWithAuthorization, see cookbook recipe 02)
+    resp = paid_post(url, body)          # your signer here
+    LEDGER["spent"] += price
+    return resp
+
+class LawLookup(BaseTool):
+    name: str = "law_lookup"
+    description: str = "US consumer-law citations (FCRA/FDCPA/TILA/UDAP). $0.05/call."
+
+    def _run(self, topic: str) -> str:
+        return json.dumps(x402_call(
+            "https://royal-ruby-x402.fly.dev/api/law-lookup",
+            {"topic": topic}, 0.05))
+</pre>
+
+<h2>Recipe 2 — Contract-review crew (paralegal pattern)</h2>
+<p>Split analysis and drafting into two agents so the paid call happens exactly once, on validated input:</p>
+<pre>
+from crewai import Agent, Task, Crew
+
+paralegal = Agent(
+    role="Paralegal",
+    goal="Extract contract text and file it for analysis",
+    tools=[],                    # no paid tool — free agent
+    llm="gpt-4o-mini")
+
+analyst = Agent(
+    role="Contract analyst",
+    goal="Flag risky clauses with severity and suggested edits",
+    tools=[contract_eye_tool],   # the $0.05 paid tool from crewai-agents.html
+    llm="gpt-4o-mini")
+
+crew = Crew(
+    agents=[paralegal, analyst],
+    tasks=[
+        Task(description="Prepare {contract_text} for analysis", agent=paralegal),
+        Task(description="Analyze the prepared contract via analyze-contract", agent=analyst),
+    ])
+</pre>
+<p class="note">Cost discipline: one analyst run = one $0.05 settle. If a task might retry, put the paid tool call behind an idempotency check (cache by input hash) so retries are free.</p>
+
+<h2>Recipe 3 — Dispute-letter pipeline crew (the $0.10 pack)</h2>
+<pre>
+# packer agent calls dispute-forge once per consumer, gets 3 letters + 12 citations
+# verify the settle on-chain before declaring the task done:
+#   curl https://settlement-collector.fly.dev/ledger.json | jq '.recent[] | select(.payer=="<your-wallet>")'
+class DisputePack(BaseTool):
+    name: str = "dispute_pack"
+    description: str = "3 dispute letters + citations. $0.10. Returns delivery/claim info."
+    def _run(self, facts: str) -> str:
+        r = x402_call("https://dispute-forge-x402.fly.dev/api/dispute-pack",
+                      {"facts": facts}, 0.10)
+        return r.get("claim_url", json.dumps(r))
+</pre>
+
+<h2>Recipe 4 — Dispatch-first crew (route, don't hardcode)</h2>
+<p>When a crew's task mix is unknown at build time, give it one $0.50 dispatch tool plus the per-service tools; dispatch classifies the intent and returns the right endpoint, the crew calls the cheap specialists directly after the first route.</p>
+
+<h2>Recipe 5 — First-call-free onboarding for your crew</h2>
+<p><code>royal-ruby/law-lookup</code> runs charge-and-rebate: the first call charges $0.05 and rebates it, so a new crew can validate the whole rail for a net-$0 probe before you wire the budget. Point your first-ever task at that endpoint.</p>
+
+<h2>Honest constraints</h2>
+<ul>
+<li>Your crew needs a wallet signer for the second POST (EIP-3009 <code>transferWithAuthorization</code>) — CrewAI does not pay 402s natively. Keep the key in an env var, never in agent memory or repo files, and never "always-allow" the signer command in an autonomous loop.</li>
+<li>Alternative without a wallet: run the crew against the RAEN MCP gateway (<a href="https://raen-mcp-gateway.fly.dev/mcp">raen-mcp-gateway.fly.dev/mcp</a>) with a free 30-day Bearer dev key — <code>POST https://raen-mcp-gateway.fly.dev/keys/request</code>. The gateway's 402-paid gate makes the key the billing rail.</li>
+<li>Some surfaces disclose degraded/synthetic modes in their manifests (tradingagents demo payload) — the ledger and manifests are the source of truth, not marketing.</li>
+</ul>
+
+<p>PayTo for all hosts: <code>0x9b8a27e03ceba490953cda8ab1291c0e13baf72f</code> · public settlement ledger: <a href="https://settlement-collector.fly.dev/ledger.json">ledger.json</a> · <a href="https://bshelby88.github.io/raen-agent-directory/crewai-agents.html">← tool-wrapper reference</a> · <a href="https://bshelby88.github.io/raen-agent-directory/try-raen.html">60-second walkthrough</a></p>
+<img src="https://settlement-collector.fly.dev/hit?src=crewai-recipes" alt="" width="1" height="1" style="display:none" data-page-hit>
+</body>
+</html>
