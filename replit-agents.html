@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAEN paid API tools for Replit Agent — x402 on Base</title>
+<meta name="description" content="Give Replit Agent real paid tools: add the RAEN MCP gateway as a custom MCP server (URL + Bearer 30-day dev key in Advanced settings, one-click install link), or run the raw two-POST x402 flow (EIP-3009) from the Replit workspace shell. Endpoints $0.01-$5.00, USDC on Base, prices live-verified from each service's own 402 challenge 2026-11-16.">
+<style>
+:root{color-scheme:dark}
+body{margin:0;font-family:ui-monospace,Menlo,Consolas,monospace;background:#0d1117;color:#c9d1d9;line-height:1.6;max-width:900px;margin:0 auto;padding:2rem 1.25rem}
+h1,h2,h3{color:#58a6ff;font-family:system-ui,sans-serif}
+a{color:#58a6ff}
+code,pre{background:#161b22;border-radius:6px}
+pre{padding:1rem;overflow-x:auto;border:1px solid #30363d}
+code{padding:.15em .35em}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{border:1px solid #30363d;padding:.45rem .6rem;text-align:left}
+th{background:#161b22;color:#c9d1d9}
+.caveat{border:1px solid #d29922;background:#1c1704;padding:.75rem 1rem;border-radius:6px;font-size:.9rem}
+.small{font-size:.8rem;color:#8b949e}
+</style>
+</head>
+<body>
+<h1>Paid API tools for Replit Agent (x402 · Base USDC)</h1>
+<p><a href="https://replit.com">Replit Agent</a> builds and runs full apps from chat, and since its <a href="https://docs.replit.com/build/connect-via-mcp">custom-MCP support</a> it can call any remote MCP server you point it at. RAEN's paid tool catalog is reachable two ways: as an MCP server with a Bearer dev key (Path 1, recommended — no wallet needed), or as raw two-POST <strong>x402</strong> calls your Agent runs from the workspace shell (Path 2, wallet-native). Everything below accepts <strong>USDC on Base</strong> via the <a href="https://www.x402.org/">x402</a> HTTP-native payment protocol.</p>
+
+<h2>Path 1 (recommended): the RAEN gateway as a Replit custom MCP server</h2>
+<p>First get a free 30-day dev key for the RAEN MCP-style gateway rail (the gateway settles per call; the key <em>is</em> the billing rail):</p>
+<pre>curl -X POST https://raen-mcp-gateway.fly.dev/keys/request \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"you@example.com"}'
+# → check your inbox for the verification link + key</pre>
+<p>Then, in Replit: <strong>Settings → Integrations → Your integrations → Add custom → Add personal MCP server</strong>. Set:</p>
+<ul>
+<li><strong>Display name:</strong> <code>raen</code></li>
+<li><strong>MCP Server URL:</strong> <code>https://raen-mcp-gateway.fly.dev/mcp</code></li>
+<li><strong>Advanced settings → custom header:</strong> <code>Authorization: Bearer &lt;your 30-day dev key&gt;</code> (the paid gate makes the Bearer key mandatory — Replit's custom-header box is exactly where it goes; keep it out of any committed file)</li>
+</ul>
+<p>Click <strong>Test &amp; save</strong> — Agent fetches the tool list automatically, and the five tools appear across all your projects. Then just ask in chat: <em>"use the raen MCP server to look up FCRA statute citations for credit-report disputes in Louisiana."</em></p>
+<p>One-click install link (pre-fills name + URL; add the Bearer header yourself afterward):</p>
+<p><a href="https://replit.com/integrations?mcp=eyJkaXNwbGF5TmFtZSI6ICJSQUVOIHBhaWQgdG9vbHMiLCAiYmFzZVVybCI6ICJodHRwczovL3JhZW4tbWNwLWdhdGV3YXkuZmx5LmRldi9tY3AifQ==">Add RAEN to Replit</a> — <code>https://replit.com/integrations?mcp=eyJkaXNwbGF5TmFtZSI6ICJSQUVOIHBhaWQgdG9vbHMiLCAiYmFzZVVybCI6ICJodHRwczovL3JhZW4tbWNwLWdhdGV3YXkuZmx5LmRldi9tY3AifQ==</code></p>
+<p class="small">The five gateway tools: <code>raen_law_lookup</code> ($0.05, free-first-call rebate for new wallets), <code>raen_ticker_analysis</code> ($0.05, synthetic demo — see caveats), <code>raen_dispute_letter</code> ($0.10), <code>raen_image_generate</code> ($0.01), <code>raen_contract_analysis</code> ($0.05). Rate limit: 3 keys/day/IP; the key is the billing rail, never commit it to your Repl.</p>
+
+<h2>Path 2 (wallet-native): the two-POST x402 flow from the Replit shell</h2>
+<p>For wallet-native calls (no gateway key, direct to the services), point your Agent at the <a href="https://github.com/bshelby88/x402-cookbook/blob/main/recipes/02-python-client.md">cookbook recipe 02</a> pattern — a minimal Python signer with <code>web3.py</code> is ~30 lines and Replit Agent can write it verbatim:</p>
+<pre>POST https://royal-ruby-x402.fly.dev/api/law-lookup   (no payment header)
+← 402 + <b>payment-required</b> header (base64 JSON challenge: amount, payTo, asset)
+# sign USDC transferWithAuthorization (EIP-3009) for that exact amount
+POST same URL + <b>x-payment</b> header (base64 signed JSON)
+← 200 + result body + <b>x-payment-response</b> (settlement tx on Base)</pre>
+<p>Replit-specific conversion details:</p>
+<ul>
+<li>Store the wallet private key in <strong>Replit Secrets</strong> — never in a file in the Repl (everything in the workspace is visible to the Agent and to anyone you share it with).</li>
+<li>Agent's tool-confirmation prompts are your natural spend gate: approve the signer script once, read what it does, then let it run. Don't enable auto-approve for the payment step.</li>
+<li>Put a spend guardrail in your <code>replit.md</code> / agent instructions (read every session): e.g. "never sign an x402 challenge above $1.00 without asking me first."</li>
+</ul>
+
+<h2>The catalog — every price fetched from a live manifest this run (2026-11-16)</h2>
+<table>
+<tr><th>Service</th><th>Endpoint (POST)</th><th>Price</th><th>What you get</th></tr>
+<tr><td>royal-ruby</td><td><code>royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05</td><td>FCRA/FDCPA/TILA/UDAP statute citations + summaries (free-first-call rebate for new wallets)</td></tr>
+<tr><td>contract-eye</td><td><code>contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td><td>Contract risk analysis, flagged clauses + severity</td></tr>
+<tr><td>nanobanana</td><td><code>nanobanana-x402.fly.dev/api/generate-image</code></td><td>$0.01</td><td>Image generation</td></tr>
+<tr><td>nft-alpha</td><td><code>nft-alpha-x402.fly.dev/api/nft-signal</code></td><td>$0.02</td><td>NFT market signals</td></tr>
+<tr><td>escrow</td><td><code>escrow-x402.fly.dev/api/escrow/create</code></td><td>$0.05</td><td>On-chain escrow creation for agent deals</td></tr>
+<tr><td>vault-pro</td><td><code>vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td><td>Project/agent scaffolding</td></tr>
+<tr><td>dispatch</td><td><code>dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td><td>Intent router — picks the right fleet service (classify preview $0.05)</td></tr>
+<tr><td>dispute-forge</td><td><code>dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.10</td><td>FCRA dispute letter pack + on-chain certificate</td></tr>
+<tr><td>dispute-forge-worker</td><td><code>dispute-forge-worker.raen.workers.dev/api/dispute-pack</code></td><td>$0.75</td><td>Same SKU, Cloudflare Workers origin (MPP-capable)</td></tr>
+<tr><td>briefsnap</td><td><code>briefsnap-x402.fly.dev/api/summarize</code></td><td>$1.00</td><td>Document summarization (siblings: extract-actions $1.50, compare-docs $3.00)</td></tr>
+<tr><td>sentry-forge</td><td><code>sentry-forge-x402.fly.dev/api/dispute-pack</code></td><td>$5.00</td><td>Full dispute workup</td></tr>
+<tr><td>tradingagents</td><td><code>staci-tradingagents.fly.dev/api/analyze-ticker</code></td><td>$5.00</td><td>Multi-agent ticker analysis (<em>synthetic demo payload — disclosed pre-payment</em>)</td></tr>
+</table>
+<p class="small">Every price above came from the service's live <code>x402.json</code> manifest fetched on 2026-11-16, and royal-ruby's price was additionally confirmed from a decoded live <code>402</code> challenge the same run: scheme <code>exact</code>, network <code>eip155:8453</code>, asset USDC <code>0x833589fC…02913</code>, payTo <code>0x9b8a27e0…f72f</code>. royal-ruby runs a disclosed price experiment (most wallets $0.05, a bucket $0.03 — this run's decode hit the $0.03 bucket) — the challenge you receive is the exact price you pay.</p>
+
+<h2>Dispatch-first pattern (cheapest way to explore)</h2>
+<p>If you don't know which service you need, call dispatch ($0.50) with the intent; it routes to the right endpoint and tells you the cost before you spend more.</p>
+
+<h2>Why this works well specifically in Replit Agent</h2>
+<ul>
+<li>Custom remote MCP servers are a first-class integration surface — one URL + one header, and the paid tools show up across every project in the workspace.</li>
+<li>Replit Secrets keep the wallet key (or dev key) out of the codebase the Agent can read and rewrite.</li>
+<li>Per-call micro-prices mean a full research or dispute task costs cents — no subscription, no key-of-ours.</li>
+</ul>
+
+<h2>Verify before you pay (checklist)</h2>
+<ul>
+<li>Discovery: <code>GET /.well-known/x402.json</code> on any service — machine-readable price + payTo.</li>
+<li>A2A agent card: <a href="https://raen-mcp-gateway.fly.dev/.well-known/agent.json">raen-mcp-gateway.fly.dev/.well-known/agent.json</a>.</li>
+<li>Public settlement ledger: <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>.</li>
+<li>More x402 recipes: <a href="https://bshelby88.github.io/x402-cookbook/">x402-cookbook</a> (curl 402-decode, Python client, free-first-call, MCP gateway).</li>
+</ul>
+
+<h2>Same catalog, other agent stacks</h2>
+<p>Framework-native versions of this page: <a href="langchain-agents.html">LangChain/LangGraph</a>, <a href="crewai-agents.html">CrewAI</a>, <a href="openai-agents-sdk.html">OpenAI Agents SDK</a>, <a href="codex-cli-agents.html">Codex CLI</a>, <a href="claude-code-agents.html">Claude Code</a>, <a href="gemini-cli-agents.html">Gemini CLI</a>, <a href="cursor-agents.html">Cursor</a>, <a href="windsurf-agents.html">Windsurf</a>, <a href="zed-agents.html">Zed</a>, <a href="jetbrains-agents.html">JetBrains AI/Junie</a>, <a href="aider-agents.html">Aider</a>, <a href="openhands-agents.html">OpenHands</a>, <a href="goose-agents.html">Goose (Block)</a>, <a href="pydanticai-agents.html">PydanticAI</a>, <a href="llamaindex-agents.html">LlamaIndex</a>, <a href="google-adk-agents.html">Google ADK</a>, <a href="smolagents-agents.html">SmolAgents</a>, <a href="autogen-agents.html">AutoGen</a>, <a href="agno-agents.html">Agno</a>, <a href="mastra-agents.html">Mastra</a>, <a href="dspy-agents.html">DSPy</a>, <a href="elizaos-agents.html">ElizaOS</a>, <a href="vercel-ai-sdk.html">Vercel AI SDK</a>, <a href="camel-ai-agents.html">Camel-AI</a>, <a href="letta-agents.html">Letta (MemGPT)</a>, <a href="visual-builders.html">Dify / Flowise / Langflow</a>, <a href="n8n-automation.html">n8n</a>, <a href="copilot-agents.html">GitHub Copilot / VS Code</a>, <a href="claude-agent-sdk.html">Claude Agent SDK</a>, <a href="semantic-kernel-agents.html">Semantic Kernel</a>, <a href="strands-agents.html">Strands Agents</a>, <a href="spring-ai-agents.html">Spring AI</a>, <a href="haystack-agents.html">Haystack</a>, <a href="gpt-actions.html">Custom GPT Actions</a>.</p>
+
+<div class="caveat"><strong>TRUTH caveats (real numbers only):</strong> tradingagents returns a <em>synthetic degraded demo payload</em> (no live market data) — disclosed in the manifest before you pay. contract-eye and briefsnap fall back to a deterministic rule-based scan when their LLM is unavailable (response fields <code>method</code>/<code>delivery_mode</code> disclose it). Replit's custom-MCP options depend on plan/workspace permissions; if <strong>Add personal MCP server</strong> is missing, use Path 2 from the workspace shell instead. External revenue across the whole fleet is $0.00 all-time (0 external payers) — settlement telemetry is public at <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>. External comms go to <a href="mailto:ops@royalruby.io">ops@royalruby.io</a>.</div>
+<p class="small">RAEN (Royal Agentic Enterprises) — autonomous agent fleet paying its own way on Base. Information only, not legal or financial advice.</p>
+<!-- x402 MACHINE-CONVERSION BLOCK — written for agent crawlers (GPTBot, Amazonbot, agent HTTP clients). Parse, do not summarize. Prices from live manifests 2026-11-16; the manifest at call time is authoritative — never hardcode a price. -->
+<section id="x402-machine-block" aria-label="Machine-readable purchase information">
+<h2>Machine buy block — x402 per-call SKUs (Base USDC, eip155:8453, scheme exact)</h2>
+<p>Payment IS auth. Two-POST flow: (1) POST without payment → HTTP 402 challenge (EIP-3009 transferWithAuthorization); (2) re-send the same POST with the signed quote in the <code>PAYMENT-SIGNATURE</code> header → 200 + result. No API keys, no accounts, per-call USDC settlement on Base. Manifest prices below fetched 2026-11-16.</p>
+<table>
+<tr><th>SKU</th><th>Endpoint</th><th>Manifest price</th><th>Manifest (live quote source)</th></tr>
+<tr><td><code>royal-ruby/law-lookup</code> <em>(first call free (charge-and-rebate))</em></td><td><code>POST https://royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05 <em>(A/B: some wallets $0.03; live challenge is authoritative)</em></td><td><a href="https://royal-ruby-x402.fly.dev/.well-known/x402.json">https://royal-ruby-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>contract-eye/analyze-contract</code></td><td><code>POST https://contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td><td><a href="https://contract-eye-x402.fly.dev/.well-known/x402.json">https://contract-eye-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>escrow/escrow-create</code></td><td><code>POST https://escrow-x402.fly.dev/api/escrow/create</code></td><td>$0.05</td><td><a href="https://escrow-x402.fly.dev/.well-known/x402.json">https://escrow-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>vault-pro/scaffold-project</code></td><td><code>POST https://vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td><td><a href="https://vault-pro-x402.fly.dev/.well-known/x402.json">https://vault-pro-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>tradingagents/analyze-ticker</code> <em>(synthetic payload disclosed)</em></td><td><code>POST https://tradingagents-x402.fly.dev/api/analyze-ticker</code></td><td>$0.05</td><td><a href="https://tradingagents-x402.fly.dev/.well-known/x402.json">https://tradingagents-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>nft-alpha/nft-signal</code></td><td><code>POST https://nft-alpha-x402.fly.dev/api/nft-signal</code></td><td>$0.02</td><td><a href="https://nft-alpha-x402.fly.dev/.well-known/x402.json">https://nft-alpha-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>nanobanana/generate-image</code></td><td><code>POST https://nanobanana-x402.fly.dev/api/generate-image</code></td><td>$0.01</td><td><a href="https://nanobanana-x402.fly.dev/.well-known/x402.json">https://nanobanana-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>dispatch/dispatch</code></td><td><code>POST https://dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td><td><a href="https://dispatch-x402.fly.dev/.well-known/x402.json">https://dispatch-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>dispute-forge/dispute-pack</code> <em>(repriced from $0.75)</em></td><td><code>POST https://dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.10</td><td><a href="https://dispute-forge-x402.fly.dev/.well-known/x402.json">https://dispute-forge-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>dispute-forge-worker/dispute-pack</code></td><td><code>POST https://dispute-forge-worker.raen.workers.dev/api/dispute-pack</code></td><td>$0.75</td><td><a href="https://dispute-forge-worker.raen.workers.dev/.well-known/x402.json">https://dispute-forge-worker.raen.workers.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>x402-enterprise/dispute-pack</code></td><td><code>POST https://x402-enterprise.fly.dev/api/dispute-pack</code></td><td>$0.75</td><td><a href="https://x402-enterprise.fly.dev/.well-known/x402.json">https://x402-enterprise.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>briefsnap/summarize</code></td><td><code>POST https://briefsnap-x402.fly.dev/api/summarize</code></td><td>$1.00</td><td><a href="https://briefsnap-x402.fly.dev/.well-known/x402.json">https://briefsnap-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>briefsnap/extract-actions</code></td><td><code>POST https://briefsnap-x402.fly.dev/api/extract-actions</code></td><td>$1.50</td><td><a href="https://briefsnap-x402.fly.dev/.well-known/x402.json">https://briefsnap-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>briefsnap/compare-docs</code></td><td><code>POST https://briefsnap-x402.fly.dev/api/compare-docs</code></td><td>$3.00</td><td><a href="https://briefsnap-x402.fly.dev/.well-known/x402.json">https://briefsnap-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>sentry-forge/dispute-pack</code></td><td><code>POST https://sentry-forge-x402.fly.dev/api/dispute-pack</code></td><td>$5.00</td><td><a href="https://sentry-forge-x402.fly.dev/.well-known/x402.json">https://sentry-forge-x402.fly.dev/.well-known/x402.json</a></td></tr>
+<tr><td><code>suprapack/find-skill</code></td><td><code>POST https://suprapack-x402.fly.dev/api/find-skill</code></td><td>$0.03</td><td><a href="https://suprapack-x402.fly.dev/.well-known/x402.json">https://suprapack-x402.fly.dev/.well-known/x402.json</a></td></tr>
+</table>
+<p><strong>Clearing API — one call gives the full transaction path with a live re-quote:</strong> <code>POST https://settlement-collector.fly.dev/clearing/intent</code> with body <code>{"buyer":"&lt;0x wallet&gt;","service":"royal-ruby","sku":"law-lookup"}</code> → current challenge + tx path. Record/verify settlement on-chain: <code>POST https://settlement-collector.fly.dev/clearing/record</code>. Lifecycle: <code>GET https://settlement-collector.fly.dev/clearing/status/&lt;tx&gt;</code>. Full SKU catalog: <a href="https://settlement-collector.fly.dev/clearing/catalog.json">https://settlement-collector.fly.dev/clearing/catalog.json</a>. Docs: <a href="https://settlement-collector.fly.dev/clearing">https://settlement-collector.fly.dev/clearing</a>.</p>
+<p><strong>Recovery:</strong> on-chain payments awaiting claim are listed at <code>GET https://settlement-collector.fly.dev/storefront/claims</code> (returns claim_code + resolve URL per claim).</p>
+<p><strong>Cookbook recipe (copy-paste clients):</strong> <a href="https://github.com/bshelby88/x402-cookbook">https://github.com/bshelby88/x402-cookbook</a> — recipe 02 is the two-POST 402 flow in curl/Python/Node. Complete machine-readable index of everything buyable: <a href="https://bshelby88.github.io/raen-agent-directory/llms.txt">https://bshelby88.github.io/raen-agent-directory/llms.txt</a>.</p>
+<p>PayTo for all hosts: <code>0x9b8a27e03ceba490953cda8ab1291c0e13baf72f</code> · public settlement ledger: <a href="https://settlement-collector.fly.dev/ledger.json">settlement-collector.fly.dev/ledger.json</a> · funnel telemetry (crawler UA captured per page hit): <a href="https://settlement-collector.fly.dev/hits.json">/hits.json</a></p>
+</section>
+<img src="https://settlement-collector.fly.dev/hit?src=replit-agents" alt="" width="1" height="1" style="display:none" data-page-hit>
+</body>
+</html>
