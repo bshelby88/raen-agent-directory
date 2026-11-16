@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paid tools for JetBrains agents — RAEN x402 APIs (AI Assistant, Junie)</title>
+<meta name="description" content="Give JetBrains AI Assistant and Junie paid tools: the RAEN MCP gateway added as an MCP server in IDE settings (free 30-day dev key, no wallet) or the raw two-POST x402 flow from the built-in terminal. USDC on Base, prices decoded from live 402 challenges 2026-11-16.">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+:root{color-scheme:dark;--bg:#0c0f14;--card:#141a23;--line:#232c38;--txt:#dbe4ee;--dim:#8fa0b3;--cyan:#3fd6c8;--amber:#e8b34c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.65 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{max-width:880px;margin:0 auto;padding:32px 20px 80px}
+h1{font-size:1.5rem;line-height:1.3}h1 .hl{color:var(--cyan)}
+h2{font-size:1.15rem;color:var(--cyan);margin-top:2.2em;border-bottom:1px solid var(--line);padding-bottom:.3em}
+a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}
+code,pre{background:var(--card);border:1px solid var(--line);border-radius:6px}
+code{padding:1px 5px;font-size:.85em}
+pre{padding:14px;overflow-x:auto;font-size:.82rem;line-height:1.5}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:18px 0}
+.tag{display:inline-block;border:1px solid var(--cyan);color:var(--cyan);border-radius:999px;padding:1px 10px;font-size:.72rem;margin-right:8px}
+.dim{color:var(--dim)}
+table{border-collapse:collapse;width:100%;font-size:.85rem;margin:14px 0}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left}
+th{color:var(--cyan);font-weight:600}
+td.r{text-align:right;white-space:nowrap}
+.top{font-size:.8rem;color:var(--dim)}
+footer{margin-top:48px;border-top:1px solid var(--line);padding-top:16px;font-size:.8rem;color:var(--dim)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<p class="top">RAEN — paid API tools for AI agents · USDC on Base · payment-is-auth, no API keys · <a href="https://settlement-collector.fly.dev/proof">live sales ledger</a></p>
+<h1>Paid tools for <span class="hl">JetBrains</span> agents (AI Assistant &amp; Junie)</h1>
+<p>IntelliJ IDEA, PyCharm, WebStorm and friends ship a native MCP client (Settings → Tools → MCP Servers) and Junie — JetBrains' coding agent — can run terminal commands. Two real paths to pay-per-call APIs, both work today:</p>
+<div class="card">
+<p><span class="tag">PATH 1 — no wallet, recommended</span> <strong>RAEN MCP gateway as a remote MCP server in IDE settings.</strong> Free 30-day Bearer dev key via <code>POST /keys/request</code> — no credit card, no wallet install; the key IS the billing rail.</p>
+<p><span class="tag">PATH 2 — wallet-native</span> <strong>Raw two-POST x402 flow</strong> run from the IDE's built-in terminal by Junie or AI Assistant. Sign EIP-3009 <code>transferWithAuthorization</code> per cookbook recipe 02. JetBrains-specific spend guardrails below.</p>
+</div>
+
+<h2>Path 1 — RAEN gateway as a remote MCP server (no wallet)</h2>
+<p>Get a free dev key first:</p>
+<pre>curl -X POST https://raen-mcp-gateway.fly.dev/keys/request \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"you@yourcompany.com"}'
+# verification email → open the link → 30-day Bearer key</pre>
+<p>Then in the IDE: <strong>Settings → Tools → MCP Servers → Add</strong>, choose a remote server, set:</p>
+<pre>URL:     https://raen-mcp-gateway.fly.dev/mcp
+Type:    Streamable HTTP
+Headers: Authorization: Bearer RAEN_YOUR_KEY</pre>
+<p>The gateway's 5 tools appear in AI Assistant / Junie tool calls as <code>raen_law_lookup</code>, <code>raen_analyze_contract</code>, <code>raen_generate_image</code>, <code>raen_analyze_ticker</code>, <code>raen_dispatch</code>. Tool annotations (<code>readOnlyHint: true</code>, <code>destructiveHint: false</code>) are live on all 5 tools — trust surfaces that read annotations treat them as read-only lookups — but each call is a metered paid API call behind the 402 gate; the Bearer key is the billing rail.</p>
+<p class="dim">Version note: remote (Streamable HTTP) MCP servers are supported in recent 2025.x IDE builds — if your build only offers local command servers, upgrade or use Path 2. Keep the dev key out of the repo: it lives in IDE settings, never in committed files.</p>
+
+<h2>Path 2 — wallet-native: the two-POST x402 flow from the IDE terminal</h2>
+<p>POST unpaid → HTTP 402 with a <code>payment-required</code> challenge header → sign EIP-3009 <code>transferWithAuthorization</code> for USDC on Base → retry POST with the <code>x-payment</code> header → 200 + paid result. Full client code: <a href="https://bshelby88.github.io/x402-cookbook/recipes/02-python-client.html">cookbook recipe 02 (Python client)</a>.</p>
+<pre>import requests
+r = requests.post("https://contract-eye-x402.fly.dev/api/analyze-contract",
+                  json={"text": contract_text})
+if r.status_code == 402:
+    payment = sign_challenge(r.headers["payment-required"], private_key)
+    r = requests.post(same_url, json=same_body,
+                      headers={"x-payment": payment})
+print(r.json())</pre>
+<div class="card">
+<p><strong>JetBrains-specific spend guardrails (do these before Path 2):</strong></p>
+<ul>
+<li>Junie: keep "auto-run commands" OFF / restricted — the per-command approval prompt is your hard spend backstop; never allowlist the signer command.</li>
+<li>Put a budget rule in <code>.junie/guidelines.md</code> (Junie's project guidelines, read every run): e.g. "stop after $0.50 of paid API calls per session; always print the price from the 402 quote before spending".</li>
+<li>Wallet private key as an env var only; never let the agent write it into a project file or commit it.</li>
+<li>Start on the cheapest endpoints ($0.01–$0.05) to validate the flow before anything pricier.</li>
+<li>Use a dedicated thinly-funded wallet for agent spending, not your primary key.</li>
+</ul>
+</div>
+
+<h2>The catalog — every price verified from the live challenge or manifest today</h2>
+<table>
+<tr><th>Endpoint</th><th>What your agent gets</th><th class="r">Price (USDC, Base)</th></tr>
+<tr><td>POST nanobanana-x402.fly.dev/api/generate-image</td><td>Image generation</td><td class="r">$0.01</td></tr>
+<tr><td>POST nanobanana-x402.fly.dev/api/edit-image</td><td>Image editing</td><td class="r">$0.01</td></tr>
+<tr><td>GET royal-ruby-x402.fly.dev/api/ping</td><td>Alive-check + chain block/latency</td><td class="r">$0.001</td></tr>
+<tr><td>POST royal-ruby-x402.fly.dev/api/law-lookup</td><td>FCRA/FDCPA/TILA/UDAP citations <span class="dim">(disclosed A/B price experiment — your 402 challenge states your exact price)</span></td><td class="r">$0.05 (most wallets)</td></tr>
+<tr><td>POST contract-eye-x402.fly.dev/api/analyze-contract</td><td>Contract risk review: score, flagged clauses, suggested modifications</td><td class="r">$0.05</td></tr>
+<tr><td>POST nft-alpha-x402.fly.dev/api/nft-signal</td><td>NFT market signal</td><td class="r">$0.02</td></tr>
+<tr><td>POST escrow-x402.fly.dev/api/escrow/create</td><td>On-chain escrow creation</td><td class="r">$0.05</td></tr>
+<tr><td>POST vault-pro-x402.fly.dev/api/scaffold-project</td><td>Project scaffolding</td><td class="r">$0.05</td></tr>
+<tr><td>POST tradingagents-x402.fly.dev/api/analyze-ticker</td><td>Multi-agent ticker analysis <span class="dim">(synthetic demo payload — disclosed in the manifest)</span></td><td class="r">$0.05</td></tr>
+<tr><td>POST dispatch-x402.fly.dev/dispatch</td><td>Intent router → picks the right fleet tool</td><td class="r">$0.50</td></tr>
+<tr><td>POST dispute-forge-x402.fly.dev/api/dispute-pack</td><td>3 dispute letters + citations (FCRA/FDCPA)</td><td class="r">$0.10</td></tr>
+<tr><td>POST dispute-forge-worker.raen.workers.dev/api/dispute-pack</td><td>Dispute packs at the Cloudflare edge (x402 + MPP dual-protocol)</td><td class="r">$0.75</td></tr>
+<tr><td>POST briefsnap-x402.fly.dev/api/summarize</td><td>Long-doc summary ladder ($1.00 / $1.50 extract-actions / $3.00 compare-docs)</td><td class="r">$1.00</td></tr>
+<tr><td>GET sentry-forge-x402.fly.dev/api/dispute-pack</td><td>Full dispute workup</td><td class="r">$5.00</td></tr>
+<tr><td>POST staci-tradingagents.fly.dev/api/analyze-ticker</td><td>Full ticker simulation <span class="dim">(simulation — disclosed)</span></td><td class="r">$5.00</td></tr>
+</table>
+<p class="dim">Every <code>payTo</code> verified canonical (0x9b8a27e03ceba490953cda8ab1291c0e13baf72f) across all 12 Fly hosts + the Workers edge host this build (2026-11-16); royal-ruby and dispute-forge-worker additionally decoded from LIVE 402 challenges the same day. Verify your own challenge at pay time — the challenge is the exact price you pay.</p>
+
+<h2>Honest state (TRUTH law)</h2>
+<p class="dim">External revenue to date: $0.00 settled all-time (one 0.05 USDC external payment received but never fulfilled — <a href="https://settlement-collector.fly.dev/proof">live ledger</a> has every number, machine-readable at <a href="https://settlement-collector.fly.dev/ledger.json">ledger.json</a>). Internal test settles only so far. Tradingagents surfaces ship synthetic demo payloads — disclosed, not hidden. Contract-eye and royal-ruby fall back to a deterministic statutory baseline when the LLM key is unavailable — also disclosed per call. We publish our zeros.</p>
+
+<h2>Related</h2>
+<ul>
+<li><a href="mcp-clients.html">MCP gateway quickstart for any MCP client</a></li>
+<li><a href="https://bshelby88.github.io/x402-cookbook/">x402 cookbook (recipes 01–21)</a></li>
+<li><a href="https://x402-decoder.vercel.app/">x402 challenge decoder</a> — paste a <code>payment-required</code> header, see the JSON</li>
+<li>Other editors/agents: <a href="cursor-agents.html">Cursor</a> · <a href="windsurf-agents.html">Windsurf</a> · <a href="zed-agents.html">Zed</a> · <a href="amazon-q-agents.html">Amazon Q</a> · <a href="claude-code-agents.html">Claude Code</a> · <a href="copilot-agents.html">Copilot</a></li>
+</ul>
+
+<footer>
+RAEN is a 13-service x402 API fleet on Base (scheme=exact, eip155:8453, USDC 0x833589fC…02913, payTo canonical). Discoverability: <a href="llms.txt">llms.txt</a> · MCP Registry · <a href="https://settlement-collector.fly.dev/proof">proof of commerce</a>.<br>
+<img src="https://settlement-collector.fly.dev/hit?src=jetbrains-agents" alt="" width="1" height="1" style="display:none">
+</footer>
+</div>
+<script>
+// demo-click beacon: fires when a reader clicks into a command block
+document.querySelectorAll('pre').forEach(function(p){
+  p.addEventListener('click',function(){
+    new Image().src='https://settlement-collector.fly.dev/hit?src=jetbrains-agents-demo';
+  });
+});
+</script>
+</body>
+</html>
