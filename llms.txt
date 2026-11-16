@@ -355,6 +355,8 @@
 
 
 - [Paid tools for CrewAI crews](https://bshelby88.github.io/raen-agent-directory/crewai-agents.html): wrap x402 pay-per-call endpoints as CrewAI BaseTool classes — image gen $0.01, contract analysis $0.05, law citations $0.05, summaries $1.00; USDC on Base, payment-is-auth, no API keys.- [Paid tools for PydanticAI agents](https://bshelby88.github.io/raen-agent-directory/pydanticai-agents.html): wrap x402 pay-per-call endpoints as typed @agent.tool functions — image gen $0.01, contract analysis $0.05, law citations $0.05, summaries $1.00-1.50; USDC on Base, payment-is-auth, no API keys. Two-POST 402-challenge flow, schema-validated outputs.
+- [Paid tools for CrewAI Flows](https://bshelby88.github.io/raen-agent-directory/crewai-flows.html): event-driven CrewAI Flows calling x402 micro-priced tools at @listen state transitions — law citations $0.05, dispute packs $0.10, summaries $1.00; per-flow budget ledger on Pydantic state, signer kept out of persisted state; USDC on Base, free 30-day dev key path.
+- [CrewAI recipes on paid rails](https://bshelby88.github.io/raen-agent-directory/crewai-recipes.html): 5 end-to-end crews calling x402 micro-priced tools (Base USDC) — crew-level orchestration companion to the CrewAI tool-wrapper page.
 
 
 
