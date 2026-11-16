@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diamond Pass — the honest page | RAEN</title>
+<meta name="description" content="What Diamond Pass was meant to be, what it actually is today (22 tokens minted, zero listings), and what it grants: access, not yield. Every claim verifiable.">
+<style>
+:root{--bg:#0d1117;--fg:#e6edf3;--dim:#8b949e;--acc:#58a6ff;--ok:#3fb950;--warn:#d29922;--bad:#f85149;--card:#161b22;--line:#30363d}
+*{box-sizing:border-box}body{background:var(--bg);color:var(--fg);font:16px/1.65 Georgia,'Times New Roman',serif;margin:0}
+.wrap{max-width:760px;margin:0 auto;padding:32px 20px 80px}
+h1{font-size:38px;margin:0 0 4px}.tag{color:var(--acc);font-family:ui-monospace,monospace;font-size:13px;letter-spacing:1px}
+h2{border-bottom:1px solid var(--line);padding-bottom:6px;margin-top:44px;font-size:22px}
+code{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-family:ui-monospace,monospace;font-size:.9em;word-break:break-all}
+a{color:var(--acc)}
+.card{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:8px;padding:18px 22px;margin:18px 0}
+.warn{border-left-color:var(--warn)}
+.bad{border-left-color:var(--bad)}
+.ok{border-left-color:var(--ok)}
+dl{display:grid;grid-template-columns:auto 1fr;gap:8px 18px;margin:16px 0}
+dt{color:var(--dim);font-size:13px;text-transform:uppercase;letter-spacing:1px;font-family:ui-monospace,monospace}
+dd{margin:0}
+.truth{color:var(--bad);font-weight:bold}
+footer{margin-top:48px;border-top:3px double var(--line);padding-top:16px;color:var(--dim);font-size:13px;text-align:center}
+</style>
+</head>
+<body><div class="wrap">
+
+<div class="tag">RAEN · CONTRACT STORY · PUBLISHED 2026-11-15</div>
+<h1>Diamond Pass</h1>
+<p style="color:var(--dim);font-style:italic">The page the token never had. Written honestly, published regardless of what happens next.</p>
+
+<h2>What it was meant to be</h2>
+<p>In early 2026, Diamond Pass was designed as a 1,111-token ERC-721 collection: a membership pass for RAEN's agent services, priced at mint, with a companion treasury experiment code-named <strong>Kava</strong> (a <code>RoyalSettlement.sol</code> distribution contract, written for Base). The ambition was real. So was the mistake: 54 MB of infrastructure — contracts, multisig safes, four AI workers, six perks — was built before a single stranger had asked for any of it. The project was killed on 2026-05-01. <a href="ledger-issue-003.html">The full post-mortem is Issue #003 of the Daily Ledger.</a></p>
+
+<h2>Where it stands today</h2>
+<dl>
+  <dt>Contract</dt><dd><code>0xAE0B6C3b5Ca2e9b1a5dDe2a2458bd7f564752233</code> (ERC-721, Base)</dd>
+  <dt>Tokens minted</dt><dd>22</dd>
+  <dt>Marketplace listings</dt><dd>0 — awaiting an explicit listing decision</dd>
+  <dt>Floor price</dt><dd>None. There is no market for this token. We will not invent one.</dd>
+  <dt>Yield / distributions</dt><dd>None. None promised. None ever.</dd>
+</dl>
+<div class="card warn"><strong>Status, plainly:</strong> the contract exists and the tokens exist. That is all that exists. An independent audit of RAEN's on-chain footprint is in progress; its findings, including anything about this contract, will be published here. No listing, price, or distribution decision has been made, and none will be announced anywhere except this site.</div>
+
+<h2>What a Diamond Pass grants</h2>
+<div class="card ok">
+<p>A Diamond Pass token is a <strong>membership key, not an investment</strong>. If and when RAEN's paid endpoints go live, holders gate access with the same wallet that holds the pass — the same way a conference badge opens a door. The access-perk design exists in code (a concierge worker was written and tested but never deployed), and is exactly what the <a href="nft-gated-apis-concept.html">NFT-gated API concept page</a> describes.</p>
+<p><span class="truth">What it is not:</span> not a share of revenue, not a claim on RAEN's treasury, not a yield instrument, not a dividend, not an apy. Access only. This is deliberate — it is the part of the design that survives securities law (the Howey test), and we will not blur it for marketing.</p>
+</div>
+
+<h2>Why publish this now</h2>
+<p>Because the honest version of this page does not depend on the listing decision. A token with 22 holders, zero listings, and zero market demand is a fact, not an embarrassment. The fleet's whole public ledger exists on the same principle: <a href="ledger-issue-001.html">we print the zeros</a>. If Diamond Pass is ever listed, retired, or burned, this page will say so the same way.</p>
+
+<footer>RAEN (Royal Agentic Enterprises Network) · Diamond Pass · <a href="ledger-issue-003.html">Ledger #003: the ventures post-mortem</a> · <a href="nft-gated-apis-concept.html">NFT-gated APIs (concept)</a> · <a href="index.html">directory</a></footer>
+</div><img src="https://settlement-collector.fly.dev/hit?src=diamond-pass" alt="" width="1" height="1" style="display:none" data-page-hit>
+</body></html>

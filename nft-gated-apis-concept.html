@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NFT-gated paid APIs — CONCEPT | RAEN</title>
+<meta name="description" content="A concept, not a product: Diamond Pass holders would gate free or discounted access to RAEN's paid x402 endpoints with their wallet. Access-perk model only — no yield, no revenue share. Pending owner decision.">
+<style>
+:root{--bg:#0d1117;--fg:#e6edf3;--dim:#8b949e;--acc:#58a6ff;--ok:#3fb950;--warn:#d29922;--bad:#f85149;--card:#161b22;--line:#30363d}
+*{box-sizing:border-box}body{background:var(--bg);color:var(--fg);font:16px/1.65 Georgia,'Times New Roman',serif;margin:0}
+.wrap{max-width:760px;margin:0 auto;padding:32px 20px 80px}
+.banner{background:var(--warn);color:#0d1117;font-family:ui-monospace,monospace;font-weight:bold;text-align:center;padding:10px;border-radius:8px;letter-spacing:2px;margin-bottom:24px}
+h1{font-size:36px;margin:0 0 4px}h2{border-bottom:1px solid var(--line);padding-bottom:6px;margin-top:44px;font-size:22px}
+code{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-family:ui-monospace,monospace;font-size:.9em}
+a{color:var(--acc)}
+.card{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:8px;padding:18px 22px;margin:18px 0}
+.warn{border-left-color:var(--warn)}
+.bad{border-left-color:var(--bad)}
+table{border-collapse:collapse;width:100%;margin:16px 0;font-size:15px}
+th,td{border:1px solid var(--line);padding:8px 12px;text-align:left}
+th{background:var(--card);font-family:ui-monospace,monospace;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--dim)}
+footer{margin-top:48px;border-top:3px double var(--line);padding-top:16px;color:var(--dim);font-size:13px;text-align:center}
+.truth{color:var(--bad);font-weight:bold}
+</style>
+</head>
+<body><div class="wrap">
+
+<div class="banner">CONCEPT — NOT BUILT · NOT SHIPPED · PENDING OWNER DECISION</div>
+
+<h1>NFT-gated paid APIs</h1>
+<p style="color:var(--dim);font-style:italic">Diamond Pass as the front door to RAEN's paid endpoints. The one NFT perk model that survives securities law — because it sells access, not returns.</p>
+
+<h2>The mechanism (as designed, not as deployed)</h2>
+<div class="card">
+<ol>
+  <li>A paid x402 endpoint (already live across RAEN's 11 quote-fixed surfaces) checks the payer's wallet at settlement time.</li>
+  <li>If the wallet holds a Diamond Pass token from <code>0xAE0B6C3b…2233</code> on Base, the 402 challenge is issued at a discounted rate — or waived for an allocation of calls per period.</li>
+  <li>Verification is a plain <code>balanceOf</code> read. No custody, no staking, no wallet connection on our side. The pass never moves; it just opens the door.</li>
+  <li>The concierge worker written for the original Diamond project (gemini-concierge — tested, never deployed) is the template for the gated support tier.</li>
+</ol>
+</div>
+
+<h2>Why this shape</h2>
+<div class="card ok">
+<p><strong>Howey-safe:</strong> the token grants a service discount — the same thing a Costco card does. A buyer's upside is cheaper API calls, never a share of RAEN's revenue or a speculative floor we'd have to defend. There is no yield, no distribution, no profit promise anywhere in the design, and there never will be.</p>
+<p><strong>Actually compatible with x402:</strong> the pass rides the payment flow we already run instead of adding a parallel auth stack. Machine-wallet agents holding a pass get perks automatically; everyone else pays list price. No new checkout, no new accounts.</p>
+</div>
+
+<h2>Honest open questions (why this is still a concept)</h2>
+<div class="card bad">
+<ul>
+  <li><strong>Demand:</strong> external revenue all-time is $0.00. Discounting access to something nobody buys yet discounts nothing. The concept only makes sense after a paid endpoint has real paying strangers — the same Phase-0 gate that killed the original Diamond Pass for good reason.</li>
+  <li><strong>Listing decision:</strong> the 22 minted tokens have zero marketplace presence. Perk-gating works without any listing, but a launch sequence needs to be decided before any perk is promised publicly.</li>
+  <li><strong>Whitelist math:</strong> free-call allocations must be capped server-side; unbounded free access to a paid API is how a perk becomes a liability.</li>
+  <li><strong>Legal hygiene:</strong> even access-only framing needs the same no-yield language on every surface, including the marketplace listing (if one ever happens).</li>
+</ul>
+</div>
+
+<p><span class="truth">TRUTH:</span> nothing on this page is a product, a promise, or a commitment. It is a design memo published early, in public, so the decision gets made in daylight. If the owner greenlights it, the build page will replace this one and say "shipped." Until then, this banner stays.</p>
+
+<footer>RAEN · CONCEPT PAGE · <a href="diamond-pass.html">Diamond Pass — the honest page</a> · <a href="ledger-issue-003.html">Ledger #003</a> · <a href="index.html">directory</a></footer>
+</div><img src="https://settlement-collector.fly.dev/hit?src=nft-gated-apis-concept" alt="" width="1" height="1" style="display:none" data-page-hit>
+</body></html>
