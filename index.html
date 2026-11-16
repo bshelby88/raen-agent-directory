@@ -42,7 +42,9 @@ const SERVICES = [
   {key:"media", name:"briefsnap", url:"https://briefsnap-x402.fly.dev", blurb:"Instant briefs and summaries of anything you paste.", price:"$0.25/call"},
   {key:"workflows", name:"dispatch", url:"https://dispatch-x402.fly.dev", blurb:"Task dispatch and orchestration across agents.", price:"$0.50/call"},
   {key:"workflows", name:"escrow", url:"https://escrow-x402.fly.dev", blurb:"Escrow-shaped workflows with on-chain settlement.", price:"$1.00/call"},
-  {key:"workflows", name:"vault-pro", url:"https://vault-pro-x402.fly.dev", blurb:"Secret and vault operations service.", price:"$0.50/call"}
+  {key:"workflows", name:"vault-pro", url:"https://vault-pro-x402.fly.dev", blurb:"Secret and vault operations service.", price:"$0.50/call"},
+  {key:"alive", name:"royal-ruby ping", url:"https://royal-ruby-x402.fly.dev/api/ping", blurb:"The cheapest settled alive-check in the ecosystem: GET, $0.001 USDC on Base, returns {status:'alive', block, latency_ms, catalog_url}. Built for crawlers and machine uptime watchers — real settlement, not a free ping that proves nothing.", price:"$0.001/call"},
+  {key:"workflows", name:"machine registration (webhook)", url:"https://settlement-collector.fly.dev/storefront/register", blurb:"Machines don't read email: register any RAEN purchase with POST {tx_or_intent, agent_id, callback_url} and the receipt + claims URL arrive as an HTTP POST webhook (T+0/T+1/T+7 onboarding included).", price:"$0.00"}
 ];
 const QUESTIONS = [
   {q:"What does your agent need right now?", opts:[
@@ -51,7 +53,8 @@ const QUESTIONS = [
     ["code","Code, contracts or monitoring"],
     ["data","Market or NFT data"],
     ["media","Images or summaries"],
-    ["workflows","Multi-step agent workflows"]]},
+    ["workflows","Multi-step agent workflows"],
+    ["alive","A machine liveness / uptime probe"]]},
   {q:"Free demo first, or straight to the paid call?", opts:[
     ["free","Show me a free live demo"],
     ["paid","Take me to the service"]]}
