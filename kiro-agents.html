@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAEN paid API tools for Kiro — x402 on Base</title>
+<meta name="description" content="Give Kiro (AWS's agentic IDE) real paid tools: add the RAEN MCP gateway to ~/.kiro/settings/mcp.json or .kiro/settings/mcp.json (free 30-day dev key, Bearer header with ${ENV} expansion, no wallet in the IDE) or run the raw two-POST x402 flow (EIP-3009) from Kiro's terminal. 13 endpoints $0.01-$5.00, USDC on Base, every price live-decoded from each service's own 402 challenge 2026-11-15.">
+<script>try{new Image().src="https://settlement-collector.fly.dev/hit?src=kiro-agents&ref="+encodeURIComponent(location.href);}catch(e){}</script>
+<style>
+:root{color-scheme:dark}
+body{margin:0;font-family:ui-monospace,Menlo,Consolas,monospace;background:#0d1117;color:#c9d1d9;line-height:1.6;max-width:900px;margin:0 auto;padding:2rem 1.25rem}
+h1,h2,h3{color:#58a6ff;font-family:system-ui,sans-serif}
+a{color:#58a6ff}
+code,pre{background:#161b22;border-radius:6px}
+pre{padding:1rem;overflow-x:auto;border:1px solid #30363d}
+code{padding:.15em .35em}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{border:1px solid #30363d;padding:.45rem .6rem;text-align:left}
+th{background:#161b22;color:#c9d1d9}
+.caveat{border:1px solid #d29922;background:#1c1704;padding:.75rem 1rem;border-radius:6px;font-size:.9rem}
+.small{font-size:.8rem;color:#8b949e}
+</style>
+</head>
+<body>
+<h1>Paid API tools for Kiro (x402 · Base USDC)</h1>
+<p><a href="https://kiro.dev/">Kiro</a> — AWS's spec-driven agentic IDE — speaks MCP natively with support for <strong>remote servers passed by <code>url</code> plus custom request <code>headers</code></strong>, configured at the workspace level (<code>.kiro/settings/mcp.json</code>) or user level (<code>~/.kiro/settings/mcp.json</code>). That makes it a natural host for the RAEN paid-tool catalog. Two payment paths: the RAEN MCP gateway added as a <strong>remote MCP server</strong> (Path 1, no wallet needed — the Bearer dev key <em>is</em> the billing rail), or the raw two-POST x402 flow executed from Kiro's built-in terminal with your wallet (Path 2). Everything below accepts <strong>USDC on Base</strong> via the <a href="https://www.x402.org/">x402</a> HTTP-native payment protocol.</p>
+
+<h2>Path 1 (recommended, no wallet): RAEN MCP gateway in Kiro's MCP config</h2>
+<p>First get a free 30-day dev key (email-verified, self-serve):</p>
+<pre>curl -X POST https://raen-mcp-gateway.fly.dev/keys/request \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"you@example.com"}'
+# → check your inbox for the verification link + key</pre>
+<p>Then put the key in an environment variable and add the gateway to <code>~/.kiro/settings/mcp.json</code> (global) or <code>.kiro/settings/mcp.json</code> (this workspace only):</p>
+<pre>{
+  "mcpServers": {
+    "raen": {
+      "url": "https://raen-mcp-gateway.fly.dev/mcp",
+      "headers": { "Authorization": "Bearer ${RAEN_KEY}" },
+      "disabled": false
+    }
+  }
+}</pre>
+<p>Kiro expands <code>${ENV_VAR}</code> references inside header values, so the Bearer key never has to live in the dotfile — set <code>RAEN_KEY</code> in your shell profile (or paste the literal key and treat the config file as a secret; never commit it). Workspace config takes precedence over global when both define <code>raen</code>, and any <code>mcpServers</code> block in a Kiro agent JSON overrides both. Save the file and Kiro reconnects the server. The tools surface as <code>raen_law_lookup</code> (FCRA/FDCPA/TILA/UDAP statute citations), <code>raen_ticker_analysis</code>, <code>raen_dispute_letter</code>, <code>raen_image_generate</code>, <code>raen_contract_analysis</code>. The gateway's 402 paid gate makes the Bearer key the billing rail — Kiro pays per MCP tool call without ever touching a wallet. Verify the handshake by asking Kiro "list your raen tools".</p>
+
+<h2>Path 2 (wallet-native): the two-POST x402 flow from Kiro's terminal</h2>
+<p>Kiro executes shell commands in its integrated terminal, so it can run the raw x402 flow directly — hand it <a href="https://github.com/bshelby88/x402-cookbook/blob/main/recipes/02-python-client.md">cookbook recipe 02</a> and it writes the signer verbatim (~30 lines, <code>web3.py</code>):</p>
+<pre>POST https://royal-ruby-x402.fly.dev/api/law-lookup   (no payment header)
+← 402 + <b>payment-required</b> header AND body (base64 JSON: amount, payTo, asset)
+# sign USDC transferWithAuthorization (EIP-3009) for that exact amount
+POST same URL + <b>x-payment</b> header (base64 signed JSON)
+← 200 + result body + <b>x-payment-response</b> (settlement tx on Base)</pre>
+
+<div class="caveat"><strong>Kiro-specific spend guardrails:</strong> Kiro's <code>autoApprove</code> array runs MCP tools <em>without an approval prompt</em> — and <code>"autoApprove": ["*"]</code> auto-approves every tool on the server. Do not put the paid RAEN tools in <code>autoApprove</code> while a wallet path is live: the per-call approval prompt is your hard spend backstop (in an untrusted workspace Kiro prompts on every call regardless, which is the safe default). Kiro reads <strong>steering files</strong> from <code>.kiro/steering/*.md</code> into agent context every session — put the budget rule there: "never sign an x402 challenge above $1.00 — ask me first". Load the wallet key as an env var (<code>export RAEN_WALLET_KEY=...</code>) rather than letting Kiro write a key into any file.</div>
+
+<h2>The catalog — every price decoded from a LIVE 402 challenge this run (2026-11-15)</h2>
+<table>
+<tr><th>Service</th><th>Endpoint (POST)</th><th>Price</th><th>What you get</th></tr>
+<tr><td>royal-ruby</td><td><code>royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05</td><td>FCRA/FDCPA/TILA/UDAP statute citations + summaries (free-first-call rebate for new wallets; disclosed A/B bucket may show $0.03)</td></tr>
+<tr><td>contract-eye</td><td><code>contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td><td>Contract risk analysis, flagged clauses + severity</td></tr>
+<tr><td>nanobanana</td><td><code>nanobanana-x402.fly.dev/api/generate-image</code></td><td>$0.01</td><td>Image generation</td></tr>
+<tr><td>nft-alpha</td><td><code>nft-alpha-x402.fly.dev/api/nft-signal</code></td><td>$0.02</td><td>NFT market signals</td></tr>
+<tr><td>escrow</td><td><code>escrow-x402.fly.dev/api/escrow/create</code></td><td>$0.05</td><td>On-chain escrow creation for agent deals</td></tr>
+<tr><td>vault-pro</td><td><code>vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td><td>Project/agent scaffolding</td></tr>
+<tr><td>dispatch</td><td><code>dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td><td>Intent router — picks the right fleet service and tells you its cost first</td></tr>
+<tr><td>dispute-forge</td><td><code>dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.75</td><td>FCRA/FDCPA dispute letter packages (live-decoded 402: amount 750000, canonical payTo)</td></tr>
+<tr><td>dispute-forge-worker</td><td><code>dispute-forge-worker.raen.workers.dev/api/dispute-pack</code></td><td>$0.75</td><td>Dispute letter + SVG certificate (Cloudflare Workers origin)</td></tr>
+<tr><td>briefsnap</td><td><code>briefsnap-x402.fly.dev/api/summarize</code></td><td>$1.00</td><td>Document/URL summarization (ladder: $1.00 / $1.50 / $3.00 tiers)</td></tr>
+<tr><td>tradingagents</td><td><code>tradingagents-x402.fly.dev/api/analyze-ticker</code></td><td>$0.05</td><td>Synthetic degraded demo payload — disclosed, <code>simulated:true</code>, not market research</td></tr>
+<tr><td>staci-tradingagents</td><td><code>staci-tradingagents.fly.dev/api/analyze-ticker</code></td><td>$5.00</td><td>Structured BUY/HOLD/SELL + per-agent reports — <strong>simulation engine disclosed: response is simulated</strong>, you pay for pipeline shape + verifiable receipt</td></tr>
+<tr><td>sentry-forge</td><td><code>sentry-forge-x402.fly.dev/api/dispute-pack</code></td><td>$5.00</td><td>Deep multi-tool dispute workup (full audit tier)</td></tr>
+</table>
+<p class="small">Prices were decoded this run (2026-11-15) from each service's LIVE 402 <code>payment-required</code> challenge (not just the manifest): all 13 endpoints advertise scheme=exact, network=eip155:8453, USDC <code>0x833589fC…02913</code>, payTo <code>0x9b8a27e0…f72f</code> — the 11 Fly manifests were also re-fetched this run and all are canonical. tradingagents validates the request schema before quoting (a missing <code>ticker</code> returns 400 pre-payment, not a challenge). Prices can change — the 402 challenge you receive at call time is the exact price you pay.</p>
+
+<h2>Verify before you spend</h2>
+<ul>
+<li><code>curl https://royal-ruby-x402.fly.dev/.well-known/x402.json</code> — every service publishes its manifest (scheme, network, payTo, price).</li>
+<li>A free-first-call rebate is available on royal-ruby for brand-new wallets: send <code>x-payer-address</code> on your first call, pay the challenge, and the full amount is rebated after settlement (one per wallet per 30 days). Guide: <a href="https://bshelby88.github.io/raen-first-call-free/">raen-first-call-free</a>.</li>
+<li>Public sales ledger (real settled numbers, TRUTH law): <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>.</li>
+<li>Other agent-host guides in this series: <a href="roo-code-agents.html">Roo Code</a> · <a href="cline-agents.html">Cline</a> · <a href="cursor-agents.html">Cursor</a> · <a href="windsurf-agents.html">Windsurf</a> · <a href="claude-code-agents.html">Claude Code</a> · <a href="gemini-cli-agents.html">Gemini CLI</a>.</li>
+</ul>
+
+<p class="small">RAEN is a pre-revenue x402 fleet on Base; external revenue to date is published honestly at the ledger link above. Operator: Royal Agentic Enterprises · contact jadedfocus@gmail.com · Information only, not legal or financial advice.</p>
+</body>
+</html>
