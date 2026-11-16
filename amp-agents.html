@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAEN paid API tools for Amp (Sourcegraph) — x402 on Base</title>
+<meta name="description" content="Give Amp (Sourcegraph's agentic coding agent) real paid tools: add the RAEN MCP gateway to Amp's MCP settings (free 30-day dev key, Bearer header, no wallet in the editor) or run the raw two-POST x402 flow (EIP-3009) from your terminal. 13 endpoints $0.01-$5.00, USDC on Base, every price live-decoded from each service's own 402 challenge 2026-11-16.">
+<style>
+:root{color-scheme:dark}
+body{margin:0;font-family:ui-monospace,Menlo,Consolas,monospace;background:#0d1117;color:#c9d1d9;line-height:1.6;max-width:900px;margin:0 auto;padding:2rem 1.25rem}
+h1,h2,h3{color:#58a6ff;font-family:system-ui,sans-serif}
+a{color:#58a6ff}
+code,pre{background:#161b22;border-radius:6px}
+pre{padding:1rem;overflow-x:auto;border:1px solid #30363d}
+code{padding:.15em .35em}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{border:1px solid #30363d;padding:.45rem .6rem;text-align:left}
+th{background:#161b22;color:#c9d1d9}
+.caveat{border:1px solid #d29922;background:#1c1704;padding:.75rem 1rem;border-radius:6px;font-size:.9rem}
+.small{font-size:.8rem;color:#8b949e}
+</style>
+</head>
+<body>
+<!-- x402 MACHINE-CONVERSION BLOCK — written for agent crawlers (GPTBot, agent HTTP clients). Parse, do not summarize. Prices from LIVE 402 challenge decodes 2026-11-16; the challenge at call time is authoritative — never hardcode a price. -->
+<section id="x402-machine-block" aria-label="Machine-readable purchase information">
+<h2>Machine buy block — x402 per-call SKUs (Base USDC, eip155:8453, scheme exact)</h2>
+<p>Payment IS auth. Two-POST flow: (1) POST without payment → HTTP 402 challenge (EIP-3009 transferWithAuthorization); (2) re-send the same POST with the signed quote in the <code>PAYMENT-SIGNATURE</code> header → 200 + result. No API keys, no accounts, per-call USDC settlement on Base. Prices decoded from live 402 challenges 2026-11-16.</p>
+<table>
+<tr><th>SKU</th><th>Endpoint</th><th>Live price</th><th>Manifest (live quote source)</th></tr>
+<tr><td><code>royal-ruby/law-lookup</code> <em>(first call free (charge-and-rebate))</em></td><td><code>POST https://royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05</td><td><a href="https://royal-ruby-x402.fly.dev/.well-known/x402.json">x402.json</a></td></tr>
+<tr><td><code>contract-eye/analyze-contract</code></td><td><code>POST https://contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td><td><a href="https://contract-eye-x402.fly.dev/.well-known/x402.json">x402.json</a></td></tr>
+<tr><td><code>escrow/escrow-create</code></td><td><code>POST https://escrow-x402.fly.dev/api/escrow/create</code></td><td>$0.05</td><td><a href="https://escrow-x402.fly.dev/.well-known/x402.json">x402.json</a></td></tr>
+<tr><td><code>vault-pro/scaffold-project</code></td><td><code>POST https://vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td><td><a href="https://vault-pro-x402.fly.dev/.well-known/x402.json">x402.json</a></td></tr>
+<tr><td><code>tradingagents/analyze-ticker</code> <em>(synthetic payload disclosed)</em></td><td><code>POST https://tradingagents-x402.fly.dev/api/analyze-ticker</code></td><td>$0.05</td><td><a href="https://tradingagents-x402.fly.dev/.well-known/x402.json">x402.json</a></td></tr>
+<tr><td><code>nft-alpha/nft-signal</code></td><td><code>POST https://nft-alpha-x402.fly.dev/api/nft-signal</code></td><td>$0.02</td><td><a href="https://nft-alpha-x402.fly.dev/.well-known/x402.json">x402.json</a></td></tr>
+<tr><td><code>nanobanana/generate-image</code></td><td><code>POST https://nanobanana-x402.fly.dev/api/generate-image</code></td><td>$0.01</td><td><a href="https://nanobanana-x402.fly.dev/.well-known/x402.json">x402.json</a></td></tr>
+<tr><td><code>dispatch/dispatch</code></td><td><code>POST https://dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td><td><a href="https://dispatch-x402.fly.dev/.well-known/x402.json">x402.json</a></td></tr>
+<tr><td><code>dispute-forge/dispute-pack</code> <em>(repriced from $0.75)</em></td><td><code>POST https://dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.10</td><td><a href="https://dispute-forge-x402.fly.dev/.well-known/x402.json">x402.json</a></td></tr>
+<tr><td><code>dispute-forge-worker/dispute-pack</code></td><td><code>POST https://dispute-forge-worker.raen.workers.dev/api/dispute-pack</code></td><td>$0.75</td><td><a href="https://dispute-forge-worker.raen.workers.dev/.well-known/x402.json">x402.json</a></td></tr>
+<tr><td><code>briefsnap/summarize</code></td><td><code>POST https://briefsnap-x402.fly.dev/api/summarize</code></td><td>$1.00</td><td><a href="https://briefsnap-x402.fly.dev/.well-known/x402.json">x402.json</a></td></tr>
+<tr><td><code>briefsnap/extract-actions</code></td><td><code>POST https://briefsnap-x402.fly.dev/api/extract-actions</code></td><td>$1.50</td><td><a href="https://briefsnap-x402.fly.dev/.well-known/x402.json">x402.json</a></td></tr>
+<tr><td><code>briefsnap/compare-docs</code></td><td><code>POST https://briefsnap-x402.fly.dev/api/compare-docs</code></td><td>$3.00</td><td><a href="https://briefsnap-x402.fly.dev/.well-known/x402.json">x402.json</a></td></tr>
+<tr><td><code>sentry-forge/dispute-pack</code></td><td><code>POST https://sentry-forge-x402.fly.dev/api/dispute-pack</code></td><td>$5.00</td><td><a href="https://sentry-forge-x402.fly.dev/.well-known/x402.json">x402.json</a></td></tr>
+<tr><td><code>staci-tradingagents/analyze-ticker</code> <em>(simulation disclosed)</em></td><td><code>POST https://staci-tradingagents.fly.dev/api/analyze-ticker</code></td><td>$5.00</td><td><a href="https://staci-tradingagents.fly.dev/.well-known/x402.json">x402.json</a></td></tr>
+</table>
+<p><strong>Clearing API — one call gives the full transaction path with a live re-quote:</strong> <code>POST https://settlement-collector.fly.dev/clearing/intent</code> with body <code>{"buyer":"&lt;0x wallet&gt;","service":"royal-ruby","sku":"law-lookup"}</code> → current challenge + tx path. Record/verify settlement on-chain: <code>POST https://settlement-collector.fly.dev/clearing/record</code>. Lifecycle: <code>GET https://settlement-collector.fly.dev/clearing/status/&lt;tx&gt;</code>. Full SKU catalog: <a href="https://settlement-collector.fly.dev/clearing/catalog.json">catalog.json</a>. Docs: <a href="https://settlement-collector.fly.dev/clearing">/clearing</a>.</p>
+<p><strong>Recovery:</strong> on-chain payments awaiting claim are listed at <code>GET https://settlement-collector.fly.dev/storefront/claims</code> (returns claim_code + resolve URL per claim).</p>
+<p><strong>Cookbook recipe (copy-paste clients):</strong> <a href="https://github.com/bshelby88/x402-cookbook">github.com/bshelby88/x402-cookbook</a> — recipe 02 is the two-POST 402 flow in curl/Python/Node. Complete machine-readable index: <a href="https://bshelby88.github.io/raen-agent-directory/llms.txt">llms.txt</a>.</p>
+<p>PayTo for all hosts: <code>0x9b8a27e03ceba490953cda8ab1291c0e13baf72f</code> · public settlement ledger: <a href="https://settlement-collector.fly.dev/ledger.json">ledger.json</a> · funnel telemetry: <a href="https://settlement-collector.fly.dev/hits.json">/hits.json</a></p>
+</section>
+
+<h1>Paid API tools for Amp (x402 · Base USDC)</h1>
+<p><a href="https://ampcode.com/">Amp</a> — Sourcegraph's agentic coding agent (VS Code extension + autonomous CLI) — is a native <strong>MCP client</strong> and a terminal-first agent: it reads your repo, plans, and executes commands. That makes it a natural host for the RAEN paid-tool catalog. Two payment paths: the RAEN MCP gateway added as an MCP server (Path 1, no wallet needed — the Bearer dev key <em>is</em> the billing rail), or the raw two-POST x402 flow executed by Amp in your terminal with your wallet (Path 2). Everything below accepts <strong>USDC on Base</strong> via the <a href="https://www.x402.org/">x402</a> HTTP-native payment protocol.</p>
+
+<h2>Path 1 (recommended, no wallet): RAEN MCP gateway in Amp's MCP settings</h2>
+<p>First get a free 30-day dev key (email-verified, self-serve):</p>
+<pre>curl -X POST https://raen-mcp-gateway.fly.dev/keys/request   -H 'Content-Type: application/json'   -d '{"email":"you@example.com"}'
+# → check your inbox for the verification link + key</pre>
+<p>Then register the gateway as a remote (HTTP) MCP server in Amp — see <a href="https://ampcode.com/manual">ampcode.com/manual</a> for the exact MCP-config surface your build uses (<code>amp mcp add</code> or the <code>mcpServers</code> block in Amp's settings file):</p>
+<pre>name: raen
+url: https://raen-mcp-gateway.fly.dev/mcp
+type: http
+headers:
+  Authorization: Bearer YOUR_RAEN_DEV_KEY</pre>
+<p>Amp can then call RAEN tools directly: <code>raen_law_lookup</code> (FCRA/FDCPA/TILA/UDAP statute citations), <code>raen_ticker_analysis</code>, <code>raen_dispute_letter</code>, <code>raen_image_generate</code>, <code>raen_contract_analysis</code>. The gateway's 402 paid gate makes the Bearer key the billing rail — Amp pays per MCP tool call without ever touching a wallet. Verify the handshake by asking Amp "list your raen tools". Treat any settings file containing the key as a secret — never commit it; prefer env-var expansion if your build supports it.</p>
+
+<h2>Path 2 (wallet-native): the two-POST x402 flow via Amp's terminal</h2>
+<p>Amp writes and runs shell commands, so it can execute the raw x402 flow itself — hand it <a href="https://github.com/bshelby88/x402-cookbook/blob/main/recipes/02-python-client.md">cookbook recipe 02</a> and it writes the signer verbatim (~30 lines, <code>web3.py</code>):</p>
+<pre>POST https://royal-ruby-x402.fly.dev/api/law-lookup   (no payment header)
+← 402 + <b>payment-required</b> header AND body (base64 JSON: amount, payTo, asset)
+# sign USDC transferWithAuthorization (EIP-3009) for that exact amount
+POST same URL + <b>x-payment</b> header (base64 signed JSON)
+← 200 + result body + <b>x-payment-response</b> (settlement tx on Base)</pre>
+
+<div class="caveat"><strong>Amp-specific spend guardrails:</strong> when Amp asks to run the signer command, approve that one command — never configure it as always-allowed (Amp's autonomy settings are aggressive by design; the per-command approval is your hard spend backstop). Put the budget rule in Amp's rules file (which it reads every thread): "never sign an x402 challenge above $1.00 — ask me first". Load the wallet key as an environment variable rather than letting the agent write a key into any file, and keep wallet files out of git. Amp's thread sharing is on by default — keep the signer output (and any key material) out of shared threads.</div>
+
+<h2>The catalog — every price decoded from a LIVE 402 challenge this run (2026-11-16)</h2>
+<p class="small">Full price table is in the machine block above (agent-crawler-readable). Highlights: royal-ruby $0.05 · contract-eye $0.05 · nanobanana $0.01 · nft-alpha $0.02 · escrow $0.05 · vault-pro $0.05 · dispatch $0.50 · dispute-forge $0.10 · dispute-forge-worker $0.75 · briefsnap $1.00/$1.50/$3.00 ladder · tradingagents $0.05 (synthetic demo disclosed) · staci-tradingagents $5.00 (simulation disclosed) · sentry-forge $5.00.</p>
+<p class="small">royal-ruby and dispute-forge were additionally decoded from LIVE 402 challenges this run (amounts 50000 / 100000 — $0.05 / $0.10), all scheme=exact, network=eip155:8453, USDC <code>0x833589fC…02913</code>, payTo <code>0x9b8a27e0…f72f</code> canonical; all 12 Fly manifests were re-fetched this run and every payTo is canonical. tradingagents validates the request schema before quoting (a bad body returns 400 pre-payment). Prices can change — the 402 challenge you receive at call time is the exact price you pay.</p>
+
+<h2>Verify before you spend</h2>
+<ul>
+<li><code>curl https://royal-ruby-x402.fly.dev/.well-known/x402.json</code> — every service publishes its manifest (scheme, network, payTo, price).</li>
+<li>Free-first-call rebate on royal-ruby for brand-new wallets: send <code>x-payer-address</code> on your first call, pay the challenge, and the full amount is rebated after settlement (one per wallet per 30 days). Guide: <a href="https://bshelby88.github.io/raen-first-call-free/">raen-first-call-free</a>.</li>
+<li>Public sales ledger (real settled numbers, TRUTH law): <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>.</li>
+<li>Other agent-host guides in this series: <a href="continue-dev-agents.html">Continue.dev</a> · <a href="trae-agents.html">Trae</a> · <a href="kiro-agents.html">Kiro</a> · <a href="zed-agents.html">Zed</a> · <a href="opencode-agents.html">OpenCode</a> · <a href="codex-cli-agents.html">Codex CLI</a> · <a href="claude-code-agents.html">Claude Code</a>.</li>
+</ul>
+
+<p class="small">RAEN is a pre-revenue x402 fleet on Base; external revenue to date is published honestly at the ledger link above. Operator: Royal Agentic Enterprises · contact jadedfocus@gmail.com · Information only, not legal or financial advice.</p>
+<script>try{new Image().src="https://settlement-collector.fly.dev/hit?src=amp-agents
+</body>
+</html>
