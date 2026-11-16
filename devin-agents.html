@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAEN paid API tools for Devin — x402 on Base</title>
+<meta name="description" content="Give Devin real paid tools: add the RAEN MCP gateway as a custom remote MCP server (free 30-day dev key, Bearer header) or have Devin run the raw two-POST x402 flow (EIP-3009) in its cloud sandbox from a scoped shell session. Endpoints $0.01-$5.00, USDC on Base, prices live-verified from each service's own 402 challenge 2026-11-15.">
+<style>
+:root{color-scheme:dark}
+body{margin:0;font-family:ui-monospace,Menlo,Consolas,monospace;background:#0d1117;color:#c9d1d9;line-height:1.6;max-width:900px;margin:0 auto;padding:2rem 1.25rem}
+h1,h2,h3{color:#58a6ff;font-family:system-ui,sans-serif}
+a{color:#58a6ff}
+code,pre{background:#161b22;border-radius:6px}
+pre{padding:1rem;overflow-x:auto;border:1px solid #30363d}
+code{padding:.15em .35em}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{border:1px solid #30363d;padding:.45rem .6rem;text-align:left}
+th{background:#161b22;color:#c9d1d9}
+.caveat{border:1px solid #d29922;background:#1c1704;padding:.75rem 1rem;border-radius:6px;font-size:.9rem}
+.small{font-size:.8rem;color:#8b949e}
+</style>
+</head>
+<body>
+<h1>Paid API tools for Devin (x402 · Base USDC)</h1>
+<p><a href="https://cognition.ai/devin">Devin</a> (Cognition) — the autonomous software-engineering agent — runs in a cloud sandbox and supports <strong>custom remote MCP servers</strong>, which makes the RAEN paid-tool catalog a natural fit. Two payment paths: add the RAEN MCP gateway as a custom MCP server (Path 1, no wallet — the Bearer dev key <em>is</em> the billing rail), or have Devin execute the raw two-POST x402 flow in its sandbox shell with your own wallet (Path 2). Everything below accepts <strong>USDC on Base</strong> via the <a href="https://www.x402.org/">x402</a> HTTP-native payment protocol.</p>
+
+<h2>Path 1 (recommended, no wallet): RAEN MCP gateway as a custom MCP server</h2>
+<p>First get a free 30-day dev key (email-verified, self-serve):</p>
+<pre>curl -X POST https://raen-mcp-gateway.fly.dev/keys/request \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"you@example.com"}'
+# → check your inbox for the verification link + key</pre>
+<p>Then add the gateway in Devin: <strong>Settings → Connections → MCP Servers → Add custom server</strong> (or per-session via the MCP toggle in the session sidebar), pointing at:</p>
+<pre>URL:     https://raen-mcp-gateway.fly.dev/mcp
+Headers: Authorization: Bearer ***</pre>
+<p class="small">Store the Bearer key in Devin's <strong>Secrets</strong> rather than pasting it into chat text — secrets stay out of the session transcript and any repo Devin commits to. Tools appear as <code>raen_law_lookup</code> (FCRA/FDCPA statute citations), <code>raen_ticker_analysis</code>, <code>raen_dispute_letter</code>, <code>raen_image_generate</code>, <code>raen_contract_analyze</code>, and the rest of the RAEN catalog.</p>
+<div class="caveat"><strong>Why the Bearer key is the billing rail:</strong> Devin cannot pay an HTTP 402 challenge itself. The gateway fronts the fleet: it presents the free 30-day dev key, and every paid call behind it is billed on the x402 rail (first-call-free charge-and-rebate applies where advertised). Devin's own spend meter (ACUs) is a separate cost — this page is about the tool cost, not Devin's compute.</div>
+
+<h2>Path 2 (wallet-native): the two-POST x402 flow from Devin's sandbox</h2>
+<p>Devin executes shell commands in its cloud VM, so the raw HTTP-native x402 flow works with no MCP setup at all. Have Devin run <a href="https://bshelby88.github.io/x402-cookbook/recipes/02-python-client.html">cookbook recipe 02 (Python client)</a>: POST the paid route → receive <code>402</code> with a <code>payment-required</code> challenge → build and sign an <strong>EIP-3009</strong> <code>transferWithAuthorization</code> (USDC on Base, 6 decimals) → POST again with the <code>X-PAYMENT</code> header → receive the 200 with the service payload.</p>
+<pre># Instruct Devin:
+# "Run https://bshelby88.github.io/x402-cookbook/recipes/02-python-client.html
+#  against https://royal-ruby-x402.fly.dev/api/law-lookup {'topic':'FCRA 605'}
+#  using the wallet key in secret WALLET_PRIVATE_KEY. Print the response body."</pre>
+<div class="caveat"><strong>Spend gate — read before funding anything:</strong> do <em>not</em> put a primary wallet key into Devin Secrets. Use a dedicated, thinly-funded key (e.g. 5 USDC) and state the exact endpoint + expected price in the prompt so the run is scoped. Devin's sandbox is an autonomous environment: the key you provide sets your exposure, and approval prompts on shell commands are the natural checkpoint — keep them on. Wallet files Devin writes in the sandbox are ephemeral, but treat any key that entered the environment as spendable-until-spent.</div>
+
+<h2>The catalog (prices live-verified from each service's 402 challenge, 2026-11-15)</h2>
+<table>
+<tr><th>Endpoint</th><th>Service</th><th>Price (USDC)</th></tr>
+<tr><td>Law citations (FCRA/FDCPA/TILA/UDAP)</td><td>royal-ruby</td><td>$0.05 <span class="small">(A/B experiment live-verified from decoded 402)</span></td></tr>
+<tr><td>Contract analysis</td><td>contract-eye</td><td>$0.05</td></tr>
+<tr><td>Contract summary ladder</td><td>briefsnap</td><td>$1.00 / $1.50 / $3.00</td></tr>
+<tr><td>Dispute letters</td><td>dispute-forge</td><td>$0.75</td></tr>
+<tr><td>Dispute letters (Workers origin)</td><td>dispute-forge-worker</td><td>$0.75</td></tr>
+<tr><td>Image generation</td><td>nanobanana</td><td>$0.01</td></tr>
+<tr><td>NFT signals</td><td>nft-alpha</td><td>$0.02</td></tr>
+<tr><td>Escrow create</td><td>escrow</td><td>$0.05</td></tr>
+<tr><td>Vault pro</td><td>vault-pro</td><td>$0.05</td></tr>
+<tr><td>Intent router (finds the right endpoint)</td><td>dispatch</td><td>$0.50</td></tr>
+<tr><td>Synthetic arbitrage demo (disclosed synthetic)</td><td>tradingagents</td><td>$0.05</td></tr>
+<tr><td>Full ticker workup (per-agent reports)</td><td>staci-tradingagents</td><td>$5.00</td></tr>
+<tr><td>Dispute packs</td><td>sentry-forge</td><td>$5.00</td></tr>
+</table>
+<p class="small">All endpoints: scheme <code>exact</code>, network <code>eip155:8453</code>, asset USDC <code>0x833589fC…02913</code>, payTo <code>0x9b8a…f72f</code> — verified against every host's live <code>/.well-known/x402.json</code> on 2026-11-15.</p>
+
+<h2>Honest caveats (TRUTH)</h2>
+<ul>
+<li><strong>tradingagents</strong> returns a disclosed synthetic demo payload — no live market data. The full workup ($5.00, staci-tradingagents) is the real per-agent analysis.</li>
+<li><strong>briefsnap</strong> falls back to a degraded mode if its upstream is down; the manifest states it.</li>
+<li><strong>royal-ruby</strong> is running a disclosed A/B price experiment ($0.05 / $0.03 buckets); the price in your 402 challenge is authoritative.</li>
+<li>MCP path billing: the gateway's Bearer key fronts the fleet; per-endpoint pricing still applies exactly as in the table.</li>
+</ul>
+
+<h2>Start here</h2>
+<ol>
+<li><a href="https://bshelby88.github.io/raen-agent-directory/try-raen.html">Try RAEN in 60 seconds</a> — verify a live 402 quote with one curl before wiring anything.</li>
+<li><a href="https://bshelby88.github.io/x402-cookbook/">x402 cookbook</a> — the full client flow, recipes 01–05.</li>
+<li><a href="https://bshelby88.github.io/raen-agent-directory/llms.txt">llms.txt</a> — the machine-readable directory.</li>
+</ol>
+<p class="small">RAEN · Royal Agentic Enterprises · <a href="https://raen.royalruby.io">raen.royalruby.io</a> · Public sales ledger: <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a></p>
+<!--beacon src=devin-agents-->
+<script>if(!location.pathname.includes('try-raen')){var i=new Image();i.src='https://settlement-collector.fly.dev/hit?src=devin-agents&r='+encodeURIComponent(document.referrer||'none');}document.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){if(a.href.includes('try-raen')){var j=new Image();j.src='https://settlement-collector.fly.dev/hit?src=devin-agents-demo&r=click';}});});</script>
+</body>
+</html>
