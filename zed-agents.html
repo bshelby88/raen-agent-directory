@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paid x402 API tools for Zed agent-panel agents — RAEN</title>
+<meta name="description" content="Give the Zed agent panel real paid tools: the RAEN MCP gateway via context_servers settings (Bearer 30-day dev key, no wallet) or the raw two-POST x402 flow from Zed's terminal. USDC on Base, prices decoded from live 402 challenges.">
+<style>
+ body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:860px;margin:2rem auto;padding:0 1.25rem;line-height:1.6;color:#1a1a2e;background:#fafafa}
+ h1{font-size:1.6rem} h2{margin-top:2rem;border-bottom:1px solid #ddd;padding-bottom:.25rem}
+ code,pre{background:#eef1f5;border-radius:6px}
+ code{padding:.1rem .35rem;font-size:.9em}
+ pre{padding:1rem;overflow-x:auto;font-size:.85em;border:1px solid #dde}
+ table{border-collapse:collapse;width:100%;font-size:.9em}
+ td,th{border:1px solid #ccc;padding:.4rem .6rem;text-align:left}
+ .note{background:#fff7e0;border-left:4px solid #e0a800;padding:.6rem .9rem;font-size:.9em;margin:1rem 0}
+ .truth{background:#eef7ff;border-left:4px solid #2a7fd4;padding:.6rem .9rem;font-size:.9em;margin:1rem 0}
+ footer{margin-top:3rem;font-size:.85em;color:#666}
+</style>
+</head>
+<body>
+<h1>Paid API tools for Zed agents</h1>
+<p>Zed's agent panel can call real, metered web services through MCP. RAEN runs <strong>12 production x402 services on Base Mainnet</strong> (USDC, pay-per-call, $0.01–$5.00) plus a Bearer-gated MCP gateway exposing 5 flagship tools. No subscription, no API key vendor: the HTTP 402 challenge <em>is</em> the pricing, and payment is the authorization.</p>
+
+<h2>Path 1 — No wallet: the RAEN MCP gateway (recommended)</h2>
+<p>The gateway at <code>https://raen-mcp-gateway.fly.dev/mcp</code> is a Streamable-HTTP MCP server. Get a free 30-day dev key (email verification, self-serve, no waiting):</p>
+<pre><code>curl -X POST https://raen-mcp-gateway.fly.dev/keys/request \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"you@example.com"}'</code></pre>
+<p>Add it to <code>~/.zed/settings.json</code> as a remote context server:</p>
+<pre><code>{
+  "context_servers": {
+    "raen": {
+      "enabled": true,
+      "url": "https://raen-mcp-gateway.fly.dev/mcp",
+      "headers": { "Authorization": "Bearer YOUR_DEV_KEY" }
+    }
+  }
+}</code></pre>
+<p class="note">Remote (HTTP) MCP server support in Zed is version-dependent — earlier Zed releases only supported stdio servers via extensions. If your build rejects <code>url</code>, upgrade Zed or use Path 2. Put the dev key in an environment variable and reference it where your setup allows; never commit a key into the repo Zed has open. Tools appear as <code>raen_law_lookup</code>, <code>raen_ticker_analysis</code>, <code>raen_dispute_letter</code>, <code>raen_image_generate</code>, <code>raen_contract_analysis</code>.</p>
+
+<h2>Path 2 — Wallet-native: raw x402 from Zed's terminal</h2>
+<p>Zed's agent can run shell commands, so it can run the raw two-POST x402 flow itself: POST an unpaid request, receive HTTP 402 with a <code>payment-required</code> challenge (EIP-3009 <code>transferWithAuthorization</code>, USDC on Base), sign, then resend with the payment header. Full working recipes: <a href="https://github.com/bshelby88/x402-cookbook/blob/main/README.md">x402 Integration Cookbook</a> (recipe 02 is the Python client).</p>
+<p class="note">Zed-specific spend guardrails: the agent panel's project trust decides what it can run unattended — keep the wallet key as an environment variable (never pasted into the panel, never in project files), add a budget rule to <code>.zed/</code> project instructions or your <code>rules</code> file so the price ceiling is in context every session, and treat terminal-command approvals as the per-call spend backstop. Never auto-approve a loop that calls paid tools.</p>
+
+<h2>What your agent can buy (prices verified live, 2026-11-15)</h2>
+<table>
+<tr><th>Service</th><th>Endpoint</th><th>Price (USDC)</th></tr>
+<tr><td>royal-ruby</td><td>POST /api/law-lookup</td><td>$0.05 (A/B test: some wallets see $0.03 — the live 402 states the exact price)</td></tr>
+<tr><td>contract-eye</td><td>POST /api/analyze-contract</td><td>$0.05</td></tr>
+<tr><td>nanobanana</td><td>POST /api/generate-image</td><td>$0.01</td></tr>
+<tr><td>nft-alpha</td><td>POST /api/nft-signal</td><td>$0.02</td></tr>
+<tr><td>escrow</td><td>POST /api/escrow/create</td><td>$0.05</td></tr>
+<tr><td>vault-pro</td><td>POST /api/scaffold-project</td><td>$0.05</td></tr>
+<tr><td>dispatch</td><td>POST /api/dispatch</td><td>$0.50</td></tr>
+<tr><td>dispute-forge</td><td>POST /api/dispute-pack</td><td>$0.75</td></tr>
+<tr><td>briefsnap</td><td>POST /api/summarize ladder</td><td>$1.00 / $1.50 / $3.00</td></tr>
+<tr><td>tradingagents (demo)</td><td>POST /api/analyze</td><td>$0.05 (synthetic demo payload — disclosed in the manifest)</td></tr>
+<tr><td>staci-tradingagents</td><td>POST /api/workup</td><td>$5.00 (simulation — disclosed)</td></tr>
+<tr><td>sentry-forge</td><td>POST /api/dispute-pack</td><td>$5.00</td></tr>
+</table>
+<p class="truth">Honesty section (checked live this run): every host's manifest advertises payTo <code>0x9b8a27e03ceba490953cda8ab1291c0e13baf72f</code> (case-insensitive), scheme <code>exact</code>, network <code>eip155:8453</code>, USDC. Royal-ruby ($0.05 A/B), dispute-forge ($0.75) and sentry-forge ($5.00) were additionally verified from their live 402 quote endpoints; the rest from live manifests. RAEN's revenue so far is small and published — see the <a href="https://settlement-collector.fly.dev/ledger">public sales ledger</a> and <a href="https://bshelby88.github.io/raen-agent-directory/honest-teardown.html">the honest teardown</a>.</p>
+
+<h2>60-second first call</h2>
+<pre><code># 1. get the challenge (free — this costs nothing)
+curl -s -D headers.txt -o body.txt -X POST \
+  https://royal-ruby-x402.fly.dev/api/law-lookup \
+  -H 'Content-Type: application/json' \
+  -d '{"topic":"FCRA 1681s-6","state":"TX"}'
+# -> HTTP 402, payment-required header + JSON quote body ($0.05, eip155:8453)
+
+# 2. sign the EIP-3009 authorization for the quoted amount, resend
+#    the same POST with the PAYMENT-SIGNATURE header -> HTTP 200 + result</code></pre>
+<p>Full client code: <a href="https://github.com/bshelby88/x402-cookbook">cookbook</a> · Try it in the browser: <a href="https://bshelby88.github.io/raen-agent-directory/try-raen.html">Try RAEN in 60 seconds</a>.</p>
+
+<footer>
+RAEN — Royal Agentic Enterprises · payTo 0x9b8a27e03ceba490953cda8ab1291c0e13baf72f (Base, USDC) ·
+<a href="https://settlement-collector.fly.dev/ledger">public sales ledger</a> ·
+<a href="https://bshelby88.github.io/raen-agent-directory/llms.txt">llms.txt</a> ·
+<a href="https://bshelby88.github.io/raen-agent-directory/faq.html">FAQ</a>
+<img src="https://settlement-collector.fly.dev/hit?src=zed-agents" alt="" width="1" height="1" style="display:none">
+</footer>
+</body>
+</html>
