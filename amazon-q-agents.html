@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAEN paid API tools for Amazon Q Developer — x402 on Base</title>
+<meta name="description" content="Give Amazon Q Developer CLI real paid tools: register the RAEN MCP gateway in mcp.json (free 30-day dev key, Bearer header, no wallet on the platform) or run the raw two-POST x402 flow (EIP-3009) from Q's shell. Endpoints $0.01-$5.00, USDC on Base, prices live-verified from each service's own manifest/402 challenge 2026-11-15.">
+<style>
+:root{color-scheme:dark}
+body{margin:0;font-family:ui-monospace,Menlo,Consolas,monospace;background:#0d1117;color:#c9d1d9;line-height:1.6;max-width:900px;margin:0 auto;padding:2rem 1.25rem}
+h1,h2,h3{color:#58a6ff;font-family:system-ui,sans-serif}
+a{color:#58a6ff}
+code,pre{background:#161b22;border-radius:6px}
+pre{padding:1rem;overflow-x:auto;border:1px solid #30363d}
+code{padding:.15em .35em}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{border:1px solid #30363d;padding:.45rem .6rem;text-align:left}
+th{background:#161b22;color:#c9d1d9}
+.caveat{border:1px solid #d29922;background:#1c1704;padding:.75rem 1rem;border-radius:6px;font-size:.9rem}
+.small{font-size:.8rem;color:#8b949e}
+</style>
+</head>
+<body>
+<h1>Paid API tools for Amazon Q Developer (x402 · Base USDC)</h1>
+<p><a href="https://aws.amazon.com/q/developer/">Amazon Q Developer</a> — AWS's agentic CLI (<code>q chat</code>) — executes shell commands with per-command approval and speaks MCP via <code>mcp.json</code>, which makes it a natural host for the RAEN paid-tool catalog. Two payment paths: the RAEN MCP gateway registered in <code>mcp.json</code> (Path 1, no wallet needed — the Bearer dev key <em>is</em> the billing rail), or the raw two-POST x402 flow executed from Q's own shell with your wallet (Path 2). Everything below accepts <strong>USDC on Base</strong> via the <a href="https://www.x402.org/">x402</a> HTTP-native payment protocol.</p>
+
+<h2>Path 1 (recommended, no wallet): RAEN MCP gateway in mcp.json</h2>
+<p>First get a free 30-day dev key (email-verified, self-serve):</p>
+<pre>curl -X POST https://raen-mcp-gateway.fly.dev/keys/request \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"you@example.com"}'
+# → check your inbox for the verification link + key</pre>
+<p>Then register the gateway in Q Developer's MCP config — <code>~/.aws/amazonq/mcp.json</code> for global scope or <code>.amazonq/mcp.json</code> in the workspace (workspace overrides global):</p>
+<pre>{
+  "mcpServers": {
+    "raen": {
+      "url": "https://raen-mcp-gateway.fly.dev/mcp",
+      "headers": { "Authorization": "Bearer ***" }
+    }
+  }
+}</pre>
+<p>Check your Q CLI version's support for remote HTTP servers with <code>q mcp</code> after editing — recent <code>q</code> releases accept <code>url</code>-based MCP servers with custom headers; if your build only lists stdio servers, Path 2 works regardless. Keep the key out of any committed file — paste the Bearer value from your inbox and treat <code>mcp.json</code> as a secret. Tools appear to Q as <code>raen_law_lookup</code> (FCRA/FDCPA statute citations), <code>raen_ticker_analysis</code>, <code>raen_dispute_letter</code>, <code>raen_image_generate</code>, <code>raen_contract_analysis</code>. The gateway's 402 paid gate makes the Bearer key the billing rail — Q pays per MCP tool call without ever touching a wallet. Verify with <code>q mcp</code> or by asking Q "list your raen tools".</p>
+
+<h2>Path 2 (wallet-native): the two-POST x402 flow from Q's shell</h2>
+<p><code>q chat</code> executes bash and python directly (with approval), so it can run the raw x402 flow — hand it <a href="https://github.com/bshelby88/x402-cookbook/blob/main/recipes/02-python-client.md">cookbook recipe 02</a> and it writes the signer verbatim (~30 lines, <code>web3.py</code>):</p>
+<pre>POST https://royal-ruby-x402.fly.dev/api/law-lookup   (no payment header)
+← 402 + <b>payment-required</b> header AND body (base64 JSON: amount, payTo, asset)
+# sign USDC transferWithAuthorization (EIP-3009) for that exact amount
+POST same URL + <b>x-payment</b> header (base64 signed JSON)
+← 200 + result body + <b>x-payment-response</b> (settlement tx on Base)</pre>
+
+<div class="caveat"><strong>Amazon-Q-specific spend guardrails:</strong> Q asks before every shell command by default — keep it that way; per-command approval is the natural spend backstop, and <code>q trust</code>-ing tools or allowing all tools removes it. Load the wallet key as an env var (<code>export RAEN_WALLET_KEY=...</code>) and never let Q write a key into a file inside your repo. Put the budget rule in <code>AmazonQ.md</code> (the rules file Q reads every session): e.g. "never sign an x402 challenge above $1.00 — ask me first". Context windows are restored per chat, but the rule file loads every time.</div>
+
+<h2>The catalog — every price fetched from a live manifest this run (2026-11-15)</h2>
+<table>
+<tr><th>Service</th><th>Endpoint (POST)</th><th>Price</th><th>What you get</th></tr>
+<tr><td>royal-ruby</td><td><code>royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05</td><td>FCRA/FDCPA/TILA/UDAP statute citations + summaries (free-first-call rebate for new wallets; disclosed A/B: a bucket sees $0.03)</td></tr>
+<tr><td>contract-eye</td><td><code>contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td><td>Contract risk analysis, flagged clauses + severity</td></tr>
+<tr><td>nanobanana</td><td><code>nanobanana-x402.fly.dev/api/generate-image</code></td><td>$0.01</td><td>Image generation (edit-image same price)</td></tr>
+<tr><td>nft-alpha</td><td><code>nft-alpha-x402.fly.dev/api/nft-signal</code></td><td>$0.02</td><td>NFT market signals</td></tr>
+<tr><td>escrow</td><td><code>escrow-x402.fly.dev/api/escrow/create</code></td><td>$0.05</td><td>On-chain escrow creation for agent deals</td></tr>
+<tr><td>vault-pro</td><td><code>vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td><td>Project/agent scaffolding (scaffold-agent same price)</td></tr>
+<tr><td>dispatch</td><td><code>dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td><td>Intent router — picks the right fleet service and tells you its cost first</td></tr>
+<tr><td>dispute-forge</td><td><code>dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.75</td><td>FCRA/FDCPA dispute letters + certificate (worker mirror <code>dispute-forge-worker.raen.workers.dev</code> same price, manifest-verified)</td></tr>
+<tr><td>summaries</td><td><code>briefsnap-x402.fly.dev/api/summarize</code></td><td>$1.00</td><td>Document summaries (eli5 $1.00, extract-actions $1.50, compare-docs $3.00)</td></tr>
+<tr><td>full workups</td><td><code>sentry-forge-x402.fly.dev/api/dispute-pack</code> · <code>staci-tradingagents.fly.dev/api/analyze-ticker</code></td><td>$5.00</td><td>Deep multi-tool workups; staci ticker is a disclosed synthetic simulation demo</td></tr>
+</table>
+<p class="small">Prices are from each service's own /.well-known/x402.json manifest this run (13 hosts, 19 endpoints, $0.01-$5.00); all accepts carried scheme=exact, network=eip155:8453 and the canonical payTo 0x9b8a...f72f. royal-ruby's $0.05 was additionally confirmed by decoding a live 402 <code>payment-required</code> challenge (amount 50000, USDC 0x8335...2913, scheme=exact, eip155:8453, canonical payTo). Prices can change — the 402 challenge you receive at call time is the exact price you pay.</p>
+
+<h2>Verify before you spend</h2>
+<ul>
+<li><code>curl https://royal-ruby-x402.fly.dev/.well-known/x402.json</code> — every service publishes its manifest (scheme, network, payTo, price).</li>
+<li>A free-first-call rebate is available on royal-ruby for brand-new wallets: send <code>x-payer-address</code> on your first call, pay the challenge, and the full amount is rebated after settlement (one per wallet per 30 days). Guide: <a href="https://bshelby88.github.io/raen-first-call-free/">raen-first-call-free</a>.</li>
+<li>Public sales ledger (real settled numbers, TRUTH law): <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>.</li>
+</ul>
+
+<p class="small">RAEN is a pre-revenue x402 fleet on Base; external revenue to date is published honestly at the ledger link above. Operator: Royal Agentic Enterprises · contact jadedfocus@gmail.com · Information only, not legal or financial advice.</p>
+<img src="https://settlement-collector.fly.dev/hit?src=amazon-q-agents" alt="" style="display:none">
+</body>
+</html>
