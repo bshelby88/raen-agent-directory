@@ -51,7 +51,7 @@ if __name__ == "__main__":
     print(json.dumps(call(sys.argv[1], json.loads(sys.argv[2])), indent=2)[:4000])</pre>
 <p>Run it like any project script:</p>
 <pre>/run python raen_client.py raen_law_lookup '{"topic":"debt validation"}'</pre>
-<p>The five gateway tools: <code>raen_law_lookup</code> ($0.05), <code>raen_ticker_analysis</code> ($0.05, synthetic demo — see caveats), <code>raen_dispute_letter</code> ($0.75), <code>raen_image_generate</code> ($0.01), <code>raen_contract_analysis</code> ($0.05). Keep the key out of git: add <code>RAEN_KEY</code> to <code>.env</code> / your shell profile, never to the repo.</p>
+<p>The five gateway tools: <code>raen_law_lookup</code> ($0.05), <code>raen_ticker_analysis</code> ($0.05, synthetic demo — see caveats), <code>raen_dispute_letter</code> ($0.10), <code>raen_image_generate</code> ($0.01), <code>raen_contract_analysis</code> ($0.05). Keep the key out of git: add <code>RAEN_KEY</code> to <code>.env</code> / your shell profile, never to the repo.</p>
 
 <h2>Path 2 (wallet-native): the two-POST x402 flow via /run</h2>
 <p>For wallet-native calls (no gateway key, direct to the services), hand aider the <a href="https://github.com/bshelby88/x402-cookbook/blob/main/recipes/02-python-client.md">cookbook recipe 02</a> pattern — a minimal Python signer with <code>web3.py</code> is ~30 lines and aider can write it verbatim:</p>
@@ -77,7 +77,7 @@ POST same URL + <b>x-payment</b> header (base64 signed JSON)
 <tr><td>escrow</td><td><code>escrow-x402.fly.dev/api/escrow/create</code></td><td>$0.05</td><td>On-chain escrow creation for agent deals</td></tr>
 <tr><td>vault-pro</td><td><code>vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td><td>Project/agent scaffolding</td></tr>
 <tr><td>dispatch</td><td><code>dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td><td>Intent router — picks the right fleet service (classify preview $0.05)</td></tr>
-<tr><td>dispute-forge</td><td><code>dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.75</td><td>FCRA dispute letter pack + on-chain certificate</td></tr>
+<tr><td>dispute-forge</td><td><code>dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.10</td><td>FCRA dispute letter pack + on-chain certificate</td></tr>
 <tr><td>dispute-forge-worker</td><td><code>dispute-forge-worker.raen.workers.dev/api/dispute-pack</code></td><td>$0.75</td><td>Same SKU, Cloudflare Workers origin (MPP-capable)</td></tr>
 <tr><td>briefsnap</td><td><code>briefsnap-x402.fly.dev/api/summarize</code></td><td>$1.00</td><td>Document summarization (siblings: extract-actions $1.50, compare-docs $3.00)</td></tr>
 <tr><td>sentry-forge</td><td><code>sentry-forge-x402.fly.dev/api/dispute-pack</code></td><td>$5.00</td><td>Full dispute workup</td></tr>

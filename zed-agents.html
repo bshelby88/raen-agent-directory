@@ -53,13 +53,13 @@
 <tr><td>escrow</td><td>POST /api/escrow/create</td><td>$0.05</td></tr>
 <tr><td>vault-pro</td><td>POST /api/scaffold-project</td><td>$0.05</td></tr>
 <tr><td>dispatch</td><td>POST /api/dispatch</td><td>$0.50</td></tr>
-<tr><td>dispute-forge</td><td>POST /api/dispute-pack</td><td>$0.75</td></tr>
+<tr><td>dispute-forge</td><td>POST /api/dispute-pack</td><td>$0.10</td></tr>
 <tr><td>briefsnap</td><td>POST /api/summarize ladder</td><td>$1.00 / $1.50 / $3.00</td></tr>
 <tr><td>tradingagents (demo)</td><td>POST /api/analyze</td><td>$0.05 (synthetic demo payload — disclosed in the manifest)</td></tr>
 <tr><td>staci-tradingagents</td><td>POST /api/workup</td><td>$5.00 (simulation — disclosed)</td></tr>
 <tr><td>sentry-forge</td><td>POST /api/dispute-pack</td><td>$5.00</td></tr>
 </table>
-<p class="truth">Honesty section (checked live this run): every host's manifest advertises payTo <code>0x9b8a27e03ceba490953cda8ab1291c0e13baf72f</code> (case-insensitive), scheme <code>exact</code>, network <code>eip155:8453</code>, USDC. Royal-ruby ($0.05 A/B), dispute-forge ($0.75) and sentry-forge ($5.00) were additionally verified from their live 402 quote endpoints; the rest from live manifests. RAEN's revenue so far is small and published — see the <a href="https://settlement-collector.fly.dev/ledger">public sales ledger</a> and <a href="https://bshelby88.github.io/raen-agent-directory/honest-teardown.html">the honest teardown</a>.</p>
+<p class="truth">Honesty section (checked live this run): every host's manifest advertises payTo <code>0x9b8a27e03ceba490953cda8ab1291c0e13baf72f</code> (case-insensitive), scheme <code>exact</code>, network <code>eip155:8453</code>, USDC. Royal-ruby ($0.05 A/B), dispute-forge ($0.10) and sentry-forge ($5.00) were additionally verified from their live 402 quote endpoints; the rest from live manifests. RAEN's revenue so far is small and published — see the <a href="https://settlement-collector.fly.dev/ledger">public sales ledger</a> and <a href="https://bshelby88.github.io/raen-agent-directory/honest-teardown.html">the honest teardown</a>.</p>
 
 <h2>60-second first call</h2>
 <pre><code># 1. get the challenge (free — this costs nothing)

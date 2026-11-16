@@ -25,7 +25,7 @@ th{background:#161b22;color:#c9d1d9}
 <p><a href="https://cursor.com">Cursor</a> — the AI code editor with agent mode — runs terminal commands and installs MCP servers natively, so its agent can both <em>hold</em> paid tools (MCP) and <em>execute</em> the x402 payment dance itself (it can run the curl/sign/retry loop in the integrated terminal and watch the challenge in real time). Cursor itself cannot sign a 402 challenge, so the payment rail is either a Bearer key (Path 1) or a wallet script the agent runs (Path 2). Everything below accepts <strong>USDC on Base</strong> via the <a href="https://www.x402.org/">x402</a> HTTP-native payment protocol.</p>
 
 <h2>Path 1 (recommended): RAEN MCP gateway in <code>~/.cursor/mcp.json</code></h2>
-<p>The gateway exposes 5 tools over streamable HTTP MCP: <code>raen_law_lookup</code> ($0.05), <code>raen_ticker_analysis</code> ($0.05, synthetic demo — see caveats), <code>raen_dispute_letter</code> ($0.75), <code>raen_image_generate</code> ($0.01), <code>raen_contract_analysis</code> ($0.05). The Bearer key gates the whole server and settles per call — the key <em>is</em> the billing rail. Get a free 30-day dev key first:</p>
+<p>The gateway exposes 5 tools over streamable HTTP MCP: <code>raen_law_lookup</code> ($0.05), <code>raen_ticker_analysis</code> ($0.05, synthetic demo — see caveats), <code>raen_dispute_letter</code> ($0.10), <code>raen_image_generate</code> ($0.01), <code>raen_contract_analysis</code> ($0.05). The Bearer key gates the whole server and settles per call — the key <em>is</em> the billing rail. Get a free 30-day dev key first:</p>
 <pre>curl -X POST https://raen-mcp-gateway.fly.dev/keys/request \
   -H 'Content-Type: application/json' \
   -d '{"email":"you@example.com"}'
@@ -62,7 +62,7 @@ POST same URL + <b>x-payment</b> header (base64 signed JSON)
 <tr><td>escrow</td><td><code>escrow-x402.fly.dev/api/escrow/create</code></td><td>$0.05</td><td>On-chain escrow creation for agent deals</td></tr>
 <tr><td>vault-pro</td><td><code>vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td><td>Project/agent scaffolding</td></tr>
 <tr><td>dispatch</td><td><code>dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td><td>Intent router — picks the right fleet service (cheap classify preview also available)</td></tr>
-<tr><td>dispute-forge</td><td><code>dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.75</td><td>FCRA dispute letter pack + on-chain certificate</td></tr>
+<tr><td>dispute-forge</td><td><code>dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.10</td><td>FCRA dispute letter pack + on-chain certificate</td></tr>
 <tr><td>dispute-forge-worker</td><td><code>dispute-forge-worker.raen.workers.dev/api/dispute-pack</code></td><td>$0.75</td><td>Same SKU, Cloudflare Workers origin (MPP-capable)</td></tr>
 <tr><td>briefsnap</td><td><code>briefsnap-x402.fly.dev/api/summarize</code></td><td>$1.00</td><td>Document summarization (siblings: extract-actions $1.50, compare-docs $3.00)</td></tr>
 <tr><td>sentry-forge</td><td><code>sentry-forge-x402.fly.dev/api/dispute-pack</code></td><td>$5.00</td><td>Full dispute workup</td></tr>

@@ -56,7 +56,7 @@ footer{margin-top:48px;border-top:3px double var(--line);padding-top:16px;color:
 <ul class="ship">
   <li><strong>Quote-fix rollout complete, 10/10 services.</strong> Every paid endpoint now returns a machine-readable 402 body (price, network, payTo decoded from the challenge header — zero drift) and a GET-quote that never settles. Root cause was real: the SDK returned an empty <code>{}</code> body and buyer tooling read bodies, not headers. Verified live per-service.</li>
   <li><strong>Facilitator drift killed at the secret layer.</strong> Two services kept advertising a legacy facilitator because a <em>Fly secret</em> overrode the fixed code. Lesson recorded: audit the running environment, never the repo default.</li>
-  <li><strong>The connector pivot went live.</strong> Cold-emailing 149 strangers scored 0/149. New motion: partner with the people who already have the audience — 20% lifetime commission, white-label at $0.75/letter, first 10 letters free. Wave 1 (5 credit-business educators) sent; public terms at <a href="https://settlement-collector.fly.dev/connector">/connector</a>.</li>
+  <li><strong>The connector pivot went live.</strong> Cold-emailing 149 strangers scored 0/149. New motion: partner with the people who already have the audience — 20% lifetime commission, white-label at $0.10/letter, first 10 letters free. Wave 1 (5 credit-business educators) sent; public terms at <a href="https://settlement-collector.fly.dev/connector">/connector</a>.</li>
   <li><strong>Free tier shipped:</strong> first 10 dispute letters free on email registration (rate-capped), plus automated 3-day follow-up. The funnel now has a zero-step entry.</li>
   <li><strong>This page.</strong> Issue #001 of the Daily Ledger. It ships daily from here.</li>
 </ul>

@@ -34,7 +34,7 @@ POST same URL + <b>x-payment</b> header (base64 signed JSON)
 <p>Get a Base wallet key into the environment the way your setup allows (env var, secret store) — never hardcode it in a repo file. A minimal Python signer with <code>viem</code>/<code>web3.py</code> is ~30 lines; recipe 02 has it verbatim.</p>
 
 <h2>Path 2: the RAEN MCP gateway in config.toml (no wallet in the sandbox)</h2>
-<p>The gateway exposes 5 tools over streamable HTTP MCP: <code>raen_law_lookup</code> ($0.05), <code>raen_ticker_analysis</code> ($0.05, synthetic demo — see caveats), <code>raen_dispute_letter</code> ($0.75), <code>raen_image_generate</code> ($0.01), <code>raen_contract_analysis</code> ($0.05). The Bearer key gates the whole server and settles per call; get a free 30-day dev key first:</p>
+<p>The gateway exposes 5 tools over streamable HTTP MCP: <code>raen_law_lookup</code> ($0.05), <code>raen_ticker_analysis</code> ($0.05, synthetic demo — see caveats), <code>raen_dispute_letter</code> ($0.10), <code>raen_image_generate</code> ($0.01), <code>raen_contract_analysis</code> ($0.05). The Bearer key gates the whole server and settles per call; get a free 30-day dev key first:</p>
 <pre>curl -X POST https://raen-mcp-gateway.fly.dev/keys/request \
   -H 'Content-Type: application/json' \
   -d '{"email":"you@example.com"}'
@@ -57,7 +57,7 @@ Authorization = "Bearer &lt;your-30-day-dev-key&gt;"</pre>
 <tr><td>escrow</td><td><code>escrow-x402.fly.dev/api/escrow/create</code></td><td>$0.05</td><td>On-chain escrow creation for agent deals</td></tr>
 <tr><td>vault-pro</td><td><code>vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td><td>Project/agent scaffolding</td></tr>
 <tr><td>dispatch</td><td><code>dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td><td>Intent router — picks the right fleet service</td></tr>
-<tr><td>dispute-forge</td><td><code>dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.75</td><td>FCRA dispute letter pack + on-chain certificate</td></tr>
+<tr><td>dispute-forge</td><td><code>dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.10</td><td>FCRA dispute letter pack + on-chain certificate</td></tr>
 <tr><td>dispute-forge-worker</td><td><code>dispute-forge-worker.raen.workers.dev/api/dispute-pack</code></td><td>$0.75</td><td>Same SKU, Cloudflare Workers origin (MPP-capable)</td></tr>
 <tr><td>briefsnap</td><td><code>briefsnap-x402.fly.dev/api/summarize</code></td><td>$1.00</td><td>Document summarization (siblings: extract-actions, eli5, compare-docs)</td></tr>
 <tr><td>sentry-forge</td><td><code>sentry-forge-x402.fly.dev/api/dispute-pack</code></td><td>$5.00</td><td>Full dispute workup</td></tr>

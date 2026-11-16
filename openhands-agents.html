@@ -25,7 +25,7 @@ th{background:#161b22;color:#c9d1d9}
 <p><a href="https://github.com/All-Hands-AI/OpenHands">OpenHands</a> (formerly OpenDevin) — the open-source autonomous software-engineer agent — pays per call for real work: no API keys, no signups, no monthly plans. OpenHands is MCP-native, so the fastest path is RAEN's Bearer-gated MCP gateway added as a remote MCP server — one command. And because OpenHands agents execute bash and Python in a sandbox, the wallet-native path (Path 2) runs unchanged inside the agent's own terminal. Everything below accepts <strong>USDC on Base</strong> via the <a href="https://www.x402.org/">x402</a> HTTP-native payment protocol.</p>
 
 <h2>Path 1 (recommended): the RAEN MCP gateway as a remote MCP server</h2>
-<p>The gateway exposes 5 tools: <code>raen_law_lookup</code> ($0.05), <code>raen_ticker_analysis</code> ($0.05, synthetic demo — see caveats), <code>raen_dispute_letter</code> ($0.75), <code>raen_image_generate</code> ($0.01), <code>raen_contract_analysis</code> ($0.05).</p>
+<p>The gateway exposes 5 tools: <code>raen_law_lookup</code> ($0.05), <code>raen_ticker_analysis</code> ($0.05, synthetic demo — see caveats), <code>raen_dispute_letter</code> ($0.10), <code>raen_image_generate</code> ($0.01), <code>raen_contract_analysis</code> ($0.05).</p>
 <ol>
 <li>Get a free 30-day dev key (self-serve, email verification, no waiting):
 <pre>curl -X POST https://raen-mcp-gateway.fly.dev/keys/request \
@@ -75,7 +75,7 @@ def x402_call(url, body, signer):
 <tr><td><code>POST nanobanana-x402.fly.dev/api/generate-image</code></td><td>$0.01</td><td>Gemini image generation from a text prompt (base64 PNG out)</td></tr>
 <tr><td><code>POST nanobanana-x402.fly.dev/api/edit-image</code></td><td>$0.01</td><td>Natural-language image editing (source image + prompt)</td></tr>
 <tr><td><code>POST nft-alpha-x402.fly.dev/api/nft-signal</code></td><td>$0.02</td><td>OpenSea Base market signals: listings, sales, bids, floor pressure</td></tr>
-<tr><td><code>POST dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.75</td><td>FCRA-compliant dispute letter + on-chain certificate</td></tr>
+<tr><td><code>POST dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.10</td><td>FCRA-compliant dispute letter + on-chain certificate</td></tr>
 <tr><td><code>POST dispute-forge-worker.raen.workers.dev/api/dispute-pack</code></td><td>$0.75</td><td>Same dispute-pack SKU on Cloudflare Workers (edge); also speaks MPP</td></tr>
 <tr><td><code>POST dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td><td>Meta-router: natural-language intent → the right fleet service + ready request</td></tr>
 <tr><td><code>POST vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td><td>Obsidian project plan markdown from a one-line brief</td></tr>

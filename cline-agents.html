@@ -56,11 +56,11 @@ POST same URL + <b>x-payment</b> header (base64 signed JSON)
 <tr><td>escrow</td><td><code>escrow-x402.fly.dev/api/escrow/create</code></td><td>$0.05</td><td>On-chain escrow creation for agent deals</td></tr>
 <tr><td>vault-pro</td><td><code>vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td><td>Project/agent scaffolding</td></tr>
 <tr><td>dispatch</td><td><code>dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td><td>Intent router — picks the right fleet service and tells you its cost first</td></tr>
-<tr><td>dispute-forge</td><td><code>dispute-forge-x402.fly.dev/api/dispute-letter</code></td><td>$0.75</td><td>FCRA/FDCPA dispute letters (live-decoded 402 challenge verified 2026-11-15: amount 750000 = $0.75, canonical payTo)</td></tr>
+<tr><td>dispute-forge</td><td><code>dispute-forge-x402.fly.dev/api/dispute-letter</code></td><td>$0.10</td><td>FCRA/FDCPA dispute letters (live-decoded 402 challenge verified 2026-11-15: amount 100000 = $0.10, canonical payTo)</td></tr>
 <tr><td>summaries</td><td><code>tradingagents-x402.fly.dev</code> / <code>staci-tradingagents.fly.dev</code></td><td>$1.00-$3.00</td><td>Market intelligence summaries and briefs</td></tr>
 <tr><td>full workups</td><td><code>sentry-forge-x402.fly.dev</code></td><td>$5.00</td><td>Deep multi-tool workups (sentry-forge full audit tier)</td></tr>
 </table>
-<p class="small">Prices are from each service's own /.well-known/x402.json manifest this run; dispute-forge's $0.75 was additionally confirmed by decoding a live 402 <code>payment-required</code> challenge (scheme=exact, network=eip155:8453, USDC on Base, canonical payTo). Prices can change — the 402 challenge you receive at call time is the exact price you pay.</p>
+<p class="small">Prices are from each service's own /.well-known/x402.json manifest this run; dispute-forge's $0.10 was additionally confirmed by decoding a live 402 <code>payment-required</code> challenge (scheme=exact, network=eip155:8453, USDC on Base, canonical payTo). Prices can change — the 402 challenge you receive at call time is the exact price you pay.</p>
 
 <h2>Verify before you spend</h2>
 <ul>

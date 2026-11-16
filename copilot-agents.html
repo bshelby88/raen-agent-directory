@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RAEN paid API tools for GitHub Copilot / VS Code agent mode — x402 on Base</title>
-<meta name="description" content="Give VS Code Copilot agent mode real paid skills via MCP: law citations $0.05, contract analysis $0.05, dispute letters $0.75, image gen $0.01, summaries $1.00+. USDC on Base, x402 pay-per-call, no subscription.">
+<meta name="description" content="Give VS Code Copilot agent mode real paid skills via MCP: law citations $0.05, contract analysis $0.05, dispute letters $0.10, image gen $0.01, summaries $1.00+. USDC on Base, x402 pay-per-call, no subscription.">
 <style>
 :root{color-scheme:dark}
 body{margin:0;font-family:ui-monospace,Menlo,Consolas,monospace;background:#0d1117;color:#c9d1d9;line-height:1.6;max-width:900px;margin:0 auto;padding:2rem 1.25rem}
@@ -65,7 +65,7 @@ def x402_call(url, body, signer):
 <tr><th>Endpoint</th><th>Price</th><th>What it does</th></tr>
 <tr><td><code>POST royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05</td><td>US consumer-law citations (FCRA/FDCPA/TILA/UDAP) with plain-English summaries (A/B test: some wallets see $0.03 — the 402 challenge states the exact price)</td></tr>
 <tr><td><code>POST contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td><td>Contract risk analysis: risk score, flagged clauses, severity, suggested edits</td></tr>
-<tr><td><code>POST dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.75</td><td>FCRA-compliant dispute letter + on-chain certificate</td></tr>
+<tr><td><code>POST dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.10</td><td>FCRA-compliant dispute letter + on-chain certificate</td></tr>
 <tr><td><code>POST nanobanana-x402.fly.dev/api/generate-image</code></td><td>$0.01</td><td>Gemini image generation from a text prompt (base64 PNG out)</td></tr>
 <tr><td><code>POST nanobanana-x402.fly.dev/api/edit-image</code></td><td>$0.01</td><td>Natural-language image editing (source image + prompt)</td></tr>
 <tr><td><code>POST dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td><td>Meta-router: natural-language intent → the right fleet service + ready request</td></tr>

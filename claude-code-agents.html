@@ -34,7 +34,7 @@ th{background:#161b22;color:#c9d1d9}
 <pre>claude mcp add --transport http --scope user raen \
   https://raen-mcp-gateway.fly.dev/mcp \
   --header "Authorization: Bearer $RAEN_KEY"</pre>
-<p>Keep the key out of dotfiles: export <code>RAEN_KEY</code> in your shell profile (or Claude Code's <code>env</code> settings block), never in a committed file. Tools appear as <code>mcp__raen__raen_law_lookup</code>, <code>mcp__raen__raen_ticker_analysis</code>, <code>mcp__raen__raen_dispute_letter</code>, <code>mcp__raen__raen_image_generate</code>, <code>mcp__raen__raen_contract_analysis</code> ($0.05 / $0.05 / $0.75 / $0.01 / $0.05). The gateway's 402 paid gate is what makes the Bearer key the billing rail — Claude Code pays per MCP tool call without ever touching a wallet. Verify with <code>/mcp</code> inside Claude Code.</p>
+<p>Keep the key out of dotfiles: export <code>RAEN_KEY</code> in your shell profile (or Claude Code's <code>env</code> settings block), never in a committed file. Tools appear as <code>mcp__raen__raen_law_lookup</code>, <code>mcp__raen__raen_ticker_analysis</code>, <code>mcp__raen__raen_dispute_letter</code>, <code>mcp__raen__raen_image_generate</code>, <code>mcp__raen__raen_contract_analysis</code> ($0.05 / $0.05 / $0.10 / $0.01 / $0.05). The gateway's 402 paid gate is what makes the Bearer key the billing rail — Claude Code pays per MCP tool call without ever touching a wallet. Verify with <code>/mcp</code> inside Claude Code.</p>
 
 <h2>Path 2 (wallet-native): the two-POST x402 flow from the Bash tool</h2>
 <p>Claude Code runs bash and python natively, so it can execute the raw x402 flow directly — hand it <a href="https://github.com/bshelby88/x402-cookbook/blob/main/recipes/02-python-client.md">cookbook recipe 02</a> and it writes the signer verbatim (~30 lines, <code>web3.py</code>):</p>
@@ -60,7 +60,7 @@ POST same URL + <b>x-payment</b> header (base64 signed JSON)
 <tr><td>escrow</td><td><code>escrow-x402.fly.dev/api/escrow/create</code></td><td>$0.05</td><td>On-chain escrow creation for agent deals</td></tr>
 <tr><td>vault-pro</td><td><code>vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td><td>Project/agent scaffolding</td></tr>
 <tr><td>dispatch</td><td><code>dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td><td>Intent router — picks the right fleet service and tells you its cost first</td></tr>
-<tr><td>dispute-forge</td><td><code>dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.75</td><td>FCRA dispute letter pack + on-chain certificate</td></tr>
+<tr><td>dispute-forge</td><td><code>dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.10</td><td>FCRA dispute letter pack + on-chain certificate</td></tr>
 <tr><td>dispute-forge-worker</td><td><code>dispute-forge-worker.raen.workers.dev/api/dispute-pack</code></td><td>$0.75</td><td>Same SKU, Cloudflare Workers origin (MPP-capable)</td></tr>
 <tr><td>briefsnap</td><td><code>briefsnap-x402.fly.dev/api/summarize</code></td><td>$1.00</td><td>Document summarization (siblings: extract-actions $1.50, compare-docs $3.00)</td></tr>
 <tr><td>sentry-forge</td><td><code>sentry-forge-x402.fly.dev/api/dispute-pack</code></td><td>$5.00</td><td>Full dispute workup</td></tr>

@@ -70,14 +70,14 @@ small,.small{color:var(--dim)}
 <li><strong>Grounded or nothing.</strong> Statute-context-injected drafting passed 10/11. Ungrounded recall is disqualified — permanently, not pending better models.</li>
 <li><strong>Contract analysis: don't.</strong> 0.5/6 with a fabricated case cite. No prompt engineering rescues a model that invents case law.</li>
 <li><strong>Test the trap, not the demo.</strong> The guaranteed-deletion prompt separates real compliance posture from marketing. A model that writes the illegal letter fails, whatever its benchmark score.</li>
-<li><strong>Per-call economics beat local latency</strong> once volume is real. Our own fleet charges $0.75 per FCRA-compliant dispute letter and $0.05 per contract risk analysis — at 3–5 tok/s on CPU, the paid API is also the <em>faster</em> option, not just the safer one.</li>
+<li><strong>Per-call economics beat local latency</strong> once volume is real. Our own fleet charges $0.10 per FCRA-compliant dispute letter and $0.05 per contract risk analysis — at 3–5 tok/s on CPU, the paid API is also the <em>faster</em> option, not just the safer one.</li>
 </ol>
 
 <h2>If you want the hosted version of the grounded path</h2>
 <p>These are the endpoints whose prices we re-verified from live manifests and a decoded live 402 challenge the day this page was published ($0.05, scheme exact, eip155:8453, USDC, canonical payTo):</p>
 <table>
 <tr><th>Endpoint</th><th>Price</th><th>What you get</th></tr>
-<tr><td><code>POST dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.75</td><td>FCRA-compliant dispute letter + on-chain certificate</td></tr>
+<tr><td><code>POST dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.10</td><td>FCRA-compliant dispute letter + on-chain certificate</td></tr>
 <tr><td><code>POST contract-eye-x402.fly.dev/api/analyze-contract</code></td><td>$0.05</td><td>Risk score + flagged clauses (deterministic fallback disclosed in-band when LLM enhancement is down)</td></tr>
 <tr><td><code>POST royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05</td><td>Statute lookup with correct citations (grounded by construction)</td></tr>
 </table>
