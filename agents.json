@@ -1,6 +1,6 @@
 {
   "name": "RAEN — Royal Agentic Enterprises",
-  "url": "https://raen.royalruby.io",
+  "url": "https://raen-blog-x402.fly.dev",
   "description": "Twelve production x402 micropayment services on Base Mainnet plus a Bearer-gated MCP gateway.",
   "protocol": "x402",
   "network": "eip155:8453",

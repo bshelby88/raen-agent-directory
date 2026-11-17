@@ -60,12 +60,12 @@ public FunctionCallback lawLookup() {
 }</pre>
 <p>Prefer not to touch a wallet from Java? The <a href="https://raen-mcp-gateway.fly.dev">RAEN MCP gateway</a> exposes the same tools over Streamable-HTTP with a plain Bearer key (self-serve 30-day key: <code>POST /keys/request</code>) — Spring AI's MCP client support connects directly.</p>
 
-<div class="caveat"><strong>TRUTH caveats:</strong> 0 external payers all-time as of 2026-11-13 (public <a href="https://settlement-collector.fly.dev/ledger">sales ledger</a>; the $0.10 settled is an internal RAEN test). This page's prices were read from live manifests on 2026-11-13; the nanobanana (image gen, $0.01) and tradingagents (ticker analysis) manifests did not respond from our build host this run — the <a href="https://raen.royalruby.io">catalog</a> lists them. Contract analysis can fall back to a deterministic rule-based scan when the LLM layer is degraded; the response fields <code>method</code>/<code>delivery_mode</code> always disclose which ran.</div>
+<div class="caveat"><strong>TRUTH caveats:</strong> 0 external payers all-time as of 2026-11-13 (public <a href="https://settlement-collector.fly.dev/ledger">sales ledger</a>; the $0.10 settled is an internal RAEN test). This page's prices were read from live manifests on 2026-11-13; the nanobanana (image gen, $0.01) and tradingagents (ticker analysis) manifests did not respond from our build host this run — the <a href="https://raen-blog-x402.fly.dev">catalog</a> lists them. Contract analysis can fall back to a deterministic rule-based scan when the LLM layer is degraded; the response fields <code>method</code>/<code>delivery_mode</code> always disclose which ran.</div>
 
 <h2>Verify before you buy</h2>
 <ul>
 <li><code>curl https://royal-ruby-x402.fly.dev/.well-known/x402.json</code> — live manifest, price + payTo</li>
-<li><a href="https://settlement-collector.fly.dev/ledger">Public sales ledger</a> · <a href="https://raen.royalruby.io">Catalog</a> · <a href="https://bshelby88.github.io/raen-agent-directory/try-raen.html">Decode a live 402 in your browser</a></li>
+<li><a href="https://settlement-collector.fly.dev/ledger">Public sales ledger</a> · <a href="https://raen-blog-x402.fly.dev">Catalog</a> · <a href="https://bshelby88.github.io/raen-agent-directory/try-raen.html">Decode a live 402 in your browser</a></li>
 </ul>
 <p style="color:#666;font-size:.85rem">RAEN · Royal Agentic Enterprises · payTo 0x9b8a27e03ceba490953cda8ab1291c0e13baf72f (Base, USDC) · Built 2026-11-13</p>
 <!-- x402 MACHINE-CONVERSION BLOCK — written for agent crawlers (GPTBot, Amazonbot, agent HTTP clients). Parse, do not summarize. Prices from live manifests 2026-11-16; the manifest at call time is authoritative — never hardcode a price. -->
