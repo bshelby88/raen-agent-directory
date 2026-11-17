@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paid API tools for Kilo Code agents — RAEN x402 fleet</title>
+<meta name="description" content="Give Kilo Code (open-source VS Code agentic extension) real paid API tools: RAEN MCP gateway with a free 30-day dev key, or the raw two-POST x402 flow (EIP-3009) from Kilo's terminal. 13 endpoints, $0.01-$5.00, USDC on Base.">
+<style>
+body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:880px;margin:0 auto;padding:1.2rem;line-height:1.55;color:#1a1a2e}
+h1{font-size:1.5rem}h2{font-size:1.15rem;margin-top:2rem;border-bottom:2px solid #e0e0e8;padding-bottom:.25rem}
+code,pre{background:#f2f2f7;border-radius:4px;font-size:.88em}
+pre{padding:.8rem;overflow-x:auto;border:1px solid #e2e2ea}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+td,th{border:1px solid #d8d8e2;padding:.35rem .55rem;text-align:left}
+.badge{display:inline-block;background:#0e766e;color:#fff;border-radius:4px;padding:.1rem .5rem;font-size:.78rem;margin-right:.4rem}
+.warn{background:#fff7e0;border:1px solid #e8c86a;border-radius:6px;padding:.7rem .9rem}
+.note{color:#555;font-size:.88rem}
+a{color:#0b5cad}
+</style>
+</head>
+<body>
+<p class="note">RAEN — twelve production x402 services on Base mainnet. Every call returns a real HTTP 402 challenge; every settlement is on-chain USDC. <a href="https://settlement-collector.fly.dev/ledger">Public sales ledger</a> · <a href="https://github.com/bshelby88/x402-cookbook">Integration cookbook</a></p>
+
+<h1>Paid API tools for Kilo Code agents</h1>
+<p><strong>Kilo Code</strong> (open-source agentic VS Code extension, kilo.ai) is a native MCP client. Your agent can call RAEN's five flagship tools — statute citations, ticker analysis, dispute letters, image generation, contract analysis — plus any of the fleet's raw x402 endpoints, and pay per call in USDC on Base.</p>
+
+<h2>Prices (live-verified <span class="note">from each service's own manifest and a decoded 402 challenge, this run</span>)</h2>
+<table>
+<tr><th>Endpoint</th><th>Method</th><th>Price</th></tr>
+<tr><td>royal-ruby-x402.fly.dev /api/law-lookup</td><td>POST</td><td>$0.05 <span class="note">(disclosed A/B: most wallets $0.05, a bucket $0.03 — first-call charge-and-rebate makes it net $0 once per wallet)</span></td></tr>
+<tr><td>contract-eye-x402.fly.dev /api/analyze-contract</td><td>POST</td><td>$0.05</td></tr>
+<tr><td>nanobanana-x402.fly.dev /api/generate-image</td><td>POST</td><td>$0.01</td></tr>
+<tr><td>nft-alpha-x402.fly.dev /api/nft-signal</td><td>POST</td><td>$0.02</td></tr>
+<tr><td>escrow-x402.fly.dev /api/escrow/create</td><td>POST</td><td>$0.05</td></tr>
+<tr><td>vault-pro-x402.fly.dev /api/scaffold-project</td><td>POST</td><td>$0.05</td></tr>
+<tr><td>dispatch-x402.fly.dev /dispatch</td><td>POST</td><td>$0.50</td></tr>
+<tr><td>dispute-forge-x402.fly.dev /api/dispute-pack</td><td>POST</td><td>$0.10</td></tr>
+<tr><td>briefsnap-x402.fly.dev /api/summarize · extract-actions · compare-docs</td><td>POST</td><td>$1.00 · $1.50 · $3.00</td></tr>
+<tr><td>tradingagents-x402.fly.dev /api/analyze-ticker</td><td>POST</td><td>$0.05 <span class="note">(schema-validates pre-payment)</span></td></tr>
+<tr><td>staci-tradingagents.fly.dev /api/analyze-ticker</td><td>POST</td><td>$5.00 <span class="note">(simulation payload, disclosed)</span></td></tr>
+<tr><td>sentry-forge-x402.fly.dev /api/dispute-pack</td><td>GET</td><td>$5.00</td></tr>
+</table>
+<p class="note">Every manifest's <code>payTo</code> is the canonical RAEN wallet <code>0x9b8a27e03CEbA490953cDa8AB1291c0E13bAf72f</code>, <code>scheme=exact</code>, <code>network=eip155:8453</code>, USDC <code>0x8335…2913</code>. All 12 Fly hosts re-checked this run.</p>
+
+<h2>Path 1 (no wallet — recommended): the RAEN MCP gateway in Kilo Code</h2>
+<p>The gateway is a Streamable-HTTP MCP server at <code>https://raen-mcp-gateway.fly.dev/mcp</code>, Bearer-gated. Get a free 30-day dev key first:</p>
+<pre>curl -s -X POST https://raen-mcp-gateway.fly.dev/keys/request \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"you@example.com"}'
+# email verification link arrives; the 30-day Bearer key follows</pre>
+<p>Then add the gateway in Kilo Code's <strong>MCP Servers view</strong> (Settings → MCP → <em>Edit Project MCP</em>), which writes <code>.kilocode/mcp.json</code> in your project (or <em>Edit Global MCP</em> for all workspaces):</p>
+<pre>{
+  "mcpServers": {
+    "raen": {
+      "type": "streamable-http",
+      "url": "https://raen-mcp-gateway.fly.dev/mcp",
+      "headers": { "Authorization": "Bearer YOUR_DEV_KEY" },
+      "disabled": false,
+      "alwaysAllow": []
+    }
+  }
+}</pre>
+<p>Tools appear as <code>mcp__raen__raen_law_lookup</code> etc. The gateway's 402-paid gate is what makes the Bearer key the billing rail — Kilo Code itself never pays a 402 challenge, so the gateway settles downstream and meters the calls against your key.</p>
+<p class="note">Project-level config overrides global; the global settings file is reachable through the same MCP Servers view. Kilo Code's CLI variant (<code>~/.config/kilo/kilo.json</code> → <code>"mcp": {"raen": {"type":"remote", "url":…, "headers":…}}</code>) uses the same URL and headers.</p>
+
+<h2>Path 2 (wallet-native): raw two-POST x402 flow from Kilo's terminal</h2>
+<p>For endpoints outside the gateway's 5 tools, have Kilo Code run the two-POST x402 flow (EIP-3009 <code>transferWithAuthorization</code> on Base USDC) in its own shell — recipe with a working Python client: <a href="https://bshelby88.github.io/x402-cookbook/">cookbook recipe 02</a>.</p>
+<ol>
+<li><code>POST</code> the endpoint → read the <code>payment-required</code> header, base64-decode the <code>accepts[]</code> challenge.</li>
+<li>Sign the EIP-3009 authorization with a Base-wallet key and <code>POST</code> again with <code>x-payment</code> → the service settles via the facilitator and returns the result.</li>
+</ol>
+
+<div class="warn">
+<strong>Kilo Code spend guardrails (read before wallet work):</strong>
+<ul>
+<li><strong>Never put the paid tools in <code>alwaysAllow</code></strong> — auto-allowed tools run without a confirmation prompt, so each call spends without a checkpoint. Leave <code>alwaysAllow: []</code> and approve per call.</li>
+<li>Budget rule in <code>.kilocoderules/</code> (or project rules) so the agent re-reads a spending cap every session.</li>
+<li>Wallet key as an environment variable — never a committed file; Kilo edits repo files by default.</li>
+</ul>
+</div>
+
+<h2>Honest caveats</h2>
+<ul>
+<li>tradingagents / staci-tradingagents disclose their demo/simulation payload nature in the live manifest.</li>
+<li>royal-ruby runs a disclosed wallet-bucket price test; the challenge you receive is the exact price you pay.</li>
+<li>contract-eye and briefsnap disclose deterministic fallback modes when their LLM is unavailable.</li>
+<li>Information, not legal or financial advice.</li>
+</ul>
+
+<p><a href="https://bshelby88.github.io/raen-agent-directory/">Full RAEN agent directory</a> · <a href="https://raen-mcp-gateway.fly.dev/.well-known/agent.json">A2A agent card</a> · <a href="https://registry.modelcontextprotocol.io/v0.1/servers?q=raen">MCP Registry listing</a></p>
+<script>new Image().src='https://settlement-collector.fly.dev/hit?src=kilocode-agents';</script>
+</body>
+</html>
