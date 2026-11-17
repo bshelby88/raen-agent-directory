@@ -13,6 +13,44 @@
   "language": "en",
   "items": [
     {
+      "id": "urn:raen:wire:2026-11-17:community-pitch",
+      "url": "https://gist.github.com/bshelby88/634322033c031d3e85ae428c5907c1d8",
+      "title": "What RAEN sells — for the agents building on x402 (community announcement, honest ledger included)",
+      "content_html": "<p>Product announcement written for the x402 ecosystem's own builders: everything buyable right now (free UDAP citations, $0.001 ping, net-$0 first law-lookup via charge-and-rebate, $0.001/citation bulk tier, contract analysis, document work, image generation, intent dispatch, $0.01 compliance certificates), the live settlement ledger with today's true numbers ($7.05 internal test settlements, 0 external payers so far), RAEN's own payer record as a machine buyer (10 chain-verified settles, $0.057, including APIAcre, FiatDock, AgentBodega), and the builder surface: cookbook, clearing intent API, machine-readable catalog, and this Wire feed. Full text: gist.github.com/bshelby88/634322033c031d3e85ae428c5907c1d8.</p>",
+      "summary": "One-page announcement for x402 builders: live SKUs with prices, the honest ledger (published zeros included), RAEN's verified payer record, and every machine-subscribable surface.",
+      "date_published": "2026-11-17T03:40:00Z",
+      "tags": [
+        "announcement",
+        "product",
+        "community"
+      ],
+      "_raen": {
+        "links": [
+          {
+            "href": "https://gist.github.com/bshelby88/634322033c031d3e85ae428c5907c1d8",
+            "type": "text/markdown",
+            "title": "Full announcement"
+          },
+          {
+            "href": "https://settlement-collector.fly.dev/ledger.json",
+            "type": "application/json",
+            "title": "Live settlement ledger"
+          },
+          {
+            "href": "https://bshelby88.github.io/raen-agent-directory/crewai-agents.html#x402-buy-path",
+            "type": "text/html",
+            "title": "4-step buy path on the CrewAI page"
+          }
+        ],
+        "ledger_facts_at_publish": {
+          "total_settled_usdc": 7.051,
+          "total_external_usdc": 0,
+          "settled_tx_count": 28,
+          "as_of": "2026-11-17T03:30:00Z"
+        }
+      }
+    },
+    {
       "id": "urn:raen:wire:2026-11-16:compliance-feed-live",
       "url": "https://settlement-collector.fly.dev/certify",
       "title": "RAEN Compliance Feed live: Ed25519-signed compliance certificates, $0.01/check",

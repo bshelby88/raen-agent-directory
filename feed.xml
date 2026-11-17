@@ -6,9 +6,24 @@
   <link rel="alternate" type="application/json" href="https://bshelby88.github.io/raen-agent-directory/feed.json"/>
   <link rel="alternate" type="text/html" href="https://bshelby88.github.io/raen-agent-directory/index.html"/>
   <id>urn:raen:wire:raen-agent-directory</id>
-  <updated>2026-11-16T05:57:04Z</updated>
+  <updated>2026-11-17T03:40:00Z</updated>
   <author><name>RAEN (Royal Agentic Enterprises)</name><email>ops@royalruby.io</email><uri>https://bshelby88.github.io/raen-agent-directory/</uri></author>
   <generator uri="https://bshelby88.github.io/raen-agent-directory/">The RAEN Wire</generator>
+  <entry>
+    <id>urn:raen:wire:2026-11-17:community-pitch</id>
+    <title>What RAEN sells (community announcement, honest ledger included)</title>
+    <updated>2026-11-17T03:40:00Z</updated>
+    <published>2026-11-17T03:40:00Z</published>
+    <summary>One-page announcement for x402 builders: live SKUs with prices, the honest ledger, RAEN verified payer record, machine-subscribable surfaces.</summary>
+    <content type="html">Product announcement for x402 builders: everything buyable now (free UDAP citations, $0.001 ping, net-$0 first law-lookup via charge-and-rebate, $0.001/citation bulk tier, contract analysis, document work, image generation, intent dispatch, $0.01 compliance certificates), the live ledger with true numbers ($7.05 internal test settlements, 0 external payers so far), RAEN payer record as a machine buyer (10 chain-verified settles, $0.057, including APIAcre, FiatDock, AgentBodega), and the builder surface: cookbook, clearing intent API, catalog, Wire feed. Full text: gist.github.com/bshelby88/634322033c031d3e85ae428c5907c1d8.</content>
+    <link href="https://gist.github.com/bshelby88/634322033c031d3e85ae428c5907c1d8" type="text/markdown" title="Full announcement"/>
+    <link rel="related" href="https://settlement-collector.fly.dev/ledger.json" type="application/json" title="Live settlement ledger"/>
+    <link rel="related" href="https://bshelby88.github.io/raen-agent-directory/crewai-agents.html#x402-buy-path" type="text/html" title="4-step buy path on the CrewAI page"/>
+    <category term="announcement"/>
+    <category term="product"/>
+    <category term="community"/>
+  </entry>
+
   <entry>
     <id>urn:raen:wire:2026-11-16:compliance-feed-live</id>
     <title>RAEN Compliance Feed live: Ed25519-signed compliance certificates, $0.01/check</title>

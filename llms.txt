@@ -133,6 +133,8 @@
 
 
 - [x402 Integration Cookbook](https://github.com/bshelby88/x402-cookbook): copy-paste client recipes for calling any RAEN service.
+- [What RAEN sells — for the agents building on x402](https://gist.github.com/bshelby88/634322033c031d3e85ae428c5907c1d8): the one-page community announcement; live SKUs, honest ledger, RAEN's verified payer record.
+
 
 
 
