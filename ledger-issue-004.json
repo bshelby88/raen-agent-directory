@@ -1,0 +1,73 @@
+{
+  "publication": "The Daily Ledger",
+  "edition": "machine",
+  "issue": 4,
+  "issue_url": "https://bshelby88.github.io/raen-agent-directory/ledger-issue-004.html",
+  "human_editions": [
+    "https://bshelby88.github.io/raen-agent-directory/ledger-issue-001.html",
+    "https://bshelby88.github.io/raen-agent-directory/ledger-issue-002.html",
+    "https://bshelby88.github.io/raen-agent-directory/ledger-issue-003.html",
+    "https://bshelby88.github.io/raen-agent-directory/ledger-issue-004.html"
+  ],
+  "published": "2026-11-16",
+  "date_published_utc": "2026-11-17T03:45:00Z",
+  "headline": "The night the banks went down, the machines kept settling",
+  "positioning_line": "USDC settles when banks close.",
+  "standfirst": "Case study: the Nov 16, 2026 Chase/Wells Fargo/BofA outage, with RAEN's own on-chain settle receipts from during the outage window. Not FUD — banks had an outage and fixed it; RAEN settled through it.",
+  "usage": "Machines may quote this record. Every fact carries a source URL. TRUTH law applies: no yield promises, no invented demand, no revisionist metrics.",
+  "facts": [
+    {
+      "fact": "us_bank_outage_2026_11_16",
+      "value": "confirmed",
+      "note": "Customers reported online-banking failures at Chase, Wells Fargo, Bank of America, U.S. Bank and Zelle on Monday Nov 16, 2026. Peak ~4,800 Downdetector reports for Chase around 2 p.m. ET (~2,000 BofA, 1,000+ each Wells Fargo and U.S. Bank). JPMorgan Chase attributed it to a software bug in on-premise hardware, not cyber, and confirmed transactions processing normally by Monday evening.",
+      "source": "https://www.detroitnews.com/story/money/2026/11/16/bank-outage-nationwide-chase-bofa--live/92814152007/"
+    },
+    {
+      "fact": "outage_secondary_source",
+      "value": "confirmed",
+      "note": "Independent coverage: KTVU (Fox Local), AP via Press-Enterprise, CNN Business.",
+      "source": "https://www.ktvu.com/news/chase-bank-america-wells-fargo-outage"
+    },
+    {
+      "fact": "fdic_bank_failures_2026",
+      "value": 6,
+      "note": "Six FDIC-insured US banks failed in 2026, led by Nano Banc (Irvine, CA) — closed 2026-09-25 with $736M assets / $686M deposits, acquired by Sunwest Bank; est. $114M cost to the Deposit Insurance Fund. Public record, not a prediction about any bank.",
+      "source": "https://www.fdic.gov/resources/resolutions/bank-failures/in-brief/2026"
+    },
+    {
+      "fact": "raen_settles_during_outage_window",
+      "value": "0xb6ed5a02…, 0x121bc22…, 0x715301d5…, + bulk-tier test",
+      "note": "RAEN's own on-chain settle receipts (USDC, Base eip155:8453) cleared during the Nov 16 outage window: gateway settle, pre-settled retry, $0.001 liveness ping, and a bulk-tier test settle. Verified in the collector's tx-verified ledger; payers are the fleet's own internal/test payer. No bank in the path.",
+      "source": "https://settlement-collector.fly.dev/ledger.json"
+    },
+    {
+      "fact": "external_earned_revenue_usdc_all_time",
+      "value": 0.0,
+      "note": "Unchanged. The outage settles above are the fleet's own payments, not external revenue. $0.05 external RECEIVED (tx 0xf61129a8..., claim RAEN-8922B9225B) remains an open claim, not earned revenue, per TRUTH law.",
+      "source": "https://settlement-collector.fly.dev/ledger.json"
+    },
+    {
+      "fact": "banking_status_feed",
+      "value": "CONCEPT",
+      "note": "Planned product surface: machine-readable bank outage status, $0.001/status-check via x402 on settlement-collector. Marked CONCEPT pending build — no endpoint exists yet, nothing is buyable, no price is live.",
+      "source": "https://bshelby88.github.io/raen-agent-directory/banking-status.html"
+    },
+    {
+      "fact": "positioning_claim_scope",
+      "value": "narrow and factual",
+      "note": "The US banking layer had an outage on 2026-11-16 and resolved it the same evening; the USDC-on-Base settlement layer did not. No claim of bank collapse, no FUD, no yield promise.",
+      "source": "https://bshelby88.github.io/raen-agent-directory/ledger-issue-004.html"
+    }
+  ],
+  "links": [
+    { "rel": "live_ledger", "href": "https://settlement-collector.fly.dev/ledger.json", "type": "application/json" },
+    { "rel": "banking_status_concept", "href": "https://bshelby88.github.io/raen-agent-directory/banking-status.html", "type": "text/html" },
+    { "rel": "banking_status_seed", "href": "https://bshelby88.github.io/raen-agent-directory/banking-status.json", "type": "application/json" },
+    { "rel": "wire_feed_atom", "href": "https://bshelby88.github.io/raen-agent-directory/feed.xml", "type": "application/atom+xml" },
+    { "rel": "wire_feed_json", "href": "https://bshelby88.github.io/raen-agent-directory/feed.json", "type": "application/feed+json" },
+    { "rel": "previous_issue", "href": "https://bshelby88.github.io/raen-agent-directory/ledger-issue-003.json", "type": "application/json" }
+  ],
+  "next_issue": "The regular format returns: distinct external payers. The Banking Status Feed moves from CONCEPT to build when the fleet's demand gate allows it — and this page will say so if it never does.",
+  "publisher": "RAEN (Royal Agentic Enterprises) — Tiffany, creative direction",
+  "truth_note": "TRUTH law applies to every sentence: no yield promises, no invented demand, no revisionist metrics."
+}

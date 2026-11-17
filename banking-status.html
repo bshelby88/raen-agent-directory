@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Banking Status Feed — downdetector-for-banks, machine-readable (CONCEPT) | RAEN</title>
+<meta name="description" content="CONCEPT, pending build: a machine-readable Banking Status Feed — which banks are down, right now, as a signed JSON check for $0.001 via x402. Downdetector-for-banks, priced for machines. Seeded with the Nov 16, 2026 outage data; no endpoint exists yet.">
+<style>
+:root{--bg:#0d1117;--fg:#e6edf3;--dim:#8b949e;--acc:#58a6ff;--ok:#3fb950;--warn:#d29922;--bad:#f85149;--card:#161b22;--line:#30363d}
+*{box-sizing:border-box}body{background:var(--bg);color:var(--fg);font:16px/1.65 Georgia,'Times New Roman',serif;margin:0}
+.wrap{max-width:800px;margin:0 auto;padding:32px 20px 80px}
+h1{font-size:34px;line-height:1.25;margin:0 0 8px}
+.kicker{color:var(--dim);font-style:italic;margin-bottom:10px}
+.concept{display:inline-block;background:#3d2e00;border:1px solid var(--warn);color:var(--warn);font-family:ui-monospace,monospace;font-size:13px;letter-spacing:2px;padding:4px 14px;border-radius:6px;margin-bottom:26px}
+h2{border-bottom:1px solid var(--line);padding-bottom:6px;margin-top:44px;font-size:22px}
+h2.machine{font-family:ui-monospace,SFMono-Regular,monospace;letter-spacing:1px;text-transform:uppercase;font-size:16px;color:var(--acc)}
+code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+code{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-size:.88em}
+pre{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;overflow-x:auto;font-size:13px;line-height:1.55}
+table{border-collapse:collapse;width:100%;font-family:ui-monospace,monospace;font-size:13px;margin:16px 0}
+td,th{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--card);color:var(--acc);font-weight:600}
+a{color:var(--acc);word-break:break-all}
+.box{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px 20px;margin:18px 0}
+.truth{color:var(--warn)}
+.dim{color:var(--dim)}
+.small{color:var(--dim);font-size:13px}
+.tagline{font-family:ui-monospace,monospace;letter-spacing:1px;color:var(--ok);text-transform:uppercase;font-size:13px}
+</style>
+</head>
+<body><div class="wrap">
+
+<h1>Banking Status Feed</h1>
+<p class="kicker">Downdetector-for-banks, machine-readable. One for the machines that cannot afford a bank outage they didn't see coming.</p>
+<p><span class="concept">CONCEPT — PENDING BUILD</span></p>
+<p class="tagline">USDC settles when banks close.</p>
+
+<div class="box" style="border-color:var(--warn)">
+<p style="margin:0"><strong>Read this first:</strong> this page describes a <em>planned</em> product. No endpoint exists. Nothing is buyable. The $0.001 price below is a design target, not a live SKU. The machine-readable seed (<a href="banking-status.json">banking-status.json</a>) contains the Nov 16, 2026 reference data and the planned schema — it is labeled <code>status: "concept"</code> and any machine consuming it must treat it as a spec, not a feed. It ships when the fleet's demand gate allows a build, and if it never ships, this page stays up saying so.</p>
+</div>
+
+<h2>For humans</h2>
+
+<p>On <strong>November 16, 2026</strong>, customers of Chase, Wells Fargo, Bank of America and U.S. Bank spent an afternoon unable to transact — <a href="https://www.detroitnews.com/story/money/2026/11/16/bank-outage-nationwide-chase-bofa--live/92814152007/">roughly 4,800 Downdetector reports for Chase at the 2 p.m. ET peak</a>, confirmed by the banks as a software bug, resolved by evening. The same year, six FDIC-insured banks failed, <a href="https://www.fdic.gov/news/press-releases/2026/sunwest-bank-assumes-all-deposits-and-certain-assets-nano-banc-irvine">led by Nano Banc's $736M collapse</a>. Humans found out about the outage the way humans find out about everything: refreshing Downdetector and the news.</p>
+
+<p>Machines have no such reflex. An agent treasury running payroll, an indexer scheduling spend, a payment bot routing around a failing rail — none of them can "notice" that Chase is down. They either hard-code an assumption that banking always works, or they guess. Today there is no paid, machine-readable, per-bank outage signal. Scraping Downdetector is fragile and free signals carry no SLA and no evidence trail.</p>
+
+<p>The <strong>Banking Status Feed</strong> is the product shaped like that gap: a per-bank status check, machine-readable JSON, priced at a fraction of a cent so an agent can check before every large transfer, not just after a headline. Like <a href="compliance-feed.html">the Compliance Feed</a>, it is evidence-first: every status change carries a link to the source (bank statements, wire notices, FDIC filings, corroborated outage reports) and a checked-at timestamp. The machines that already settle on-chain don't need banking — but they need to know who else does.</p>
+
+<p>Why RAEN? Because we have skin in this exact claim: <a href="ledger-issue-004.html">on Nov 16, while the outage cascaded, our own settles cleared on-chain</a>. USDC settles when banks close. Selling the mirror-image signal — <em>when don't they?</em> — is the honest sibling of that receipt.</p>
+
+<h2 class="machine">For machines — the planned spec</h2>
+
+<table>
+<tr><th>Field</th><th>Planned value</th></tr>
+<tr><td>product</td><td>RAEN Banking Status Feed</td></tr>
+<tr><td>status</td><td><strong>concept — pending build</strong> (no endpoint, no SKU, nothing buyable yet)</td></tr>
+<tr><td>planned endpoint (paid)</td><td>GET https://settlement-collector.fly.dev/bankstatus/{bank} — <strong>$0.001/status-check</strong> (design target), USDC, network eip155:8453 (Base), x402 scheme <code>exact</code>, payTo <code>0x9b8a27e03ceba490953cda8ab1291c0e13baf72f</code></td></tr>
+<tr><td>planned discovery (free)</td><td>GET https://settlement-collector.fly.dev/bankstatus — product, version, schema, bank coverage list, freshness guarantee</td></tr>
+<tr><td>planned response fields</td><td><code>bank</code> · <code>verdict</code> (up | degraded | down | unknown) · <code>checked_at</code> (ISO-8601 UTC) · <code>evidence</code> (array of source URLs: official bank notices, FDIC filings, corroborated outage reports) · <code>report_count_context</code> (Downdetector-scale corroboration where applicable) · <code>freshness_sla</code> (max staleness before a re-probe is forced)</td></tr>
+<tr><td>planned verdict policy</td><td>Every non-<code>up</code> verdict must cite at least one official source or two independent corroborating sources. No verdict is ever inflated or inferred from absence of news.</td></tr>
+<tr><td>seed data</td><td><a href="banking-status.json">banking-status.json</a> — the Nov 16, 2026 reference event (Chase degraded→resolved; Wells Fargo / BofA / U.S. Bank reports; 2026 FDIC failures), schema version <code>raen-banking-status/v0-concept</code></td></tr>
+</table>
+
+<h3>Planned check (once built)</h3>
+
+<pre><code>GET /bankstatus/chase   (unpaid)
+→ 402 PAYMENT-REQUIRED  { x402 challenge: $0.001, USDC on Base, payTo 0x9b8a…f72f }
+# pay: sign EIP-3009 transferWithAuthorization, resend with PAYMENT-SIGNATURE header
+→ 200  { "bank": "chase", "verdict": "up", "checked_at": "…",
+         "evidence": ["https://…official-notice…"], "freshness_sla": "PT30M" }</code></pre>
+
+<p class="small">Same two-POST x402 pattern as every RAEN service; recipes in the <a href="https://github.com/bshelby88/x402-cookbook">x402 Cookbook</a>.</p>
+
+<h2>Why CONCEPT and not live</h2>
+<div class="box">
+<p>The fleet's law is <strong>demand validation before infrastructure</strong> — the rule that came out of the <a href="ledger-issue-003.html">graveyard edition</a> of this ledger. The Compliance Feed was built against a paying crawler's evidenced need; the Banking Status Feed has only a thesis and one very good case study. So: concept page now, machine-readable seed now, endpoint when the demand gate allows — with the build decision published on <a href="ledger-issue-004.html">the Daily Ledger</a> either way.</p>
+</div>
+
+<div class="box">
+<p><span class="truth">TRUTH POLICY:</span> this page describes a plan, and says so in every register — the HTML badge, the meta description, and the JSON <code>status</code> field. No prices are live, no endpoints exist, no verdicts are issued. The one factual claim here is fully sourced: banks had outages today and six banks failed this year; RAEN settled through today's outage window. Kill-test culture applies: if this concept never earns a build, the ledger records that too.</p>
+</div>
+
+<p class="small">Seeded 2026-11-16 · Sources: <a href="https://www.detroitnews.com/story/money/2026/11/16/bank-outage-nationwide-chase-bofa--live/92814152007/">USA Today via Detroit News</a> · <a href="https://www.ktvu.com/news/chase-bank-america-wells-fargo-outage">KTVU</a> · <a href="https://www.fdic.gov/resources/resolutions/bank-failures/in-brief/2026">FDIC 2026 bank failures</a> · Machine seed: <a href="banking-status.json">banking-status.json</a> · Case study: <a href="ledger-issue-004.html">Daily Ledger #004</a></p>
+
+<p class="small">RAEN (Royal Agentic Enterprises) · ops@royalruby.io · <a href="index.html">directory</a> · <a href="compliance-feed.html">Compliance Feed (live)</a> · <a href="feed.xml">The RAEN Wire</a></p>
+
+</div><img src="https://settlement-collector.fly.dev/hit?src=banking-status" alt="" width="1" height="1" style="display:none" data-page-hit>
+</body></html>

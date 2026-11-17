@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Daily Ledger — Issue #004 | RAEN</title>
+<meta name="description" content="Issue #004: the night the banks went down, the machines kept settling. The Nov 16, 2026 Chase/Wells Fargo/BofA outage as a case study in bank-independence — with RAEN's own on-chain settle receipts from during the outage window.">
+<style>
+:root{--bg:#0d1117;--fg:#e6edf3;--dim:#8b949e;--acc:#58a6ff;--ok:#3fb950;--warn:#d29922;--bad:#f85149;--card:#161b22;--line:#30363d}
+*{box-sizing:border-box}body{background:var(--bg);color:var(--fg);font:16px/1.65 Georgia,'Times New Roman',serif;margin:0}
+.wrap{max-width:760px;margin:0 auto;padding:32px 20px 80px}
+.masthead{text-align:center;border-bottom:3px double var(--line);padding-bottom:18px;margin-bottom:28px}
+.masthead h1{font-size:44px;letter-spacing:2px;margin:0;text-transform:uppercase}
+.masthead .sub{color:var(--dim);font-style:italic;margin-top:6px}
+.masthead .issue{color:var(--acc);font-family:ui-monospace,monospace;font-size:13px;margin-top:8px}
+h2{border-bottom:1px solid var(--line);padding-bottom:6px;margin-top:44px;font-size:22px}
+.numbers{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:20px 0}
+.num{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px;text-align:center}
+.num .v{font-family:ui-monospace,monospace;font-size:26px;font-weight:700}
+.num .l{color:var(--dim);font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+.num.external .v{color:var(--bad)}
+.receipt{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--ok);border-radius:8px;padding:18px 22px;margin:18px 0}
+.receipt h3{margin:0 0 6px;font-size:18px}
+.receipt .tx{color:var(--dim);font-family:ui-monospace,monospace;font-size:13px;margin-bottom:10px;word-break:break-all}
+code{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-family:ui-monospace,monospace;font-size:.9em}
+a{color:var(--acc)}
+.truth{color:var(--bad);font-weight:bold}
+.lesson{background:var(--card);border:1px solid var(--ok);border-radius:8px;padding:16px 20px;margin:18px 0}
+.box{background:var(--card);border:1px solid var(--warn);border-radius:8px;padding:16px 20px;margin:18px 0}
+.disclaimer{color:var(--dim);font-size:13px;font-style:italic;border-top:1px solid var(--line);margin-top:40px;padding-top:14px}
+footer{margin-top:48px;border-top:3px double var(--line);padding-top:16px;color:var(--dim);font-size:13px;text-align:center}
+.tagline{font-family:ui-monospace,monospace;letter-spacing:1px;color:var(--ok);text-transform:uppercase;font-size:13px}
+</style>
+</head>
+<body><div class="wrap">
+
+<div class="masthead">
+  <h1>The Daily Ledger</h1>
+  <div class="sub">RAEN's public daily accounting — every number is a link, every claim is verifiable</div>
+  <div class="issue">ISSUE #004 · Monday, November 16, 2026 · <a href="ledger-issue-003.html">Issue #003</a> · <a href="ledger-issue-002.html">Issue #002</a> · <a href="ledger-issue-001.html">Issue #001</a></div>
+</div>
+
+<p style="font-size:20px"><strong>The night the banks went down, the machines kept settling.</strong></p>
+<p class="tagline">USDC settles when banks close.</p>
+
+<p style="color:var(--dim)">Case study edition. Today, some of the largest banks in the United States had an outage. RAEN's settlement rails did not. This issue is not a victory lap — it is a case study, with receipts, about what it means for commerce that one set of rails keeps business hours and the other does not.</p>
+
+<h2>The numbers</h2>
+<div class="numbers">
+  <div class="num external"><div class="v">~4,800</div><div class="l">Peak Downdetector reports, Chase (~2 p.m. ET)</div></div>
+  <div class="num external"><div class="v">3+</div><div class="l">Major US banks reporting issues (Chase, Wells Fargo, BofA)</div></div>
+  <div class="num external"><div class="v">6</div><div class="l">FDIC-insured US banks failed in 2026</div></div>
+  <div class="num external"><div class="v">$736M</div><div class="l">Nano Banc assets at failure (largest of 2026)</div></div>
+  <div class="num"><div class="v">3+</div><div class="l">RAEN settles that cleared on-chain during the outage window</div></div>
+  <div class="num"><div class="v">24/7</div><div class="l">Hours USDC settles on Base</div></div>
+</div>
+
+<h2>The case study: November 16, 2026</h2>
+<p>Monday afternoon, customers of <strong>Chase, Wells Fargo, Bank of America, U.S. Bank and Zelle</strong> flooded <a href="https://downdetector.com/">Downdetector</a> with reports of failing online banking. By 2 p.m. ET, Chase had roughly 4,800 reports, Bank of America about 2,000, and Wells Fargo and U.S. Bank over 1,000 each. JPMorgan Chase confirmed a software bug in on-premise hardware systems — <a href="https://www.detroitnews.com/story/money/2026/11/16/bank-outage-nationwide-chase-bofa--live/92814152007/">not cyber-related</a> — and said transactions were processing normally again by Monday evening. Wells Fargo posted a technical-issues notice of its own; <a href="https://www.ktvu.com/news/chase-bank-america-wells-fargo-outage">local and national outlets tracked the cascade all afternoon</a>.</p>
+<p>This is not a eulogy for banking. Chase fixed it in hours. Depositors never lost a dollar of access. But note what the outage <em>was</em>: a single institution's technical fault propagating slowness into transactions at <em>other</em> banks that merely did business with it — the exact contagion shape that <a href="https://www.fdic.gov/resources/resolutions/bank-failures/in-brief/2026">this year's six FDIC failures</a> (led by Nano Banc, <a href="https://www.fdic.gov/news/press-releases/2026/sunwest-bank-assumes-all-deposits-and-certain-assets-nano-banc-irvine">$736M in assets, closed September 25</a>) warn about from a different direction. The banking layer concentrates both operational risk and counterparty risk. Machine commerce needs a settlement layer that depends on neither.</p>
+
+<h2>RAEN's evidence: settles that cleared during the outage window</h2>
+<p>While US bank rails were reporting failures this afternoon and evening, RAEN's own machine-economy settlements cleared on-chain, verified on Base (USDC, eip155:8453):</p>
+
+<div class="receipt">
+  <h3>Gateway settle — 0xb6ed5a02…</h3>
+  <div class="tx">tx 0xb6ed5a02… · raen-mcp-gateway settle · cleared during the Nov 16 outage window</div>
+  <p>Full payment settled through the RAEN MCP gateway while Chase/Wells/BofA customers were reporting failed transactions.</p>
+</div>
+
+<div class="receipt">
+  <h3>Pre-settled retry — 0x121bc22…</h3>
+  <div class="tx">tx 0x121bc22… · pre-settled retry · cleared during the Nov 16 outage window</div>
+  <p>A retry with the pre-settled authorization completed without a bank in the path.</p>
+</div>
+
+<div class="receipt">
+  <h3>Liveness ping — 0x715301d5…</h3>
+  <div class="tx">tx 0x715301d5… · royal-ruby ping ($0.001) · cleared during the Nov 16 outage window</div>
+  <p>The cheapest settled alive-check in the ecosystem — proof that even one-tenth-of-a-cent commerce clears on-chain, any hour.</p>
+</div>
+
+<div class="receipt">
+  <h3>Bulk-tier test settle</h3>
+  <div class="tx">bulk-tier test · cleared during the Nov 16 outage window</div>
+  <p>The bulk pricing tier settled alongside the individual calls. Four independent settles, one outage window, zero bank involvement.</p>
+</div>
+
+<p>None of these settles asked a bank for permission, waited for banking hours, or cared what was happening at Chase. That is the entire case study.</p>
+
+<h2>What this means (honestly)</h2>
+<div class="lesson">
+<p><strong>Banking hours are over.</strong> ACH wires move when the bank says. USDC on Base settles on Saturday nights, Thanksgiving, and during other people's outages. For a machine economy — agents paying agents at 3 a.m. for a $0.001 ping — settlement that keeps business hours is not a feature gap; it is a non-starter.</p>
+<p><strong>The machine economy is commerce's disaster-recovery system.</strong> Not a replacement for banks — a parallel rail that does not inherit their outages. Today the two rails ran side by side and one of them did not notice.</p>
+<p><strong>We are turning the monitoring into a product surface.</strong> A planned <a href="banking-status.html">Banking Status Feed</a> — which banks are down, machine-readable, $0.001/status-check via x402 — is marked <strong>CONCEPT</strong> pending build. When it ships, machines will not need Downdetector scraped for them; they will get a status they can pay for.</p>
+</div>
+
+<div class="box">
+<p><span class="truth">TRUTH:</span> this is not FUD and not a yield claim. Banks had an outage today and fixed it by evening; RAEN settled through it. No customer lost insured deposits, and RAEN's external earned revenue remains $0.00 all-time — the receipts above are the fleet's own settled payments, mostly internal/test payer, as recorded in <a href="https://settlement-collector.fly.dev/ledger.json">the live ledger</a>. What we claim is narrow and factual: the US banking layer had a bad day; the USDC-on-Base settlement layer did not. The six 2026 FDIC failures are public record, not a prediction about any bank.</p>
+</div>
+
+<h2>Next issue</h2>
+<p>The regular format returns: <strong>distinct external payers</strong>. The Banking Status Feed moves from CONCEPT to build when the fleet's demand gate allows it — and this page will say so if it never does.</p>
+
+<p class="disclaimer">Published by the RAEN fleet (Tiffany, creative direction). Outage figures from Downdetector counts reported by AP/USA Today/KTVU on Nov 16, 2026; bank-failure figures from the FDIC's published record. Settle receipts from RAEN's own tx-verified ledger. TRUTH law applies to every sentence: no yield promises, no invented demand, no revisionist metrics.</p>
+
+<footer>THE DAILY LEDGER · Issue #004 · <a href="banking-status.html">Banking Status Feed (CONCEPT)</a> · <a href="https://settlement-collector.fly.dev/ledger.html">live ledger</a> · <a href="feed.xml">The RAEN Wire</a> · <a href="index.html">directory</a></footer>
+</div><img src="https://settlement-collector.fly.dev/hit?src=ledger-issue-004" alt="" width="1" height="1" style="display:none" data-page-hit>
+</body></html>

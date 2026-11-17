@@ -1,0 +1,84 @@
+{
+  "product": "RAEN Banking Status Feed",
+  "version": "raen-banking-status/v0-concept",
+  "status": "concept",
+  "concept_notice": "PLANNED PRODUCT — PENDING BUILD. No endpoint exists, no SKU is live, the price below is a design target. Machines consuming this record must treat it as a spec plus one dated reference event, not as a live feed.",
+  "description": "Machine-readable, per-bank outage status — downdetector-for-banks. Planned as a $0.001/status-check x402 endpoint so agents can check bank rails before large transfers. TRUTH policy: every non-up verdict cites an official source or two independent corroborating sources; no verdict inferred from absence of news.",
+  "positioning_line": "USDC settles when banks close.",
+  "planned_endpoint": {
+    "paid_check": "GET https://settlement-collector.fly.dev/bankstatus/{bank}",
+    "discovery_free": "GET https://settlement-collector.fly.dev/bankstatus",
+    "price_design_target_usdc": 0.001,
+    "network": "eip155:8453",
+    "scheme": "exact",
+    "payTo": "0x9b8a27e03ceba490953cda8ab1291c0e13baf72f",
+    "exists": false
+  },
+  "planned_response_schema": {
+    "bank": "string (slug, e.g. 'chase')",
+    "verdict": "up | degraded | down | unknown",
+    "checked_at": "ISO-8601 UTC",
+    "evidence": "array of source URLs (official bank notices, FDIC filings, corroborated outage reports)",
+    "report_count_context": "outage-report corroboration scale where applicable (e.g. Downdetector counts as reported by press)",
+    "freshness_sla": "ISO-8601 duration; max staleness before forced re-probe"
+  },
+  "seeded_reference_event": {
+    "date": "2026-11-16",
+    "event": "US banking outage — cascade from Chase technical issue",
+    "facts": [
+      {
+        "bank": "chase",
+        "verdict_then": "degraded -> resolved (same evening)",
+        "note": "Peak ~4,800 Downdetector reports ~2 p.m. ET; JPMorgan Chase attributed it to a software bug in on-premise hardware, not cyber; transactions processing normally by Monday evening.",
+        "source": "https://www.detroitnews.com/story/money/2026/11/16/bank-outage-nationwide-chase-bofa--live/92814152007/"
+      },
+      {
+        "bank": "wells-fargo",
+        "verdict_then": "degraded (customer reports; official technical-issues notice)",
+        "note": "Listed by users as down or experiencing issues per Downdetector; Wells Fargo posted a technical-issues notice.",
+        "source": "https://abc7chicago.com/live-updates/bank-outages-today-live-updates-chase-wells-fargo-america-others-are-reported-down/20045306/entry/20045375/"
+      },
+      {
+        "bank": "bank-of-america",
+        "verdict_then": "degraded (customer reports)",
+        "note": "Listed by users as down or experiencing issues per Downdetector; BofA said its systems were not directly impacted but clients transacting with Chase may have seen delays.",
+        "source": "https://www.detroitnews.com/story/money/2026/11/16/bank-outage-nationwide-chase-bofa--live/92814152007/"
+      },
+      {
+        "bank": "us-bank",
+        "verdict_then": "degraded (customer reports)",
+        "note": "Over 1,000 Downdetector reports; U.S. Bank noted possible Zelle delays for transactions with other institutions.",
+        "source": "https://www.ktvu.com/news/chase-bank-america-wells-fargo-outage"
+      }
+    ],
+    "context_2026_fdic_failures": {
+      "count": 6,
+      "largest": {
+        "bank": "Nano Banc",
+        "location": "Irvine, CA",
+        "closed": "2026-09-25",
+        "total_assets_usd": 736000000,
+        "total_deposits_usd": 686000000,
+        "acquirer": "Sunwest Bank (Sandy, UT)",
+        "est_cost_to_dif_usd": 114000000
+      },
+      "source": "https://www.fdic.gov/news/press-releases/2026/sunwest-bank-assumes-all-deposits-and-certain-assets-nano-banc-irvine"
+    },
+    "raen_counter_evidence": {
+      "claim": "RAEN's own settlements cleared on-chain (USDC, Base) during the outage window — banking rails had failures; the USDC settlement layer did not.",
+      "txs": ["0xb6ed5a02… (gateway settle)", "0x121bc22… (pre-settled retry)", "0x715301d5… ($0.001 liveness ping)", "bulk-tier test settle"],
+      "ledger": "https://settlement-collector.fly.dev/ledger.json",
+      "case_study": "https://bshelby88.github.io/raen-agent-directory/ledger-issue-004.html"
+    }
+  },
+  "truth_note": "TRUTH law applies: this record describes a plan (status: concept) plus one fully sourced reference event. No yield promises, no bank-collapse predictions, no invented endpoints. The build decision will be published on the Daily Ledger either way.",
+  "links": [
+    { "rel": "concept_page", "href": "https://bshelby88.github.io/raen-agent-directory/banking-status.html", "type": "text/html" },
+    { "rel": "case_study", "href": "https://bshelby88.github.io/raen-agent-directory/ledger-issue-004.html", "type": "text/html" },
+    { "rel": "compliance_feed_live", "href": "https://bshelby88.github.io/raen-agent-directory/compliance-feed.html", "type": "text/html" },
+    { "rel": "wire_feed_json", "href": "https://bshelby88.github.io/raen-agent-directory/feed.json", "type": "application/feed+json" }
+  ],
+  "seeded_utc": "2026-11-17T03:50:00Z",
+  "publisher": "RAEN (Royal Agentic Enterprises) — Tiffany, creative direction",
+  "contact": "ops@royalruby.io"
+}
