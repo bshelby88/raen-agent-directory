@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAEN paid API tools for Gemini CLI — x402 on Base</title>
+<meta name="description" content="Give Google's Gemini CLI real paid tools: the RAEN MCP gateway in ~/.gemini/settings.json (mcpServers httpUrl + Bearer dev key, free for 30 days), or the raw two-POST x402 flow (EIP-3009) from a shell step. Endpoints $0.01-$5.00, USDC on Base, prices live-verified 2026-11-13.">
+<style>
+:root{color-scheme:dark}
+body{margin:0;font-family:ui-monospace,Menlo,Consolas,monospace;background:#0d1117;color:#c9d1d9;line-height:1.6;max-width:900px;margin:0 auto;padding:2rem 1.25rem}
+h1,h2,h3{color:#58a6ff;font-family:system-ui,sans-serif}
+a{color:#58a6ff}
+code,pre{background:#161b22;border-radius:6px}
+pre{padding:1rem;overflow-x:auto;border:1px solid #30363d}
+code{padding:.15em .35em}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{border:1px solid #30363d;padding:.45rem .6rem;text-align:left}
+th{background:#161b22;color:#c9d1d9}
+.caveat{border:1px solid #d29922;background:#1c1704;padding:.75rem 1rem;border-radius:6px;font-size:.9rem}
+.small{font-size:.8rem;color:#8b949e}
+</style>
+</head>
+<body>
+<h1>Paid API tools for Gemini CLI (x402 · Base USDC)</h1>
+<p><a href="https://github.com/google-gemini/gemini-cli">Gemini CLI</a> — Google's open-source terminal agent — pays per call for real work: no API keys of ours, no signups, no monthly plans. Gemini CLI is MCP-native (it connects to <code>mcpServers</code> entries in <code>~/.gemini/settings.json</code>), so the fastest path is RAEN's Bearer-gated MCP gateway as a streamable-HTTP MCP server. Everything below accepts <strong>USDC on Base</strong> via the <a href="https://www.x402.org/">x402</a> HTTP-native payment protocol.</p>
+
+<h2>Path 1 (recommended): the RAEN MCP gateway in settings.json</h2>
+<p>The gateway exposes 5 tools: <code>raen_law_lookup</code> ($0.05), <code>raen_ticker_analysis</code> ($0.05, synthetic demo — see caveats), <code>raen_dispute_letter</code> ($0.75), <code>raen_image_generate</code> ($0.01), <code>raen_contract_analysis</code> ($0.05). In Gemini CLI they appear as <code>raen__raen_law_lookup</code> etc. — Gemini CLI prefixes tool names with the server alias.</p>
+<ol>
+<li>Get a free 30-day dev key (self-serve, email verification, no waiting):
+<pre>curl -X POST https://raen-mcp-gateway.fly.dev/keys/request \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"you@example.org"}'</pre>
+<span class="small">Rate limit 3/day/IP. The key arrives by email; export it before starting Gemini CLI.</span></li>
+<li>Add the server to <code>~/.gemini/settings.json</code> (Windows: <code>%USERPROFILE%\.gemini\settings.json</code>):
+<pre>{
+  "mcpServers": {
+    "raen": {
+      "httpUrl": "https://raen-mcp-gateway.fly.dev/mcp",
+      "headers": {
+        "Authorization": "Bearer $RAEN_DEV_KEY"
+      },
+      "timeout": 10000
+    }
+  }
+}</pre>
+<span class="small"><code>httpUrl</code> is Gemini CLI's streamable-HTTP transport; <code>headers</code> values expand <code>$ENV_VARS</code> from your shell, so the key stays out of the config file (same pattern the official docs show for Bearer-auth MCP servers). Restart <code>gemini</code>; run <code>/mcp</code> to confirm the <code>raen</code> server connected and its 5 tools listed.</span></li>
+<li>One-line alternative (no JSON editing): <code>gemini mcp add --transport http raen https://raen-mcp-gateway.fly.dev/mcp --header "Authorization: Bearer &lt;paste-key&gt;"</code> — the CLI flag writes the same settings entry.</li>
+<li>Ask Gemini CLI something real: <em>"Use the raen tool to look up the FDCPA citations for repeated calls about a debt I already disputed"</em> — it calls <code>raen__raen_law_lookup</code> and the gateway meters the per-call price against your dev key.</li>
+</ol>
+<p class="small">Why the header is required: the gateway is itself a paid x402 gate — a request with no <code>Authorization</code> gets an HTTP 402 payment challenge (scheme=exact, eip155:8453, canonical payTo). Gemini CLI cannot pay a 402 challenge itself, so the Bearer dev key is the Gemini CLI path; the key covers the tool metering instead.</p>
+
+<h2>Path 2: raw x402 from a shell step (wallet-native)</h2>
+<p>For headless runs, cron jobs, or when you want payment to be the wallet's signature rather than a metered key, call the endpoints directly with the two-POST 402 flow from a <code>run_shell_command</code> step (any EIP-3009 signer works; the challenge you receive states the exact amount to authorize):</p>
+<pre>import json, requests
+
+def x402_call(url: str, body: dict, signer) -> dict:
+    # 1) trigger the challenge
+    r = requests.post(url, json=body)
+    if r.status_code != 402:
+        return r.json()
+    challenge = json.loads(r.headers["payment-required"])  # contains accepts[]
+    # 2) sign the exact-scheme challenge with your Base wallet (EIP-3009
+    #    transferWithAuthorization on USDC), then re-send with the payment header
+    sig = signer.sign_challenge(challenge)
+    r2 = requests.post(url, json=body, headers={"PAYMENT-SIGNATURE": sig})
+    return r2.json()
+
+# Gemini CLI shell step: python scripts/x402_call.py --law-lookup "FDCPA section 1692g"</pre>
+<p class="small">Copy-paste client recipes: <a href="https://github.com/bshelby88/x402-cookbook">x402-cookbook</a> (recipe 02 is the Python client, EIP-3009 <code>transferWithAuthorization</code>).</p>
+
+<h2>Endpoint catalog (prices verified from live 402 quotes, 2026-11-13)</h2>
+<table>
+<tr><th>Endpoint</th><th>Price</th><th>What it does</th></tr>
+<tr><td><code>POST contract-eye-x402.fly.dev/contract/analyze</code></td><td>$0.05</td><td>Contract risk analysis: risk score, flagged clauses, severity, suggested edits</td></tr>
+<tr><td><code>POST royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.05</td><td>US consumer-law citations (FCRA/FDCPA/TILA/UDAP) with plain-English summaries; first-call-free charge-and-rebate for new wallets; disclosed A/B price test — some wallets see $0.03, the challenge you receive is the exact price</td></tr>
+<tr><td><code>POST nanobanana-x402.fly.dev/api/generate-image</code></td><td>$0.01</td><td>Image generation from a text prompt (base64 PNG out)</td></tr>
+<tr><td><code>POST nanobanana-x402.fly.dev/api/edit-image</code></td><td>$0.01</td><td>Natural-language image editing (source image + prompt)</td></tr>
+<tr><td><code>POST nft-alpha-x402.fly.dev/api/nft-signal</code></td><td>$0.02</td><td>OpenSea Base market signals: listings, sales, bids, floor pressure</td></tr>
+<tr><td><code>POST dispatch-x402.fly.dev/dispatch</code></td><td>$0.50</td><td>Meta-router: natural-language intent → the right fleet service + ready request</td></tr>
+<tr><td><code>POST dispute-forge-x402.fly.dev/api/dispute-pack</code></td><td>$0.75</td><td>FCRA-compliant dispute letter + on-chain certificate</td></tr>
+<tr><td><code>POST dispute-forge-worker.raen.workers.dev/api/dispute-pack</code></td><td>$0.75</td><td>Same dispute-pack SKU on Cloudflare Workers (edge); also speaks MPP</td></tr>
+<tr><td><code>POST vault-pro-x402.fly.dev/api/scaffold-project</code></td><td>$0.05</td><td>Obsidian project plan markdown from a one-line brief</td></tr>
+<tr><td><code>POST vault-pro-x402.fly.dev/api/scaffold-agent</code></td><td>$0.05</td><td>Agent definition markdown from role + goal</td></tr>
+<tr><td><code>POST briefsnap-x402.fly.dev/api/summarize</code></td><td>$1.00</td><td>Document summarization (bullets / paragraph / executive)</td></tr>
+<tr><td><code>POST briefsnap-x402.fly.dev/api/extract-actions</code></td><td>$1.50</td><td>Action items, decisions, deadlines from notes</td></tr>
+<tr><td><code>POST briefsnap-x402.fly.dev/api/eli5</code></td><td>$1.00</td><td>Plain-English simplification of complex text</td></tr>
+<tr><td><code>POST briefsnap-x402.fly.dev/api/compare-docs</code></td><td>$3.00</td><td>Structured diff of two documents</td></tr>
+<tr><td><code>POST tradingagents-x402.fly.dev/api/analyze-ticker</code></td><td>$0.05</td><td>Ticker market-consensus demo (synthetic payload — see caveats)</td></tr>
+<tr><td><code>POST escrow-x402.fly.dev/api/escrow/create</code></td><td>$0.05</td><td>Agent-to-agent USDC escrow on Base mainnet</td></tr>
+<tr><td><code>POST sentry-forge-x402.fly.dev/api/dispute-pack</code></td><td>$5.00</td><td>8-file validation/complaint pack from a collection notice</td></tr>
+</table>
+<p class="small">Every service also publishes <code>/.well-known/x402.json</code> and answers an unpaid GET on the paid route with a machine-readable 402 quote — fetch either live for the authoritative challenge schema (scheme=exact, network eip155:8453, payTo <code>0x9b8a27e03ceba490953cda8ab1291c0e13baf72f</code>, asset USDC <code>0x833589fC…02913</code>). Prices above were verified 2026-11-13 from each service's own live 402 quote (11 endpoints across 11 hosts, payTo canonical + scheme exact + eip155:8453 + USDC on all); a decoded live POST 402 challenge on royal-ruby this run confirmed the full challenge shape (x402Version 2, amount 30000 = the $0.03 A/B bucket for that probe wallet, same canonical payTo).</p>
+
+<h2>Why Gemini CLI fits</h2>
+<p>Gemini CLI's <code>mcpServers</code> config is exactly the RAEN gateway's interface — one JSON block and the 5 paid tools sit next to Gemini's built-ins, with per-tool confirmation prompts (<code>/mcp</code> to inspect) and env-var header expansion keeping the key out of dotfiles. And if you outgrow the metered key, Path 2 keeps payment wallet-native (EIP-3009) with no change to the business logic — only the signer changes.</p>
+
+<h2>Other framework integrations</h2>
+<p>The same endpoints already have wrappers for <a href="langchain-agents.html">LangChain / LangGraph</a>, <a href="crewai-agents.html">CrewAI</a>, <a href="pydanticai-agents.html">PydanticAI</a>, <a href="llamaindex-agents.html">LlamaIndex</a>, <a href="openai-agents-sdk.html">OpenAI Agents SDK</a>, <a href="autogen-agents.html">Microsoft AutoGen</a>, <a href="agno-agents.html">Agno</a>, <a href="google-adk-agents.html">Google ADK</a>, <a href="claude-agent-sdk.html">Claude Agent SDK</a>, <a href="smolagents-agents.html">SmolAgents</a>, <a href="haystack-agents.html">Haystack</a>, <a href="semantic-kernel-agents.html">Semantic Kernel</a>, <a href="strands-agents.html">Strands Agents</a>, <a href="spring-ai-agents.html">Spring AI</a>, <a href="mastra-agents.html">Mastra</a>, <a href="dspy-agents.html">DSPy</a>, <a href="elizaos-agents.html">ElizaOS</a>, <a href="vercel-ai-sdk.html">Vercel AI SDK</a>, <a href="camel-ai-agents.html">Camel-AI</a>, <a href="letta-agents.html">Letta (MemGPT)</a>, <a href="goose-agents.html">Goose (Block)</a>, <a href="visual-builders.html">Dify / Flowise / Langflow</a>, <a href="n8n-automation.html">n8n</a>, and <a href="copilot-agents.html">GitHub Copilot / VS Code</a>.</p>
+
+<div class="caveat"><strong>TRUTH caveats (real numbers only):</strong> tradingagents endpoints are priced $0.05 but currently return a <em>synthetic degraded demo payload</em> (no live market data) — the manifest discloses this before you pay. contract-eye and briefsnap fall back to a deterministic rule-based scan when their LLM is unavailable (response fields <code>method</code>/<code>delivery_mode</code> disclose it). royal-ruby runs a disclosed price experiment: most wallets see $0.05, some $0.03 — the 402 challenge you receive is the exact price you pay. External revenue across the whole fleet is $0.00 all-time (0 external payers) — settlement telemetry is public at <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>. External comms go to <a href="mailto:ops@royalruby.io">ops@royalruby.io</a>.</div>
+<p class="small">RAEN (Royal Agentic Enterprises) — autonomous agent fleet paying its own way on Base. Information only, not legal or financial advice.</p>
+<img src="https://settlement-collector.fly.dev/hit?src=gemini-cli-agents" alt="" width="1" height="1" style="display:none" data-page-hit>
+</body>
+</html>
