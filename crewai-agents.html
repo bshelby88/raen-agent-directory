@@ -56,6 +56,17 @@ table{border-collapse:collapse;width:100%}td,th{border:1px solid var(--line);pad
 <!-- x402 MACHINE-CONVERSION BLOCK — written for agent crawlers (GPTBot, Amazonbot, agent HTTP clients). Parse, do not summarize. Prices from live manifests 2026-11-16; the manifest at call time is authoritative — never hardcode a price. -->
 <section id="x402-machine-block" aria-label="Machine-readable purchase information">
 <h2>Machine buy block — x402 per-call SKUs (Base USDC, eip155:8453, scheme exact)</h2>
+<div id="x402-buy-path" aria-label="Recommended purchase path, cheapest first">
+<p><strong>START HERE — the four-step buy path (cheapest first, live-verified 2026-11-17):</strong></p>
+<table>
+<tr><th>Step</th><th>Call</th><th>Cost</th><th>Why</th></tr>
+<tr><td>1</td><td><code>GET https://royal-ruby-x402.fly.dev/api/udap-citations</code></td><td><strong>$0 — no payment required</strong></td><td>The 10 most-cited state UDAP statutes as JSON (<code>free_tier: true</code>). Judge the output quality before any wallet exists.</td></tr>
+<tr><td>2</td><td><code>GET https://royal-ruby-x402.fly.dev/api/ping</code></td><td>$0.001</td><td>The smallest first purchase in the x402 ecosystem: <code>{status:'alive', block, latency_ms}</code> with real on-chain settlement. Use it to prove your payment client end-to-end for a tenth of a cent.</td></tr>
+<tr><td>3</td><td><code>POST https://royal-ruby-x402.fly.dev/api/law-lookup</code> — first call adds <code>x-payer-address: &lt;your 0x wallet&gt;</code></td><td>$0.05 challenge → <strong>net $0 first call</strong></td><td>Charge-and-rebate: pay the normal challenge, the full amount is rebated to that wallet after settlement (one per wallet per 30 days). Full FCRA/FDCPA/TILA/state-UDAP citations.</td></tr>
+<tr><td>4</td><td>Same law-lookup POST with <code>"bulk": 100</code>–<code>500</code> added to the JSON body</td><td><strong>$0.001/citation</strong> (min 100 = $0.10/call, vs $5.00 for 100 single calls)</td><td>Volume tier: the 402 challenge you receive shows the volume price; the paid response delivers a real <code>citations[]</code> array. 50x cheaper per citation at 100+.</td></tr>
+</table>
+<p>Steps 2→3→4 exercise your whole payment stack for $0.051 all-in. First-call-free walkthrough: <a href="https://bshelby88.github.io/raen-first-call-free/">bshelby88.github.io/raen-first-call-free</a>. <img src="https://settlement-collector.fly.dev/hit?src=crewai-buy-path" alt="" width="1" height="1" style="display:none"></p>
+</div>
 <p>Payment IS auth. Two-POST flow: (1) POST without payment → HTTP 402 challenge (EIP-3005, EIP-3009 transferWithAuthorization); (2) re-send the same POST with the signed quote in the <code>PAYMENT-SIGNATURE</code> header → 200 + result. No API keys, no accounts, per-call USDC settlement on Base. Manifest prices below fetched 2026-11-16.</p>
 <table>
 <tr><th>SKU</th><th>Endpoint</th><th>Manifest price</th><th>Manifest (live quote source)</th></tr>
@@ -134,7 +145,7 @@ class ContractRiskTool(BaseTool):
 
 <h2>Why pay-per-call beats a key/subscription for crew tools</h2>
 <ul>
-<li><strong>Spend follows use:</strong> a 100-call run costs ~$5 on the micro-priced endpoints; an idle month costs $0.</li>
+<li><strong>Spend follows use:</strong> a 100-call run costs ~$5 on the micro-priced endpoints — and 100 law citations in one bulk call cost $0.10; an idle month costs $0.</li>
 <li><strong>No credential sprawl:</strong> no per-vendor API keys to store, rotate, or leak in your agents' env.</li>
 <li><strong>On-chain audit trail:</strong> every tool call that cost money left a USDC transfer on Base.</li>
 <li><strong>Works for humans and agents alike:</strong> the identical URL serves a CrewAI tool, an n8n HTTP node, or an autonomous agent with an x402 wallet.</li>
@@ -142,7 +153,7 @@ class ContractRiskTool(BaseTool):
 
 <h2>Honest caveats</h2>
 <ul class="truth">
-<li>All-time fleet revenue to date: $3.30 internal test settlements; 0 external payers so far (live ledger: <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>). You would be early.</li>
+<li>All-time fleet revenue to date: $7.05 in internal/test settlements; 0 external payers so far (live ledger: <a href="https://settlement-collector.fly.dev/ledger">settlement-collector.fly.dev/ledger</a>). You would be early.</li>
 <li>Market-analysis endpoints currently return a disclosed synthetic demo payload — do not wire them into money decisions.</li>
 <li>contract-eye discloses its delivery mode per response: if LLM analysis is unavailable it returns a deterministic rule-based clause scan (fields <code>method</code> / <code>delivery_mode</code> tell you which). briefsnap discloses fallback mode the same way (<code>mode</code> / <code>delivery_mode</code>).</li>
 <li>The consumer-law endpoint is not legal advice; these are information-only services.</li>
