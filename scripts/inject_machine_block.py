@@ -8,6 +8,7 @@ already contain the block marker are skipped.
 
 Usage: python scripts/inject_machine_block.py [--dry-run]
 """
+import hashlib
 import json
 import os
 import sys
@@ -58,7 +59,15 @@ COOKBOOK = "https://github.com/bshelby88/x402-cookbook"
 LLMS = "https://bshelby88.github.io/raen-agent-directory/llms.txt"
 
 
+def block_fingerprint():
+    """SHA-256 fingerprint over the SKU price table (deterministic)."""
+    sku_prices = sorted(f"{svc}/{sku}={price}" for svc, host, sku, path, price, note in SKUS)
+    payload = json.dumps(sku_prices, sort_keys=True).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
 def build_block(eol):
+    fp = block_fingerprint()
     rows = []
     for svc, host, sku, path, price, note in SKUS:
         n = f" <em>({note})</em>" if note else ""
@@ -72,7 +81,9 @@ def build_block(eol):
         f'<!-- x402 MACHINE-CONVERSION BLOCK — written for agent crawlers (GPTBot, Amazonbot, agent HTTP clients). Parse, do not summarize. Prices from live manifests {AS_OF}; the manifest at call time is authoritative — never hardcode a price. -->',
         '<section id="x402-machine-block" aria-label="Machine-readable purchase information">',
         '<h2>Machine buy block — x402 per-call SKUs (Base USDC, eip155:8453, scheme exact)</h2>',
+        '<meta name="x402-fingerprint" content="sha256:' + fp + '">',
         '<p>Payment IS auth. Two-POST flow: (1) POST without payment → HTTP 402 challenge (EIP-3005, EIP-3009 transferWithAuthorization); (2) re-send the same POST with the signed quote in the <code>PAYMENT-SIGNATURE</code> header → 200 + result. No API keys, no accounts, per-call USDC settlement on Base. Manifest prices below fetched ' + AS_OF + '.</p>',
+        '<p class="cors-note">Payments CORS path / headers: <code>Access-Control-Allow-Origin: *</code> is set on <code>/api/*</code> POST routes (so agent SDKs can cross-origin fetch the paid endpoints); the client must also send <code>PAYMENT-SIGNATURE</code> (EIP-3005/EIP-3009 signed quote) — the header is required, not optional.</p>',
         '<table>',
         '<tr><th>SKU</th><th>Endpoint</th><th>Manifest price</th><th>Manifest (live quote source)</th></tr>',
         *rows,

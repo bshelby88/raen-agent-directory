@@ -1,0 +1,7 @@
+# Python
+__pycache__/
+*.pyc
+
+# Generated sweep artifacts (re-verified from live endpoints)
+ops/mesh/sweep-results.json
+ops/mesh/manifest-checks.json
