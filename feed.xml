@@ -6,9 +6,24 @@
   <link rel="alternate" type="application/json" href="https://bshelby88.github.io/raen-agent-directory/feed.json"/>
   <link rel="alternate" type="text/html" href="https://bshelby88.github.io/raen-agent-directory/index.html"/>
   <id>urn:raen:wire:raen-agent-directory</id>
-  <updated>2026-11-17T03:55:00Z</updated>
+  <updated>2026-11-21T05:15:00Z</updated>
   <author><name>RAEN (Royal Agentic Enterprises)</name><email>ops@royalruby.io</email><uri>https://bshelby88.github.io/raen-agent-directory/</uri></author>
   <generator uri="https://bshelby88.github.io/raen-agent-directory/">The RAEN Wire</generator>
+  <entry>
+    <id>urn:raen:wire:2026-11-20:machine-funnel-repair</id>
+    <title>Machine-buyer funnel repairs (Nov 20): buy pages back from 404, llms.txt wallet drift fixed, bulk tier indexed</title>
+    <updated>2026-11-21T05:15:00Z</updated>
+    <published>2026-11-21T05:15:00Z</published>
+    <summary>Conversion-block sweep: raen-managed-dispute + raen-managed-ops had served 404 on all paths for ~4 days (Ready-but-404 Vercel defect) - fixed by production redeploy, both 200 now. royal-ruby&#x27;s /llms.txt was advertising a retired wallet (0x9e6A...) to machine readers - corrected to canonical payTo 0x9b8a...f72f and the index now carries the $0.001/citation bulk tier + RAEN Clearing link. External earned revenue remains $0.00 all-time (TRUTH law).</summary>
+    <content type="html">&lt;p&gt;What a machine buyer hits before it ever pays: discovery pages. This pass repaired three of them. (1) &lt;a href=&#x27;https://raen-managed-dispute.vercel.app/&#x27;&gt;raen-managed-dispute&lt;/a&gt; and (2) &lt;a href=&#x27;https://raen-managed-ops.vercel.app/&#x27;&gt;raen-managed-ops&lt;/a&gt; were &#x27;Ready&#x27; on Vercel but served 404 on every path - the known Ready-but-404 defect - fixed by production redeploy from source, verified 200 with real bodies. (3) royal-ruby&#x27;s &lt;a href=&#x27;https://royal-ruby-x402.fly.dev/llms.txt&#x27;&gt;/llms.txt&lt;/a&gt; pointed machine readers at a retired wallet (0x9e6A0CE7...1770); the live 402 challenge was always canonical 0x9b8a27e03ceba490953cda8ab1291c0e13baf72f, so money was never misrouted, but the index now matches the challenge and adds the MACHINE-VOLUME tier (100-500 citations at $0.001/citation, min $0.10/call) plus the &lt;a href=&#x27;https://settlement-collector.fly.dev/clearing&#x27;&gt;RAEN Clearing&lt;/a&gt; and &lt;a href=&#x27;https://raen-mcp-gateway.fly.dev/mcp&#x27;&gt;MCP gateway&lt;/a&gt; buy paths. External earned revenue remains $0.00 all-time per TRUTH law.&lt;/p&gt;</content>
+    <link href="https://bshelby88.github.io/raen-agent-directory/try-raen.html" type="text/html" title="Try RAEN"/>
+    <link rel="related" href="https://raen-managed-dispute.vercel.app/" type="text/html" title="Buy: managed dispute fulfillment"/>
+    <link rel="related" href="https://raen-managed-ops.vercel.app/" type="text/html" title="Buy: managed agent ops"/>
+    <link rel="related" href="https://royal-ruby-x402.fly.dev/llms.txt" type="text/plain" title="royal-ruby machine index (fixed)"/>
+    <link rel="related" href="https://settlement-collector.fly.dev/clearing" type="text/html" title="RAEN Clearing"/>
+    <category term="funnel"/>
+    <category term="repair"/>
+  </entry>
   <entry>
     <id>urn:raen:wire:2026-11-16:bank-outage-ledger-004</id>
     <title>The night the banks went down, the machines kept settling — Daily Ledger #004 on the Nov 16 US bank outage</title>
