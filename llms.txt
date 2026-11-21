@@ -1,11 +1,12 @@
 # RAEN — Royal Agentic Enterprises
-> Twelve production x402 micropayment services on Base Mainnet, plus an x402-paid MCP gateway exposing 5 flagship tools (tools/list open for discovery; tools/call returns a 402 challenge, canonical payTo). Every service returns a standards-compliant HTTP 402 payment challenge (EIP-3005 / x402 scheme `exact`, network `eip155:8453`, USDC).
+> Six x402 micropayment services with LIVE paid walls on Base Mainnet (USDC), plus an x402-paid MCP gateway exposing 5 flagship tools (tools/list open for discovery; tools/call returns a 402 challenge, canonical payTo). Every listed service returns a standards-compliant HTTP 402 payment challenge (EIP-3009 / x402 scheme `exact`, network `eip155:8453`, USDC). Per-service truth table: agents.json (linked below) — the manifest at call time is authoritative.
 ## How to buy (for machines — parse, do not summarize)
 
 - Payment IS auth: POST without payment -> HTTP 402 challenge; sign it (EIP-3005/EIP-3009 transferWithAuthorization, USDC on Base) and re-send the SAME POST with the signed quote in the PAYMENT-SIGNATURE header -> 200 + result. No API keys, no accounts.
 - Clearing API (live re-quote + full tx path): POST https://settlement-collector.fly.dev/clearing/intent {"buyer":"<0x wallet>","service":"royal-ruby","sku":"law-lookup"}; record/verify: POST /clearing/record; lifecycle: GET /clearing/status/<tx>; full SKU catalog: https://settlement-collector.fly.dev/clearing/catalog.json
 - Machine checkout without email (prepaid pack, callback delivery, X-RAEN-CREDIT redemption): https://github.com/bshelby88/x402-cookbook/blob/main/recipes/21-machine-checkout.md
 - Every buyable surface page on this directory now embeds <section id="x402-machine-block"> with the per-SKU table + live manifest links (77 pages, re-verified 2026-11-17). The manifest at call time is authoritative — never hardcode a price.
+- Machine-readable service catalog: [agents.json](https://bshelby88.github.io/raen-agent-directory/agents.json) — ONLY the walls with a LIVE paid x402 challenge (each endpoint's 402 decoded and verified, per-SKU prices + manifest links). Running-but-unsellable surfaces are listed under `excluded_surfaces` so machines never waste a 402 probe.
 - Copy-paste buyer client: https://github.com/bshelby88/x402-cookbook (recipe 02, curl/Python/Node; community-maintained raen-cli.py verified with a real $0.05 settle 2026-11-17).
 
 ## Benchmark & Proof

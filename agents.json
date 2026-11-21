@@ -1,30 +1,97 @@
 {
   "name": "RAEN — Royal Agentic Enterprises",
   "url": "https://raen-blog-x402.fly.dev",
-  "description": "Twelve production x402 micropayment services on Base Mainnet plus a Bearer-gated MCP gateway.",
+  "description": "Production x402 micropayment services on Base Mainnet (USDC) plus an x402-paid MCP gateway. This catalog lists only walls with a LIVE paid x402 challenge (402 decoded and verified 2026-11-21); running-but-unsellable surfaces are excluded so machines do not waste 402 probes.",
   "protocol": "x402",
   "network": "eip155:8453",
   "settlement_token": "USDC (0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913)",
   "payTo": "0x9b8a27e03ceba490953cda8ab1291c0e13baf72f",
   "mcp_gateway": {
     "endpoint": "https://raen-mcp-gateway.fly.dev/mcp",
-    "auth": "Bearer token required",
+    "auth": "x402 paid gate: tools/list open for discovery, tools/call returns a live 402 challenge with canonical payTo",
     "registry_id": "io.github.bshelby88/raen-mcp",
-    "tools": ["raen_law_lookup", "raen_ticker_analysis", "raen_dispute_letter", "raen_image_generate", "raen_contract_analysis"]
+    "tools": [
+      "raen_law_lookup",
+      "raen_ticker_analysis",
+      "raen_dispute_letter",
+      "raen_image_generate",
+      "raen_contract_analysis"
+    ],
+    "x402_json": "https://raen-mcp-gateway.fly.dev/mcp (POST for challenge)"
   },
   "services": [
-    {"name": "royal-ruby", "endpoint": "https://royal-ruby-x402.fly.dev", "tier": "flagship"},
-    {"name": "vault-pro", "endpoint": "https://vault-pro-x402.fly.dev"},
-    {"name": "dispute-forge", "endpoint": "https://dispute-forge-x402.fly.dev"},
-    {"name": "contract-eye", "endpoint": "https://contract-eye-x402.fly.dev"},
-    {"name": "escrow", "endpoint": "https://escrow-x402.fly.dev"},
-    {"name": "dispatch", "endpoint": "https://dispatch-x402.fly.dev"},
-    {"name": "nanobanana", "endpoint": "https://nanobanana-x402.fly.dev"},
-    {"name": "nft-alpha", "endpoint": "https://nft-alpha-x402.fly.dev"},
-    {"name": "tradingagents", "endpoint": "https://tradingagents-x402.fly.dev"},
-    {"name": "briefsnap", "endpoint": "https://briefsnap-x402.fly.dev"},
-    {"name": "sentry-forge", "endpoint": "https://sentry-forge-x402.fly.dev"},
-    {"name": "staci-tradingagents", "endpoint": "https://staci-tradingagents.fly.dev"}
+    {
+      "name": "royal-ruby",
+      "endpoint": "https://royal-ruby-x402.fly.dev",
+      "tier": "flagship",
+      "status": "live",
+      "skus": [
+        {
+          "name": "law-lookup",
+          "route": "/api/law-lookup",
+          "price_usd": 0.05,
+          "verified_402": "2026-11-21"
+        }
+      ],
+      "manifest_url": "https://royal-ruby-x402.fly.dev/.well-known/x402.json"
+    },
+    {
+      "name": "contract-eye",
+      "endpoint": "https://contract-eye-x402.fly.dev",
+      "tier": "flagship",
+      "status": "live",
+      "skus": [
+        {
+          "name": "analyze-contract",
+          "route": "/api/analyze-contract",
+          "price_usd": 0.05,
+          "verified_402": "2026-11-21"
+        }
+      ],
+      "manifest_url": "https://contract-eye-x402.fly.dev/.well-known/x402.json"
+    },
+    {
+      "name": "nanobanana",
+      "endpoint": "https://nanobanana-x402.fly.dev",
+      "status": "live",
+      "skus": [
+        {
+          "name": "generate-image",
+          "route": "/api/generate-image",
+          "price_usd": 0.01,
+          "verified_402": "2026-11-21"
+        }
+      ],
+      "manifest_url": "https://nanobanana-x402.fly.dev/.well-known/x402.json"
+    },
+    {
+      "name": "dispute-forge",
+      "endpoint": "https://dispute-forge-x402.fly.dev",
+      "status": "live",
+      "skus": [
+        {
+          "name": "dispute-pack",
+          "route": "/api/dispute-pack",
+          "price_usd": 0.1,
+          "verified_402": "2026-11-21"
+        }
+      ],
+      "manifest_url": "https://dispute-forge-x402.fly.dev/.well-known/x402.json"
+    },
+    {
+      "name": "briefsnap",
+      "endpoint": "https://briefsnap-x402.fly.dev",
+      "status": "live",
+      "skus": [
+        {
+          "name": "summarize",
+          "route": "/api/summarize",
+          "price_usd": 1.0,
+          "verified_402": "2026-11-21"
+        }
+      ],
+      "manifest_url": "https://briefsnap-x402.fly.dev/.well-known/x402.json"
+    }
   ],
   "how_to_pay": "POST your request; read the HTTP 402 'payment-required' header, pay accepts[].maxAmountRequired USDC to payTo on Base, retry with an X-PAYMENT header.",
   "free_tools": {
@@ -35,5 +102,21 @@
     "llms_txt": "https://bshelby88.github.io/raen-agent-directory/llms.txt",
     "first_call_free": "https://bshelby88.github.io/raen-first-call-free/",
     "udap_explorer": "https://raen-udap-explorer.vercel.app"
+  },
+  "verified_at": "2026-11-21T06:20:00Z",
+  "verification_method": "Live HTTP 402 payment-required header decoded on every listed paid endpoint; payTo + amount read from accepts[0].",
+  "clearing_catalog": "https://settlement-collector.fly.dev/clearing/catalog.json",
+  "clearing_api": "POST https://settlement-collector.fly.dev/clearing/intent",
+  "excluded_surfaces": {
+    "note": "These hostnames answer /health 200 but serve NO x402 manifest or paid challenge (verified 2026-11-21). Not buyable; do not route buyers here.",
+    "surfaces": [
+      "vault-pro",
+      "sentry-forge",
+      "tradingagents",
+      "escrow",
+      "dispatch",
+      "nft-alpha",
+      "staci-tradingagents (hostname down, HTTP 000)"
+    ]
   }
 }
