@@ -1,35 +1,36 @@
 {
-  "generated_at_utc": "2026-11-11T16:34:29.800192+00:00",
-  "week_ending_utc": "2026-11-11",
+  "generated_at_utc": "2026-11-22T22:19:34.395036+00:00",
+  "week_ending_utc": "2026-11-22",
   "totals": {
-    "revenue_usdc_all_time": 0.1,
+    "revenue_usdc_all_time": 9.751,
     "revenue_usdc_external": 0,
-    "settled_tx_count": 2,
-    "revenue_usd_24h": 0.1,
-    "settled_24h": 19,
-    "challenges_24h": 1905,
-    "convert_pct_24h": 1
+    "settled_tx_count": 63,
+    "revenue_usd_24h": 0,
+    "settled_24h": 0,
+    "challenges_24h": 2074,
+    "convert_pct_24h": 0,
+    "failed_24h": 104
   },
   "clients": [
     {
       "client": "BriefSnap",
       "service": "briefsnap",
-      "tasks_completed_week": 1,
-      "tasks_completed_all": 1,
+      "tasks_completed_week": 0,
+      "tasks_completed_all": 0,
       "value_settled_usdc": 0,
-      "challenges_week": 215,
-      "p50_ms": 1020,
-      "p95_ms": 1020
+      "challenges_week": 0,
+      "p50_ms": null,
+      "p95_ms": null
     },
     {
       "client": "Contract Eye",
       "service": "contract-eye",
-      "tasks_completed_week": 3,
-      "tasks_completed_all": 3,
-      "value_settled_usdc": 0,
-      "challenges_week": 234,
-      "p50_ms": 10100,
-      "p95_ms": 14323
+      "tasks_completed_week": 0,
+      "tasks_completed_all": 11,
+      "value_settled_usdc": 7.2,
+      "challenges_week": 618,
+      "p50_ms": 9925,
+      "p95_ms": 209564
     },
     {
       "client": "dispatch",
@@ -37,7 +38,7 @@
       "tasks_completed_week": 0,
       "tasks_completed_all": 0,
       "value_settled_usdc": 0,
-      "challenges_week": 127,
+      "challenges_week": 99,
       "p50_ms": null,
       "p95_ms": null
     },
@@ -57,7 +58,7 @@
       "tasks_completed_week": 0,
       "tasks_completed_all": 0,
       "value_settled_usdc": 0,
-      "challenges_week": 45,
+      "challenges_week": 59,
       "p50_ms": null,
       "p95_ms": null
     },
@@ -67,7 +68,7 @@
       "tasks_completed_week": 0,
       "tasks_completed_all": 0,
       "value_settled_usdc": 0,
-      "challenges_week": 231,
+      "challenges_week": 362,
       "p50_ms": null,
       "p95_ms": null
     },
@@ -77,19 +78,19 @@
       "tasks_completed_week": 0,
       "tasks_completed_all": 0,
       "value_settled_usdc": 0,
-      "challenges_week": 115,
+      "challenges_week": 104,
       "p50_ms": null,
       "p95_ms": null
     },
     {
       "client": "Royal Ruby (law lookup)",
       "service": "royal-ruby",
-      "tasks_completed_week": 15,
-      "tasks_completed_all": 15,
-      "value_settled_usdc": 0.1,
-      "challenges_week": 760,
-      "p50_ms": 1591,
-      "p95_ms": 7341
+      "tasks_completed_week": 0,
+      "tasks_completed_all": 50,
+      "value_settled_usdc": 2.451,
+      "challenges_week": 676,
+      "p50_ms": 5034,
+      "p95_ms": 137814
     },
     {
       "client": "sentry-forge",
@@ -97,7 +98,7 @@
       "tasks_completed_week": 0,
       "tasks_completed_all": 0,
       "value_settled_usdc": 0,
-      "challenges_week": 58,
+      "challenges_week": 59,
       "p50_ms": null,
       "p95_ms": null
     },
@@ -105,11 +106,11 @@
       "client": "tradingagents",
       "service": "tradingagents",
       "tasks_completed_week": 0,
-      "tasks_completed_all": 0,
-      "value_settled_usdc": 0,
-      "challenges_week": 43,
-      "p50_ms": null,
-      "p95_ms": null
+      "tasks_completed_all": 2,
+      "value_settled_usdc": 0.1,
+      "challenges_week": 0,
+      "p50_ms": 132131,
+      "p95_ms": 132131
     },
     {
       "client": "vault-pro",
@@ -117,7 +118,7 @@
       "tasks_completed_week": 0,
       "tasks_completed_all": 0,
       "value_settled_usdc": 0,
-      "challenges_week": 77,
+      "challenges_week": 97,
       "p50_ms": null,
       "p95_ms": null
     }
@@ -125,6 +126,25 @@
   "attribution_gap": {
     "distinct_payers": 0,
     "unattributed_tx": 0,
-    "note": "Collector payer attribution incomplete (INC-03 gap); value totals are from settled events and remain authoritative."
+    "note": "All 63 tx-verified settlements are RAEN-internal test traffic (payer in RAEN wallets list). External payers to date: 0. Value totals remain authoritative."
+  },
+  "honest_state_2026_11_22": {
+    "external_earned_all_time_usdc": 0.0,
+    "chain_scope": "Base (mainnet.base.org) + Ethereum mainnet spot-check (ethereum-rpc.publicnode.com)",
+    "external_received_not_earned_usdc": 0.05,
+    "received_not_earned_note": "2026-11-11 settle-crawler $0.05, unfulfilled; claim RAEN-8922B9225B open (owner-gated deliver-or-refund).",
+    "distribution_costs": {
+      "x402_list_listing_fee_usdc": 1.0,
+      "tx": "0xaf03728ca073a7c592623b9afa91b443cd8c0eeb62c99f2f4873f3be4fd41060",
+      "chain": "Base eip155:8453, block 60972319, EIP-3009 transferWithAuthorization, receipt status 0x1 (AuthorizationUsed + Transfer 1,000,000 atomic USDC), re-verified 2026-11-22",
+      "submission_id": "dbfe38f7-bff2-4535-b3fd-2de37ae798ee",
+      "state": "pending human review at x402-list.com",
+      "attribution_file": "ops/payments/X402LIST-FEE-ATTRIBUTION-20261122.md"
+    },
+    "agentcash_balance": {
+      "usdc_base": 2.687259,
+      "usdc_ethereum_mainnet": 15.0,
+      "verified": "2026-11-22 live balanceOf via mainnet.base.org and ethereum-rpc.publicnode.com"
+    }
   }
 }
