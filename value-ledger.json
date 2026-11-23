@@ -146,5 +146,47 @@
       "usdc_ethereum_mainnet": 15.0,
       "verified": "2026-11-22 live balanceOf via mainnet.base.org and ethereum-rpc.publicnode.com"
     }
+  },
+  "reconciliation_chain_truth_2026_11_22": {
+    "method": "Every settled tx in the live collector ledger (https://settlement-collector.fly.dev/ledger.json pulled 2026-11-22 late: 61 txs, face total $8.701) verified via eth_getTransactionReceipt on Base eip155:8453 (base-rpc.publicnode.com; mainnet.base.org returned HTTP 403 in this window), receipts decoded for ERC-20 Transfer logs and payer matched on-chain. Raw evidence: RAEN ops/franklin-work-20261122/reconcile-results.json.",
+    "buckets": {
+      "external": {
+        "count": 0,
+        "sum_usdc_chain_true": 0.0
+      },
+      "internal": {
+        "count": 61,
+        "sum_usdc_chain_true": 2.961,
+        "sum_usdc_ledger_face": 8.701
+      },
+      "unattributed": {
+        "count": 0,
+        "sum_usdc_chain_true": 0.0
+      }
+    },
+    "internal_by_service": {
+      "royal-ruby": {
+        "count": 49,
+        "ledger_face_usdc": 2.401,
+        "chain_true_usdc": 2.361
+      },
+      "contract-eye": {
+        "count": 10,
+        "ledger_face_usdc": 6.2,
+        "chain_true_usdc": 0.5
+      },
+      "tradingagents": {
+        "count": 2,
+        "ledger_face_usdc": 0.1,
+        "chain_true_usdc": 0.1
+      }
+    },
+    "findings": [
+      "All 61 ledger txs exist on Base with receipt status 0x1; on-chain Transfer.from == ledger payer (AgentCash 0xfbc0eb78...92240) and Transfer.to == fleet payee 0x9b8a27e0...13baf72f on every one \u2014 0 unattributed, 0 external.",
+      "AMOUNT DISCREPANCY: 8 of 61 ledger records overstate the on-chain transfer \u2014 6x contract-eye ledger $1.00 vs chain $0.05 (delta $5.70), 2x royal-ruby ledger $0.05 vs chain $0.03 (price A/B-test bucket, delta $0.04). Ledger face $8.701 vs chain-true $2.961: the collector's amount_usd field does not always equal the settled transfer value; chain figures are authoritative. Collector bug filed to backlog.",
+      "TOKEN NOTE: all 61 settles transfer token 0x833589fcd6edb6e08f4c7c32d4f71b54bda02913 (live eth_call: symbol 'USDC', name 'USD Coin', 6 decimals) \u2014 the fleet clearing-catalog asset (ops/steward/clearing_catalog.json), NOT canonical Base USDC 0x833589fcd6edb6e6722978f1c8e9fbb2d0892d9b. The two addresses share the first 16 hex chars ('0x833589fcd6edb6e') \u2014 lookalike-prefix pattern flagged to owner for the clearing-catalog asset choice.",
+      "External EARNED revenue remains $0.00 all-time under chain truth; the only external money ever received is the $0.05 settle-crawler payment (2026-11-11, unfulfilled, claim RAEN-8922B9225B open)."
+    ],
+    "verified_at_utc": "2026-11-23T03:0Z (session window)"
   }
 }
