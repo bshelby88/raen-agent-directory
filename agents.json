@@ -1,5 +1,5 @@
 {
-  "name": "RAEN — Royal Agentic Enterprises",
+  "name": "RAEN \u2014 Royal Agentic Enterprises",
   "url": "https://raen-blog-x402.fly.dev",
   "description": "Production x402 micropayment services on Base Mainnet (USDC) plus an x402-paid MCP gateway. This catalog lists only walls with a LIVE paid x402 challenge (402 decoded and verified 2026-11-21); running-but-unsellable surfaces are excluded so machines do not waste 402 probes.",
   "protocol": "x402",
@@ -30,7 +30,9 @@
           "name": "law-lookup",
           "route": "/api/law-lookup",
           "price_usd": 0.05,
-          "verified_402": "2026-11-21"
+          "verified_402": "2026-11-21",
+          "price_usd_ladder_2026_11_24": 0.005,
+          "price_note": "Owner-approved 2026-11-24 ladder price; repriced deploy rolling out \u2014 until it lands the live 402 shows the pre-ladder price and is authoritative. Bulk 10-99 @ $0.002, 100-500 @ $0.001; A/B ends."
         }
       ],
       "manifest_url": "https://royal-ruby-x402.fly.dev/.well-known/x402.json"
@@ -45,7 +47,9 @@
           "name": "analyze-contract",
           "route": "/api/analyze-contract",
           "price_usd": 0.05,
-          "verified_402": "2026-11-21"
+          "verified_402": "2026-11-21",
+          "price_usd_ladder_2026_11_24": 0.005,
+          "price_note": "Owner-approved 2026-11-24 ladder price; repriced deploy rolling out \u2014 until it lands the live 402 shows the pre-ladder price and is authoritative. Bulk 10-99 @ $0.002, 100+ @ $0.001."
         }
       ],
       "manifest_url": "https://contract-eye-x402.fly.dev/.well-known/x402.json"
@@ -59,7 +63,8 @@
           "name": "generate-image",
           "route": "/api/generate-image",
           "price_usd": 0.01,
-          "verified_402": "2026-11-21"
+          "verified_402": "2026-11-21",
+          "price_note": "Kept at $0.01 (real per-call model cost). Ladder adds bulk 10+ @ $0.008 and $0.001 liveness ack, rolling out."
         }
       ],
       "manifest_url": "https://nanobanana-x402.fly.dev/.well-known/x402.json"
@@ -73,7 +78,9 @@
           "name": "dispute-pack",
           "route": "/api/dispute-pack",
           "price_usd": 0.1,
-          "verified_402": "2026-11-21"
+          "verified_402": "2026-11-21",
+          "price_usd_ladder_2026_11_24": 0.01,
+          "price_note": "Owner-approved 2026-11-24 ladder price; repriced deploy rolling out \u2014 until it lands the live 402 shows the pre-ladder price and is authoritative. Bulk 10+ @ $0.005; $0.001 probe."
         }
       ],
       "manifest_url": "https://dispute-forge-x402.fly.dev/.well-known/x402.json"
@@ -81,7 +88,7 @@
     {
       "name": "briefsnap",
       "endpoint": "https://briefsnap-x402.fly.dev",
-      "status": "live",
+      "status": "retired_2026_11_24",
       "skus": [
         {
           "name": "summarize",
@@ -90,7 +97,8 @@
           "verified_402": "2026-11-21"
         }
       ],
-      "manifest_url": "https://briefsnap-x402.fly.dev/.well-known/x402.json"
+      "manifest_url": "https://briefsnap-x402.fly.dev/.well-known/x402.json",
+      "retired_note": "RETIRED (owner decision 2026-11-24): scale-to-zero, reversible, not purchase-eligible. Entry kept for the record, annotated \u2014 not deleted."
     }
   ],
   "how_to_pay": "POST your request; read the HTTP 402 'payment-required' header, pay accepts[].maxAmountRequired USDC to payTo on Base, retry with an X-PAYMENT header.",
@@ -118,5 +126,24 @@
       "nft-alpha",
       "staci-tradingagents (hostname down, HTTP 000)"
     ]
+  },
+  "pricing_decision_2026_11_24": {
+    "note": "Owner-approved 2026-11-24 ladder price; repriced deploy rolling out \u2014 until it lands the live 402 shows the pre-ladder price and is authoritative.",
+    "ladder_price_usd": {
+      "royal-ruby law-lookup": 0.005,
+      "royal-ruby validate-json": 0.005,
+      "contract-eye analyze-contract": 0.005,
+      "dispute-forge dispute-pack": 0.01,
+      "nanobanana generate-image": 0.01,
+      "raen-mcp-gateway tools/call": 0.005
+    },
+    "retired": [
+      "vault-pro",
+      "briefsnap",
+      "sentry-forge",
+      "tradingagents",
+      "staci-tradingagents"
+    ],
+    "retired_note": "Scale-to-zero (reversible), not purchase-eligible; annotated, never deleted."
   }
 }

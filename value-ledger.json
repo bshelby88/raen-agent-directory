@@ -188,5 +188,55 @@
       "External EARNED revenue remains $0.00 all-time under chain truth; the only external money ever received is the $0.05 settle-crawler payment (2026-11-11, unfulfilled, claim RAEN-8922B9225B open)."
     ],
     "verified_at_utc": "2026-11-23T03:0Z (session window)"
+  },
+  "decision_2026_11_24": {
+    "decision": "Nov-24 owner package APPROVED ('proceed with all now'); Box 3 machine-buyer price ladder ADOPTED and applied to all agent-editable copy surfaces (marked 'rolling out' until deploys land).",
+    "ladder_single_usd": {
+      "royal-ruby law-lookup": 0.005,
+      "royal-ruby validate-json": 0.005,
+      "contract-eye analyze-contract": 0.005,
+      "dispute-forge dispute-pack": 0.01,
+      "escrow create": 0.005,
+      "nanobanana generate/edit": 0.01,
+      "nft-alpha nft-signal": 0.005,
+      "suprapack find-skill": 0.005,
+      "dispatch": 0.01,
+      "tiffany-creative generate": 0.01,
+      "gateway tools/call": 0.005
+    },
+    "bulk_floors": "10-unit minimum; royal-ruby 10-99 @ $0.002 / 100-500 @ $0.001; contract-eye 10-99 @ $0.002 / 100+ @ $0.001; dispute-forge 10+ @ $0.005; escrow 10+ @ $0.003; nanobanana 10+ @ $0.008; nft-alpha/suprapack/gateway 10+ @ $0.002; dispatch 10+ @ $0.005",
+    "probes_usd": 0.001,
+    "router_bundles_usd": {
+      "market-starter": 0.01,
+      "intel-trio": 0.02,
+      "full-fleet-sampler": 0.03,
+      "fleet-bundle": 0.03,
+      "full-stack": 0.04,
+      "compliance-kit": 0.35,
+      "tip": 0.01
+    },
+    "human_billed_unchanged": {
+      "cold-start-kit": 5.0,
+      "briefsnap": "1.00-3.00",
+      "sentry-forge": 5.0,
+      "staci": 5.0
+    },
+    "x402_enterprise": "HOLD $0.75",
+    "retired_scale_to_zero_reversible": [
+      "vault-pro",
+      "briefsnap",
+      "sentry-forge",
+      "tradingagents",
+      "staci-tradingagents"
+    ],
+    "deploy_status_at_publish": "repriced deploys rolling out (Bean executing); live 402 challenges still show pre-ladder prices as of 2026-11-24 ~04:30Z",
+    "external_revenue_usd": 0.0,
+    "external_revenue_note": "unchanged; ladder removes the barrier, does not create demand",
+    "funnel_at_decision": {
+      "challenges_24h": 2113,
+      "settled_24h": 1,
+      "convert_pct": 0,
+      "revenue_external_usd_24h": 0
+    }
   }
 }
