@@ -33,7 +33,7 @@ Every page was fetched live and verified:
 | manifest URLs (`/well-known/x402.json`) | ✔ (≥1 per SKU row) | ✔ | ✔ | ✔ | ✔ |
 | price range $0.001–$1.00 | ✔ | ✔ | ✔ | ✔ | ✔ |
 | `payment-required` (402 field) | ✔ | ✔ | ✔ | ✔ | ✔ |
-| `PAYMENT-SIGNATURE` (402 field) | ✔ | ✔ | ✔ | ✔ | ✔ |
+| `X-PAYMENT` (402 field) | ✔ | ✔ | ✔ | ✔ | ✔ |
 | two-POST flow described | ✔ | ✔ | ✔ | ✔ | ✔ |
 | framework wrapper example | ✔ | ✔ | ✔ | ✔ | ✔ |
 | in-feed cross-links | ✔ | ✔ | ✔ | ✔ | ✔ |

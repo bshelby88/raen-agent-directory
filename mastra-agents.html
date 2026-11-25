@@ -22,7 +22,7 @@ th{background:#161b22;color:#c9d1d9}
 </head>
 <body>
 <h1>Paid API tools for Mastra agents (x402 · Base USDC)</h1>
-<p>Mastra agents pay per call for real work — no API keys, no signups, no monthly plans. Every endpoint below accepts <strong>USDC on Base</strong> via the <a href="https://www.x402.org/">x402</a> HTTP-native payment protocol: a request without payment gets a <code>402</code> challenge; you sign the challenge (EIP-3005 <code>transferWithAuthorization</code>) with your wallet and re-send with a <code>PAYMENT-SIGNATURE</code> header.</p>
+<p>Mastra agents pay per call for real work — no API keys, no signups, no monthly plans. Every endpoint below accepts <strong>USDC on Base</strong> via the <a href="https://www.x402.org/">x402</a> HTTP-native payment protocol: a request without payment gets a <code>402</code> challenge; you sign the challenge (EIP-3005 <code>transferWithAuthorization</code>) with your wallet and re-send with a <code>X-PAYMENT</code> header.</p>
 
 <h2>Two-POST payment flow (same for every endpoint)</h2>
 <pre>type Challenge = { accepts: Array&lt;Record&lt;string, unknown&gt;&gt; };
@@ -37,11 +37,11 @@ async function x402_call(url: string, body: unknown, sign: (c: Challenge) =&gt; 
   if (r.status !== 402) return r.json();
   const challenge: Challenge = JSON.parse(atob(r.headers.get("payment-required")!));
   // 2) sign the exact-scheme challenge with your Base wallet (EIP-3005),
-  //    then re-send with PAYMENT-SIGNATURE header
+  //    then re-send with X-PAYMENT header
   const sig = await sign(challenge);
   const r2 = await fetch(url, {
     method: "POST",
-    headers: { "content-type": "application/json", "PAYMENT-SIGNATURE": sig },
+    headers: { "content-type": "application/json", "X-PAYMENT": sig },
     body: JSON.stringify(body),
   });
   return r2.json();
@@ -90,7 +90,7 @@ export const raenAgent = new Agent({
 const result = await raenAgent.generate(
   "Analyze this lease for auto-renewal traps and cite the relevant UDAP statute: ..."
 );</pre>
-<p class="small">A <code>sign</code> implementation uses a viem/account-kit wallet: build the <code>transferWithAuthorization</code> EIP-712 message from <code>challenge.accepts[0]</code> (<code>from</code>, <code>to</code> = payTo, <code>value</code> in USDC base units, <code>validAfter/validBefore</code>, <code>nonce</code>), sign typed data on Base (chain 8453), serialize to the <code>PAYMENT-SIGNATURE</code> header. Fetch the service's <code>/.well-known/x402.json</code> live for the authoritative field list.</p>
+<p class="small">A <code>sign</code> implementation uses a viem/account-kit wallet: build the <code>transferWithAuthorization</code> EIP-712 message from <code>challenge.accepts[0]</code> (<code>from</code>, <code>to</code> = payTo, <code>value</code> in USDC base units, <code>validAfter/validBefore</code>, <code>nonce</code>), sign typed data on Base (chain 8453), serialize to the <code>X-PAYMENT</code> header. Fetch the service's <code>/.well-known/x402.json</code> live for the authoritative field list.</p>
 
 <h2>Endpoint catalog (live-manifest prices, verified 2026-11-13)</h2>
 <table>
@@ -134,8 +134,8 @@ import { Workflow, createStep } from "@mastra/core/workflows";
 <section id="x402-machine-block" aria-label="Machine-readable purchase information">
 <h2>Machine buy block — x402 per-call SKUs (Base USDC, eip155:8453, scheme exact)</h2>
 <meta name="x402-fingerprint" content="sha256:719483708e305157481584a02e3f52f71c50de4696a3503bc016560214078c6e">
-<p>Payment IS auth. Two-POST flow: (1) POST without payment → HTTP 402 challenge (EIP-3005, EIP-3009 transferWithAuthorization); (2) re-send the same POST with the signed quote in the <code>PAYMENT-SIGNATURE</code> header → 200 + result. No API keys, no accounts, per-call USDC settlement on Base. Prices below are the owner-approved 2026-11-24 ladder; repriced deploys are ROLLING OUT &mdash; until each lands, that service's live 402 challenge still shows the pre-ladder price and is authoritative at call time. Retired services (vault-pro, briefsnap, sentry-forge, tradingagents, staci-tradingagents) are scale-to-zero (reversible), not purchase-eligible.</p>
-<p class="cors-note">Payments CORS path / headers: <code>Access-Control-Allow-Origin: *</code> is set on <code>/api/*</code> POST routes (so agent SDKs can cross-origin fetch the paid endpoints); the client must also send <code>PAYMENT-SIGNATURE</code> (EIP-3005/EIP-3009 signed quote) — the header is required, not optional.</p>
+<p>Payment IS auth. Two-POST flow: (1) POST without payment → HTTP 402 challenge (EIP-3005, EIP-3009 transferWithAuthorization); (2) re-send the same POST with the signed quote in the <code>X-PAYMENT</code> header → 200 + result. No API keys, no accounts, per-call USDC settlement on Base. Prices below are the owner-approved 2026-11-24 ladder; repriced deploys are ROLLING OUT &mdash; until each lands, that service's live 402 challenge still shows the pre-ladder price and is authoritative at call time. Retired services (vault-pro, briefsnap, sentry-forge, tradingagents, staci-tradingagents) are scale-to-zero (reversible), not purchase-eligible.</p>
+<p class="cors-note">Payments CORS path / headers: <code>Access-Control-Allow-Origin: *</code> is set on <code>/api/*</code> POST routes (so agent SDKs can cross-origin fetch the paid endpoints); the client must also send <code>X-PAYMENT</code> (EIP-3005/EIP-3009 signed quote) — the header is required, not optional.</p>
 <table>
 <tr><th>SKU</th><th>Endpoint</th><th>Manifest price</th><th>Manifest (live quote source)</th></tr>
 <tr><td><code>royal-ruby/law-lookup</code> <em>(first call free (charge-and-rebate))</em></td><td><code>POST https://royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.005 (2026-11-24 ladder, deploy rolling out; bulk 10-99 @ $0.002, 100-500 @ $0.001; A/B ends once the deploy lands)</td><td><a href="https://royal-ruby-x402.fly.dev/.well-known/x402.json">https://royal-ruby-x402.fly.dev/.well-known/x402.json</a></td></tr>

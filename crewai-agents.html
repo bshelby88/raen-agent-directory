@@ -58,8 +58,8 @@ table{border-collapse:collapse;width:100%}td,th{border:1px solid var(--line);pad
 <section id="x402-machine-block" aria-label="Machine-readable purchase information">
 <h2>Machine buy block — x402 per-call SKUs (Base USDC, eip155:8453, scheme exact)</h2>
 <meta name="x402-fingerprint" content="sha256:719483708e305157481584a02e3f52f71c50de4696a3503bc016560214078c6e">
-<p>Payment IS auth. Two-POST flow: (1) POST without payment → HTTP 402 challenge (EIP-3005, EIP-3009 transferWithAuthorization); (2) re-send the same POST with the signed quote in the <code>PAYMENT-SIGNATURE</code> header → 200 + result. No API keys, no accounts, per-call USDC settlement on Base. Prices below are the owner-approved 2026-11-24 ladder; repriced deploys are ROLLING OUT &mdash; until each lands, that service's live 402 challenge still shows the pre-ladder price and is authoritative at call time. Retired services (vault-pro, briefsnap, sentry-forge, tradingagents, staci-tradingagents) are scale-to-zero (reversible), not purchase-eligible.</p>
-<p class="cors-note">Payments CORS path / headers: <code>Access-Control-Allow-Origin: *</code> is set on <code>/api/*</code> POST routes (so agent SDKs can cross-origin fetch the paid endpoints); the client must also send <code>PAYMENT-SIGNATURE</code> (EIP-3005/EIP-3009 signed quote) — the header is required, not optional.</p>
+<p>Payment IS auth. Two-POST flow: (1) POST without payment → HTTP 402 challenge (EIP-3005, EIP-3009 transferWithAuthorization); (2) re-send the same POST with the signed quote in the <code>X-PAYMENT</code> header → 200 + result. No API keys, no accounts, per-call USDC settlement on Base. Prices below are the owner-approved 2026-11-24 ladder; repriced deploys are ROLLING OUT &mdash; until each lands, that service's live 402 challenge still shows the pre-ladder price and is authoritative at call time. Retired services (vault-pro, briefsnap, sentry-forge, tradingagents, staci-tradingagents) are scale-to-zero (reversible), not purchase-eligible.</p>
+<p class="cors-note">Payments CORS path / headers: <code>Access-Control-Allow-Origin: *</code> is set on <code>/api/*</code> POST routes (so agent SDKs can cross-origin fetch the paid endpoints); the client must also send <code>X-PAYMENT</code> (EIP-3005/EIP-3009 signed quote) — the header is required, not optional.</p>
 <table>
 <tr><th>SKU</th><th>Endpoint</th><th>Manifest price</th><th>Manifest (live quote source)</th></tr>
 <tr><td><code>royal-ruby/law-lookup</code> <em>(first call free (charge-and-rebate))</em></td><td><code>POST https://royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.005 (2026-11-24 ladder, deploy rolling out; bulk 10-99 @ $0.002, 100-500 @ $0.001; A/B ends once the deploy lands)</td><td><a href="https://royal-ruby-x402.fly.dev/.well-known/x402.json">https://royal-ruby-x402.fly.dev/.well-known/x402.json</a></td></tr>
@@ -103,7 +103,7 @@ table{border-collapse:collapse;width:100%}td,th{border:1px solid var(--line);pad
 <p>Every endpoint publishes a machine-readable manifest at <code>https://&lt;host&gt;/.well-known/x402.json</code> — read it at call time for the live price and request schema rather than hardcoding either.</p>
 
 <h2>Wrapping one as a CrewAI tool</h2>
-<p>x402 is a two-POST flow: the first POST returns <code>402</code> with a <code>payment-required</code> header (a challenge naming price, payee, and network); your wallet signs a USDC <code>transferWithAuthorization</code> on Base and you re-send with a <code>PAYMENT-SIGNATURE</code> header. The <a href="https://github.com/coinbase/x402">x402 python SDK</a> handles the signing; you just wrap it as a <code>BaseTool</code>:</p>
+<p>x402 is a two-POST flow: the first POST returns <code>402</code> with a <code>payment-required</code> header (a challenge naming price, payee, and network); your wallet signs a USDC <code>transferWithAuthorization</code> on Base and you re-send with a <code>X-PAYMENT</code> header. The <a href="https://github.com/coinbase/x402">x402 python SDK</a> handles the signing; you just wrap it as a <code>BaseTool</code>:</p>
 <pre>from crewai.tools import BaseTool
 from pydantic import BaseModel
 
@@ -129,9 +129,9 @@ class ContractRiskTool(BaseTool):
         # 2) Sign the USDC transferWithAuthorization (x402 SDK or your signer)
         sig = sign_x402_payment(accepts, from_key=AGENT_KEY)
 
-        # 3) Re-send with PAYMENT-SIGNATURE
+        # 3) Re-send with X-PAYMENT
         r2 = httpx.post(URL, json={"text": text, "focus": focus},
-                        headers={"PAYMENT-SIGNATURE": sig})
+                        headers={"X-PAYMENT": sig})
         return r2.json()   # { risk_score, flagged_clauses[], suggested_edits }</pre>
 <p>Assign the tool to the crew member that needs it and the crew only spends when the task actually warrants $0.05 — every payment is an on-chain USDC transfer you can reconcile. The same endpoints also work from an <a href="https://raen-mcp-gateway.fly.dev/keys/request">MCP bearer-key gateway</a> if you prefer key-auth to wallet-auth, and from <a href="https://bshelby88.github.io/raen-agent-directory/langchain-agents.html">LangChain/LangGraph</a> or <a href="https://bshelby88.github.io/raen-agent-directory/haystack-agents.html">Haystack</a>, <a href="https://bshelby88.github.io/raen-agent-directory/semantic-kernel-agents.html">Semantic Kernel</a> and <a href="https://bshelby88.github.io/raen-agent-directory/n8n-automation.html">n8n</a> with the identical URLs.</p>
 
@@ -256,7 +256,7 @@ table{border-collapse:collapse;width:100%}td,th{border:1px solid var(--line);pad
 </table>
 <p>Steps 2→3→4 exercise your whole payment stack for $0.051 all-in. First-call-free walkthrough: <a href="https://bshelby88.github.io/raen-first-call-free/">bshelby88.github.io/raen-first-call-free</a>. <img src="https://settlement-collector.fly.dev/hit?src=crewai-buy-path" alt="" width="1" height="1" style="display:none"></p>
 </div>
-<p>Payment IS auth. Two-POST flow: (1) POST without payment → HTTP 402 challenge (EIP-3005, EIP-3009 transferWithAuthorization); (2) re-send the same POST with the signed quote in the <code>PAYMENT-SIGNATURE</code> header → 200 + result. No API keys, no accounts, per-call USDC settlement on Base. Prices below are the owner-approved 2026-11-24 ladder; repriced deploys are ROLLING OUT &mdash; until each lands, that service's live 402 challenge still shows the pre-ladder price and is authoritative at call time. Retired services (vault-pro, briefsnap, sentry-forge, tradingagents, staci-tradingagents) are scale-to-zero (reversible), not purchase-eligible.</p>
+<p>Payment IS auth. Two-POST flow: (1) POST without payment → HTTP 402 challenge (EIP-3005, EIP-3009 transferWithAuthorization); (2) re-send the same POST with the signed quote in the <code>X-PAYMENT</code> header → 200 + result. No API keys, no accounts, per-call USDC settlement on Base. Prices below are the owner-approved 2026-11-24 ladder; repriced deploys are ROLLING OUT &mdash; until each lands, that service's live 402 challenge still shows the pre-ladder price and is authoritative at call time. Retired services (vault-pro, briefsnap, sentry-forge, tradingagents, staci-tradingagents) are scale-to-zero (reversible), not purchase-eligible.</p>
 <table>
 <tr><th>SKU</th><th>Endpoint</th><th>Manifest price</th><th>Manifest (live quote source)</th></tr>
 <tr><td><code>royal-ruby/law-lookup</code> <em>(first call free (charge-and-rebate))</em></td><td><code>POST https://royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.005 (2026-11-24 ladder, deploy rolling out; bulk 10-99 @ $0.002, 100-500 @ $0.001; A/B ends once the deploy lands)</td><td><a href="https://royal-ruby-x402.fly.dev/.well-known/x402.json">https://royal-ruby-x402.fly.dev/.well-known/x402.json</a></td></tr>
@@ -300,7 +300,7 @@ table{border-collapse:collapse;width:100%}td,th{border:1px solid var(--line);pad
 <p>Every endpoint publishes a machine-readable manifest at <code>https://&lt;host&gt;/.well-known/x402.json</code> — read it at call time for the live price and request schema rather than hardcoding either.</p>
 
 <h2>Wrapping one as a CrewAI tool</h2>
-<p>x402 is a two-POST flow: the first POST returns <code>402</code> with a <code>payment-required</code> header (a challenge naming price, payee, and network); your wallet signs a USDC <code>transferWithAuthorization</code> on Base and you re-send with a <code>PAYMENT-SIGNATURE</code> header. The <a href="https://github.com/coinbase/x402">x402 python SDK</a> handles the signing; you just wrap it as a <code>BaseTool</code>:</p>
+<p>x402 is a two-POST flow: the first POST returns <code>402</code> with a <code>payment-required</code> header (a challenge naming price, payee, and network); your wallet signs a USDC <code>transferWithAuthorization</code> on Base and you re-send with a <code>X-PAYMENT</code> header. The <a href="https://github.com/coinbase/x402">x402 python SDK</a> handles the signing; you just wrap it as a <code>BaseTool</code>:</p>
 <pre>from crewai.tools import BaseTool
 from pydantic import BaseModel
 
@@ -326,9 +326,9 @@ class ContractRiskTool(BaseTool):
         # 2) Sign the USDC transferWithAuthorization (x402 SDK or your signer)
         sig = sign_x402_payment(accepts, from_key=AGENT_KEY)
 
-        # 3) Re-send with PAYMENT-SIGNATURE
+        # 3) Re-send with X-PAYMENT
         r2 = httpx.post(URL, json={"text": text, "focus": focus},
-                        headers={"PAYMENT-SIGNATURE": sig})
+                        headers={"X-PAYMENT": sig})
         return r2.json()   # { risk_score, flagged_clauses[], suggested_edits }</pre>
 <p>Assign the tool to the crew member that needs it and the crew only spends when the task actually warrants $0.05 — every payment is an on-chain USDC transfer you can reconcile. The same endpoints also work from an <a href="https://raen-mcp-gateway.fly.dev/keys/request">MCP bearer-key gateway</a> if you prefer key-auth to wallet-auth, and from <a href="https://bshelby88.github.io/raen-agent-directory/langchain-agents.html">LangChain/LangGraph</a> or <a href="https://bshelby88.github.io/raen-agent-directory/haystack-agents.html">Haystack</a>, <a href="https://bshelby88.github.io/raen-agent-directory/semantic-kernel-agents.html">Semantic Kernel</a> and <a href="https://bshelby88.github.io/raen-agent-directory/n8n-automation.html">n8n</a> with the identical URLs.</p>
 

@@ -22,7 +22,7 @@
    a crawler can verify the price table matches the manifest without re-downloading).
 2. **`payments-header` / `cors` fields missing** — the block lacked a machine-readable
    statement of the CORS policy (`Access-Control-Allow-Origin: *` on `/api/*` POST routes)
-   and the mandatory `PAYMENT-SIGNATURE` header. Added a `<p class="cors-note">` section.
+   and the mandatory `X-PAYMENT` header. Added a `<p class="cors-note">` section.
 3. **Buyable-discovery subdir surfaces missing the block** — `directories/index.html`,
    `quests/index.html`, `stats/index.html` now carry the block.
 
@@ -77,7 +77,7 @@
 - Added `<meta name="x402-fingerprint" content="sha256:<hash>">` to every block.
 - Added `<p class="cors-note">` to every block:
   - `Access-Control-Allow-Origin: *` set on `/api/*` POST routes
-  - `PAYMENT-SIGNATURE` header is required (EIP-3005/EIP-3009 signed quote).
+  - `X-PAYMENT` header is required (EIP-3005/EIP-3009 signed quote).
 
 ### 3.2 Page edits
 

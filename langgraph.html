@@ -54,7 +54,7 @@ var pb=document.querySelector('img[data-page-hit]'); if(pb) pb.src='https://sett
 </table>
 <p>Steps 2&rarr;3&rarr;4 exercise your whole payment stack for $0.051 all-in. First-call-free walkthrough: <a href="https://bshelby88.github.io/raen-first-call-free/">bshelby88.github.io/raen-first-call-free</a>. <img src="https://settlement-collector.fly.dev/hit?src=langgraph-buy-path" alt="" width="1" height="1" style="display:none"></p>
 </div>
-<p>Payment IS auth. Two-POST flow: (1) POST without payment &rarr; HTTP 402 challenge (EIP-3005, EIP-3009 transferWithAuthorization); (2) re-send the same POST with the signed quote in the <code>PAYMENT-SIGNATURE</code> header &rarr; 200 + result. No API keys, no accounts, per-call USDC settlement on Base. Manifest prices below fetched 2026-11-17.</p>
+<p>Payment IS auth. Two-POST flow: (1) POST without payment &rarr; HTTP 402 challenge (EIP-3005, EIP-3009 transferWithAuthorization); (2) re-send the same POST with the signed quote in the <code>X-PAYMENT</code> header &rarr; 200 + result. No API keys, no accounts, per-call USDC settlement on Base. Manifest prices below fetched 2026-11-17.</p>
 <table>
 <tr><th>SKU</th><th>Endpoint</th><th>Manifest price</th><th>Manifest (live quote source)</th></tr>
 <tr><td><code>langgraph/tool-call</code></td><td><code>POST https://dispatch-X402.fly.dev/dispatch</code></td><td>$0.01 (2026-11-24 ladder, deploy rolling out; bulk 10+ @ $0.005)</td><td><a href="https://dispatch-X402.fly.dev/.well-known/x402.json">https://dispatch-X402.fly.dev/.well-known/x402.json</a></td></tr>
@@ -73,7 +73,7 @@ curl -s -X POST https://settlement-collector.fly.dev/clearing/record \
   -H 'Content-Type: application/json' -d '{"tx":"0xabc...","sku":"law-lookup"}'   # -> status: settled</pre>
 <p>Lifecycle: <code>GET https://settlement-collector.fly.dev/clearing/status/&lt;tx&gt;</code>. Full SKU catalog: <a href="https://settlement-collector.fly.dev/clearing/catalog.json">settlement-collector.fly.dev/clearing/catalog.json</a>.</p>
 <h2>Wrapping one as a tool</h2>
-<p>x402 is a two-POST flow: the first POST returns <code>402</code> with a <code>payment-required</code> header (a challenge naming price, payee, and network); your wallet signs a USDC <code>transferWithAuthorization</code> on Base and you re-send with a <code>PAYMENT-SIGNATURE</code> header. The <a href="https://github.com/coinbase/x402">x402 python SDK</a> handles the signing.</p>
+<p>x402 is a two-POST flow: the first POST returns <code>402</code> with a <code>payment-required</code> header (a challenge naming price, payee, and network); your wallet signs a USDC <code>transferWithAuthorization</code> on Base and you re-send with a <code>X-PAYMENT</code> header. The <a href="https://github.com/coinbase/x402">x402 python SDK</a> handles the signing.</p>
 <pre># {wrapper} &mdash; one tool, one cost
 from agents import function_tool
 import httpx, json, base64
@@ -92,8 +92,8 @@ async def my_tool(text: str) -&gt; str:
         accepts = challenge[&quot;accepts&quot;][0]   # scheme exact, eip155:8453, USDC
         # 2) Sign the USDC transferWithAuthorization
         sig = await sign_x402_payment(accepts, from_key=AGENT_KEY)
-        # 3) Re-send with PAYMENT-SIGNATURE
-        r2 = await c.post(url, json=body, headers={&quot;PAYMENT-SIGNATURE&quot;: sig})
+        # 3) Re-send with X-PAYMENT
+        r2 = await c.post(url, json=body, headers={&quot;X-PAYMENT&quot;: sig})
         return r2.json() if r2.status_code == 200 else json.dumps({&quot;error&quot;: r2.status_code})</pre>
 <p>Hand the tool to your agent and it only spends when the task actually warrants $0.05 &mdash; every payment is an on-chain USDC transfer you can reconcile. The same endpoints also work from an <a href="https://raen-mcp-gateway.fly.dev/keys/request">MCP bearer-key gateway</a> if you prefer key-auth to wallet-auth, and from other agent runtimes with the identical URLs.</p>
 <h2>Why pay-per-call beats a key/subscription</h2>

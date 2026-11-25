@@ -36,7 +36,7 @@ def x402_call(url: str, body: dict, signer) -> dict:
     # 2) sign the exact-scheme challenge with your Base wallet (EIP-3009
     #    transferWithAuthorization), then re-send with the payment header
     sig = signer.sign_challenge(challenge)
-    r2 = requests.post(url, json=body, headers={"PAYMENT-SIGNATURE": sig})
+    r2 = requests.post(url, json=body, headers={"X-PAYMENT": sig})
     return r2.json()</pre>
 <p class="small">Any EIP-3009 signer works. Alternative: RAEN's Bearer-gated MCP gateway at <code>https://raen-mcp-gateway.fly.dev/mcp</code> — free dev key via <code>POST /keys/request</code> (30-day key, email verification), same tools over MCP. Camel-AI can consume MCP servers through its MCP toolkits, so the gateway is usable without writing any HTTP-payment code.</p>
 
@@ -111,8 +111,8 @@ task = wf.process_task("Check this collection letter for FDCPA violations")</pre
 <section id="x402-machine-block" aria-label="Machine-readable purchase information">
 <h2>Machine buy block — x402 per-call SKUs (Base USDC, eip155:8453, scheme exact)</h2>
 <meta name="x402-fingerprint" content="sha256:719483708e305157481584a02e3f52f71c50de4696a3503bc016560214078c6e">
-<p>Payment IS auth. Two-POST flow: (1) POST without payment → HTTP 402 challenge (EIP-3005, EIP-3009 transferWithAuthorization); (2) re-send the same POST with the signed quote in the <code>PAYMENT-SIGNATURE</code> header → 200 + result. No API keys, no accounts, per-call USDC settlement on Base. Prices below are the owner-approved 2026-11-24 ladder; repriced deploys are ROLLING OUT &mdash; until each lands, that service's live 402 challenge still shows the pre-ladder price and is authoritative at call time. Retired services (vault-pro, briefsnap, sentry-forge, tradingagents, staci-tradingagents) are scale-to-zero (reversible), not purchase-eligible.</p>
-<p class="cors-note">Payments CORS path / headers: <code>Access-Control-Allow-Origin: *</code> is set on <code>/api/*</code> POST routes (so agent SDKs can cross-origin fetch the paid endpoints); the client must also send <code>PAYMENT-SIGNATURE</code> (EIP-3005/EIP-3009 signed quote) — the header is required, not optional.</p>
+<p>Payment IS auth. Two-POST flow: (1) POST without payment → HTTP 402 challenge (EIP-3005, EIP-3009 transferWithAuthorization); (2) re-send the same POST with the signed quote in the <code>X-PAYMENT</code> header → 200 + result. No API keys, no accounts, per-call USDC settlement on Base. Prices below are the owner-approved 2026-11-24 ladder; repriced deploys are ROLLING OUT &mdash; until each lands, that service's live 402 challenge still shows the pre-ladder price and is authoritative at call time. Retired services (vault-pro, briefsnap, sentry-forge, tradingagents, staci-tradingagents) are scale-to-zero (reversible), not purchase-eligible.</p>
+<p class="cors-note">Payments CORS path / headers: <code>Access-Control-Allow-Origin: *</code> is set on <code>/api/*</code> POST routes (so agent SDKs can cross-origin fetch the paid endpoints); the client must also send <code>X-PAYMENT</code> (EIP-3005/EIP-3009 signed quote) — the header is required, not optional.</p>
 <table>
 <tr><th>SKU</th><th>Endpoint</th><th>Manifest price</th><th>Manifest (live quote source)</th></tr>
 <tr><td><code>royal-ruby/law-lookup</code> <em>(first call free (charge-and-rebate))</em></td><td><code>POST https://royal-ruby-x402.fly.dev/api/law-lookup</code></td><td>$0.005 (2026-11-24 ladder, deploy rolling out; bulk 10-99 @ $0.002, 100-500 @ $0.001; A/B ends once the deploy lands)</td><td><a href="https://royal-ruby-x402.fly.dev/.well-known/x402.json">https://royal-ruby-x402.fly.dev/.well-known/x402.json</a></td></tr>
